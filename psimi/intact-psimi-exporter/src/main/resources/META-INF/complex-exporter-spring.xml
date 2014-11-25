@@ -12,384 +12,32 @@
            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
            http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
 
-    <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.psimi.exporter" />
-    <context:component-scan base-package="uk.ac.ebi.intact.jami" />
-
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
-        <property name="locations">
-            <list>
-                <value>classpath*:/exporter.properties</value>
-            </list>
-        </property>
-    </bean>
-
-    <import resource="classpath*:/META-INF/psimi-batch-spring.xml"/>
-    <context:annotation-config/>
-    <tx:annotation-driven proxy-target-class="true"/>
-
-    <!-- so the @Transactional annotations work -->
-    <tx:annotation-driven transaction-manager="jamiTransactionManager"/>
-
-    <!--
-        Post-processor to perform exception translation on @Repository classes
-        (from native exceptions such as JPA PersistenceExceptions to
-        Spring&rsquo;s DataAccessException hierarchy).
-    -->
-    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
-    <!--  BeanPostProcessor that processes PersistenceUnit and PersistenceContext annotations,
-    for injection of the corresponding JPA resources EntityManagerFactory and EntityManager.
-    Any such annotated fields or methods in any Spring-managed object will automatically be injected.
-    This post-processor will inject sub-interfaces of EntityManagerFactory and EntityManager if the annotated
-    fields or methods are declared as such. The actual type will be verified early, with the exception of
-    a shared ("transactional") EntityManager reference, where type mismatches might be detected as late as on
-    the first actual invocation. -->
-    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
-
-    <!-- for autowired annotations to work propertly -->
-    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
-
-    <!-- JPATransactionManager is not dependent on hibernate. It is a more global platform -->
-    <!-- We use entity manager because it is JPA and not just specific to hibernate -->
-    <bean id="jamiTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-        <property name="dataSource" ref="jamiCoreDataSource"/>
-        <qualifier value="jamiTransactionManager"/>
-    </bean>
-
-
-    <!-- The LocalContainerEntityManagerFactoryBean gives full control over EntityManagerFactory configuration
-    and is appropriate for environments where fine-grained customization is required-->
-    <bean id="intactEntityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="persistenceUnitName" value="intact-jami"/>
-        <property name="persistenceXmlLocation" value="classpath*:/META-INF/jami-persistence.xml"/>
-        <property name="dataSource" ref="jamiCoreDataSource"/>
-        <property name="jpaProperties">
-            <props>
-                <prop key="hibernate.generate_statistics">true</prop>
-                <prop key="hibernate.format_sql">false</prop>
-                <prop key="hibernate.hbm2ddl.auto">${db.hbm2ddl}</prop>
-                <prop key="hibernate.connection.release_mode">after_transaction</prop>
-            </props>
-        </property>
-        <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-                <property name="databasePlatform" value="${db.platform}"/>
-                <property name="showSql" value="false"/>
-                <property name="generateDdl" value="false"/>
-            </bean>
-        </property>
-    </bean>
-    <!-- Intact core basic datasource -->
-    <bean id="jamiCoreDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${db.driver}"/>
-        <property name="url" value="${db.url}"/>
-        <property name="username" value="${db.user}"/>
-        <property name="password" value="${db.password}"/>
-    </bean>
-
-    <!-- INTACT more specific beans -->
-    <bean id="jamiUserContext" class="uk.ac.ebi.intact.jami.context.UserContext" scope="prototype">
-        <property name="userId" value="${jami.user.context.id}"/>
-    </bean>
-
-    <bean id="intactJamiConfiguration" class="uk.ac.ebi.intact.jami.context.IntactConfiguration" scope="prototype">
-        <property name="acPrefix" value="${ac.prefix}"/>
-        <property name="defaultInstitution" ref="sourceIntact"/>
-    </bean>
-
-    <!-- Default institutions -->
-    <bean id="sourceIntact" class="uk.ac.ebi.intact.jami.model.extension.IntactSource">
-        <constructor-arg index="0" value="intact"/>
-        <property name="fullName" value="European Bioinformatics Institute"/>
-        <property name="MIIdentifier" value="MI:0469"/>
-        <property name="url" value="http://www.ebi.ac.uk/intact/"/>
-        <property name="postalAddress" value="European Bioinformatics Institute; Wellcome Trust Genome Campus; Hinxton, Cambridge; CB10 1SD; United Kingdom"/>
-    </bean>
+    <import resource="classpath*:/META-INF/intact-exporter-base-spring.xml"/>
 
     <!-- readers -->
-    <!-- simple interaction evidence reader -->
-    <bean id="intactInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
-        <property name="queryString" value="select i from IntactInteractionEvidence i
-        order by i.created, i.ac"/>
-        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-    </bean>
-    <!-- simple negative interaction evidence reader -->
-    <bean id="intactNegativeInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
-        <property name="queryString" value="select i from IntactInteractionEvidence i
-        join i.dbAnnotations as a
-        where a.topic.shortName = :negative
-        order by i.created, i.ac"/>
-        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-        <property name="parameterValues">
-            <map>
-                <entry key="negative" value="negative"/>
-            </map>
-        </property>
-    </bean>
-    <!-- simple positive interaction evidence reader -->
-    <bean id="intactPositiveInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
-        <property name="queryString" value="select i from IntactInteractionEvidence i
-        where i.ac not in
-        (select distinct i2.ac from IntactInteractionEvidence i2
-        join i2.dbAnnotations as a
-        where a.topic.shortName = :negative)
-        order by i.created, i.ac"/>
-        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-        <property name="parameterValues">
-            <map>
-                <entry key="negative" value="negative"/>
-            </map>
-        </property>
-    </bean>
     <!-- simple complex reader -->
-    <bean id="intactComplexReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+    <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true" scope="prototype">
         <property name="queryString" value="select i from IntactComplex i
-        order by i.created, i.ac"/>
+        order by i.organism.ac, i.ac"/>
         <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
     </bean>
-
-    <!-- simple publication reader -->
-    <bean id="intactPublicationReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
-        <property name="queryString" value="select i from IntactPublication i
-        where i.shortLabel &lt;&gt; :intactPub
-        order by i.created, i.ac"/>
-        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-        <property name="parameterValues">
-            <map>
-                <entry key="intactPub" value="14681455"/>
-            </map>
-        </property>
+    <!-- complex archive reader -->
+    <bean id="complexSpeciesArchive25Reader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.SubDirectoryArchiveReader" lazy-init="true">
+        <property name="directory" value="${release.folder}/complex/psi25"/>
     </bean>
-    <!-- reader returning publication label with publication ordered by species
-    <bean id="publicationOrderedBySpeciesReader" class="org.springframework.batch.item.database.JdbcCursorItemReader" lazy-init="true">
-        <property name="dataSource" ref="intactReleaseDataSource"/>
-        <property name="sql" value="select distinct p.shortlabel as pubid, EXTRACT (YEAR FROM p.created ) as year, b.shortlabel as species, e.shortlabel as experiment_label, v.count_interaction as total_interactions, greatest(2000, v.count_interaction)
-        from ia_publication p
-        join ia_experiment e on p.ac = e.publication_ac
-        join ia_int2exp ie on ie.experiment_ac = e.ac
-        join ia_component c on ie.interaction_ac = c.interaction_ac
-        join ia_interactor i on i.ac = c.interactor_ac
-        join ia_biosource b on b.ac = i.biosource_ac
-        join (select count(ie2.interaction_ac) as count_interaction, ie2.experiment_ac as experiment_ac
-        from ia_int2exp ie2 group by ie2.experiment_ac) v on v.experiment_ac = e.ac
-        where p.shortLabel != '14681455'
-        group by b.shortlabel, p.shortlabel, e.shortlabel, p.created, v.count_interaction
-        order by b.shortlabel, greatest(2000, v.count_interaction) DESC, p.shortlabel, v.count_interaction DESC, e.shortLabel"/>
-        <property name="rowMapper">
-            <bean class="uk.ac.ebi.intact.release.psixml.species.classification.PublicationSpeciesRowMapper"/>
-        </property>
-    </bean> -->
-    <!-- the reader will read publication shortlabel, publication created year and dataset. It will order the results first by dataset and then by publication id-->
-    <!--<bean id="publicationOrderedByDatasetReader" class="org.springframework.batch.item.database.JdbcCursorItemReader" lazy-init="true">
-        <property name="dataSource" ref="intactReleaseDataSource"/>
-        <property name="sql" value="select distinct p.shortlabel as pubid, EXTRACT ( YEAR FROM p.created ) as year, a.description as dataset
-        from ia_publication p
-        join ia_pub2annot pa on p.ac = pa.publication_ac
-        join ia_annotation a on pa.annotation_ac = a.ac
-        join ia_controlledvocab c on c.ac = a.topic_ac
-        where p.shortLabel != '14681455'
-        and c.shortlabel='dataset'
-        order by a.description, EXTRACT ( YEAR FROM p.created ), p.shortLabel"/>
-        <property name="rowMapper">
-            <bean class="uk.ac.ebi.intact.release.psixml.dataset.PublicationDatasetRowMapper"/>
-        </property>
-    </bean>-->
-
-    <!-- processors -->
-    <bean id="releaseFileNameGenerator" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.util.FileNameGenerator">
-        <property name="separator" value="_"/>
-        <property name="negativeTag" value="negative"/>
-        <property name="characterToTruncate" value="("/>
-    </bean>
-    <bean id="intactPublicationXmlProcessor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationExportChunkProcessor" lazy-init="true">
-        <property name="largeScale" value="2000"/>
-        <property name="publicationNameGenerator" ref="releaseFileNameGenerator"/>
-    </bean>
-    <bean id="publicationMitabProcessor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationExportProcessor" lazy-init="true">
-        <property name="publicationNameGenerator" ref="releaseFileNameGenerator"/>
+    <bean id="complexSpeciesArchive30Reader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.SubDirectoryArchiveReader" lazy-init="true">
+        <property name="directory" value="${release.folder}/complex/psi30"/>
     </bean>
 
-    <!-- writers -->
-    <bean id="spokeExpansion" class="psidev.psi.mi.jami.binary.expansion.InteractionEvidenceSpokeExpansion" lazy-init="true"/>
+    <!-- processor -->
+    <bean id="intactComplexXmlProcessor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.complexes.ComplexProcessor" lazy-init="true">
+        <property name="speciesNameGenerator" value="releaseFileNameGenerator"/>
+    </bean>
 
-    <!-- interaction writer -->
-    <bean id="miFileOutput" class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg value="${mi.output}"/>
-    </bean>
-    <!-- interaction evidence html writer -->
-    <bean id="intactHtmlEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactHtmlExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
-                <entry key="output_format_key" value="mi_html"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <!-- complex html writer -->
-    <bean id="intactHtmlComplexWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactHtmlExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="write_html_header_option_key" value-type="java.lang.Boolean" value="true" />
-                <entry key="output_format_key" value="mi_html"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="modelled"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <!-- interaction evidence json writer -->
-    <bean id="intactJsonEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactInteractionViewerJsonExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="interaction_viewer_json_type" value-type="psidev.psi.mi.jami.json.MIJsonType" value="n_ary_only" />
-                <entry key="output_format_key" value="interaction_viewer_json"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <!-- complex json writer -->
-    <bean id="intactJsonComplexWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactInteractionViewerJsonExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="interaction_viewer_json_type" value-type="psidev.psi.mi.jami.json.MIJsonType" value="n_ary_only" />
-                <entry key="output_format_key" value="interaction_viewer_json"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="modelled"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <!-- interaction evidence structured abstract writer -->
-    <bean id="intactStructuredAbstractEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStructuredAbstractExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="structured_abstract_type" value-type="uk.ac.ebi.intact.dataexchange.structuredabstract.AbstractOutputType" value="ABSTRACT_HTML_OUTPUT" />
-                <entry key="output_format_key" value="structured_abstract"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <!-- complex structured abstract writer -->
-    <bean id="intactStructuredAbstractComplexWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStructuredAbstractExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="structured_abstract_type" value-type="uk.ac.ebi.intact.dataexchange.structuredabstract.AbstractOutputType" value="ABSTRACT_HTML_OUTPUT" />
-                <entry key="output_format_key" value="structured_abstract"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <!-- interaction evidence xml writers -->
-    <bean id="intactEvidenceXml25CompactWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="intactEvidenceXml25ExpandedWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="intactEvidenceXml30CompactWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="intactEvidenceXml30ExpandedWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="intactEvidenceXml25CompactChunkWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileChunkExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="intactEvidenceXml25ExpandedChunkWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileChunkExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="intactEvidenceXml30CompactChunkWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileChunkExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="intactEvidenceXml30ExpandedChunkWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileChunkExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <!-- complex xml writer -->
-    <bean id="intactComplexXml25CompactWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+   <!-- writers -->
+    <bean id="intactComplexXml25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.complexes.ComplexXmlWriter" lazy-init="true">
+        <property name="parentFolderPaths" value="${release.folder}/complex/psi25"/>
+        <property name="extension" value=".xml"/>
         <property name="writerOptions">
             <map>
                 <entry key="output_format_key" value="psimi_xml"/>
@@ -398,24 +46,13 @@
                 <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
                 <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
             </map>
         </property>
-        <property name="output" ref="miFileOutput"/>
     </bean>
-    <bean id="intactComplexXml25ExpandedWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="intactComplexXml30CompactWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
+    <bean id="intactComplexXml30Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.complexes.ComplexXmlWriter" lazy-init="true">
+        <property name="parentFolderPaths" value="${release.folder}/complex/psi30"/>
+        <property name="extension" value=".xml"/>
         <property name="writerOptions">
             <map>
                 <entry key="output_format_key" value="psimi_xml"/>
@@ -424,193 +61,195 @@
                 <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
                 <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="intactComplexXml30ExpandedWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="expanded"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="complex"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <!-- mitab exporters -->
-    <bean id="mitabEvidence27Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
-                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_7"/>
-                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
-                <entry key="output_format_key" value="mitab"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="mitabEvidence26Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
-                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_6"/>
-                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
-                <entry key="output_format_key" value="mitab"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <bean id="mitabEvidence25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
-        <property name="writerOptions">
-            <map>
-                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
-                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_5"/>
-                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
-                <entry key="output_format_key" value="mitab"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-        <property name="output" ref="miFileOutput"/>
-    </bean>
-    <!-- XML 25 publication writer -->
-    <bean id="intactPublicationXml25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationFileEntryXmlWriter" lazy-init="true">
-        <property name="parentFolderPaths" value="#{releaseConfig.releaseDir}/psi25/pmid"/>
-        <property name="fileExtension" value=".xml"/>
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v2_5_4"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
+                <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
             </map>
         </property>
     </bean>
-    <!-- XML 30 publication writer -->
-    <bean id="intactPublicationXml30Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationFileEntryXmlWriter" lazy-init="true">
-        <property name="parentFolderPaths" value="#{releaseConfig.releaseDir}/psi30/pmid"/>
-        <property name="fileExtension" value=".xml"/>
-        <property name="writerOptions">
-            <map>
-                <entry key="output_format_key" value="psimi_xml"/>
-                <entry key="xml25_type_key" value-type="psidev.psi.mi.jami.xml.PsiXmlType" value="compact"/>
-                <entry key="write_complex_as_interactor_key" value-type="java.lang.Boolean" value="false"/>
-                <entry key="xml_version_key" value-type="psidev.psi.mi.jami.xml.PsiXmlVersion" value="v3_0_0"/>
-                <entry key="xml25_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-    </bean>
-    <!-- MITAB 2.7 publication writer -->
-    <bean id="intactPublicationMitab27Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationFileEntryXmlWriter" lazy-init="true">
-        <property name="parentFolderPaths" value="#{releaseConfig.releaseDir}/psimitab/pmid"/>
-        <property name="fileExtension" value=".txt"/>
-        <property name="writerOptions">
-            <map>
-                <entry key="mitab_header_key" value-type="java.lang.Boolean" value="true" />
-                <entry key="mitab_extended_key" value-type="java.lang.Boolean" value="false" />
-                <entry key="mitab_version_key" value-type="psidev.psi.mi.jami.tab.MitabVersion" value="v2_7"/>
-                <entry key="complex_expansion_key" value-ref="spokeExpansion"/>
-                <entry key="output_format_key" value="mitab"/>
-                <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
-            </map>
-        </property>
-    </bean>
-    <!-- composite publication writer -->
-    <bean id="intactPublicationCompositeXmlWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.CompositePublicationFileEntryWriter"
-          lazy-init="true">
+    <bean id="intactComplexXmlWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.complexes.CompositeComplexWriter" lazy-init="true">
         <property name="delegates">
             <list>
-                <ref bean="intactPublicationXml25Writer"/>
-                <ref bean="intactPublicationXml30Writer"/>
+                <ref bean="intactComplexXml25Writer"/>
+                <ref bean="intactComplexXml30Writer"/>
             </list>
         </property>
     </bean>
 
-    <!-- Export Steps -->
-    <batch:step id="xml25.publicationStep" job-repository="basicBatchJobRepository">
+    <!-- tasklets -->
+    <bean id="compressorComplexesXml25Tasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorByFileExtensionsTasklet">
+        <property name="outputFile" value="${release.folder}/complex/psi25/complexesMIF25.zip"/>
+        <property name="compressor" ref="zipCompressor"/>
+        <property name="directory" value="${release.folder}/complex/psi25"/>
+        <property name="extensions">
+            <list>
+                <value>xml</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="compressorComplexesXml30Tasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorByFileExtensionsTasklet">
+        <property name="outputFile" value="${release.folder}/complex/psi30/complexesMIF30.zip"/>
+        <property name="compressor" ref="zipCompressor"/>
+        <property name="directory" value="${release.folder}/complex/psi30"/>
+        <property name="extensions">
+            <list>
+                <value>xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- steps -->
+    <!-- step to export complex XML 2.5 files -->
+    <batch:step id="xml25.complexStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
 
-            <batch:chunk reader="intactPublicationReader"
-                         processor="intactPublicationXmlProcessor"
-                         writer="intactPublicationXml25Writer"
-                         commit-interval="1">
+            <batch:chunk reader="intactComplexOrderedBySpeciesReader"
+                         processor="intactComplexXmlProcessor"
+                         writer="intactComplexXml25Writer"
+                         commit-interval="10">
                 <batch:streams>
-                    <batch:stream ref="intactPublicationReader"/>
-                    <batch:stream ref="intactPublicationXmlProcessor"/>
-                    <batch:stream ref="intactPublicationXml25Writer"/>
+                    <batch:stream ref="intactComplexOrderedBySpeciesReader"/>
+                    <batch:stream ref="intactComplexXml25Writer"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
-    <batch:step id="xml30.publicationStep" job-repository="basicBatchJobRepository">
+    <!-- step to export complex XML 3.0 files -->
+    <batch:step id="xml30.complexStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
 
-            <batch:chunk reader="intactPublicationReader"
-                         processor="intactPublicationXmlProcessor"
-                         writer="intactPublicationXml30Writer"
-                         commit-interval="1">
+            <batch:chunk reader="intactComplexOrderedBySpeciesReader"
+                         processor="intactComplexXmlProcessor"
+                         writer="intactComplexXml30Writer"
+                         commit-interval="10">
                 <batch:streams>
-                    <batch:stream ref="intactPublicationReader"/>
-                    <batch:stream ref="intactPublicationXmlProcessor"/>
-                    <batch:stream ref="intactPublicationXml30Writer"/>
+                    <batch:stream ref="intactComplexOrderedBySpeciesReader"/>
+                    <batch:stream ref="intactComplexXml30Writer"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
-    <batch:step id="mitab27.publicationStep" job-repository="basicBatchJobRepository">
+    <!-- step to export complex XML 2.5 and 3.0 files -->
+    <batch:step id="xml.complexStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
 
-            <batch:chunk reader="intactPublicationReader"
-                         processor="publicationMitabProcessor"
-                         writer="intactPublicationMitab27Writer"
-                         commit-interval="1">
+            <batch:chunk reader="intactComplexOrderedBySpeciesReader"
+                         processor="intactComplexXmlProcessor"
+                         writer="intactComplexXmlWriter"
+                         commit-interval="10">
                 <batch:streams>
-                    <batch:stream ref="intactPublicationReader"/>
-                    <batch:stream ref="publicationMitabProcessor"/>
-                    <batch:stream ref="intactPublicationMitab27Writer"/>
+                    <batch:stream ref="intactComplexOrderedBySpeciesReader"/>
+                    <batch:stream ref="intactComplexXml25Writer"/>
+                    <batch:stream ref="intactComplexXml30Writer"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
-    <batch:step id="xml.publicationStep" job-repository="basicBatchJobRepository">
+    <!-- step to zip each complex XML 2.5 files -->
+    <batch:step id="zip.singleComplexXml25Step" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
 
-            <batch:chunk reader="intactPublicationReader"
-                         processor="intactPublicationXmlProcessor"
-                         writer="intactPublicationCompositeXmlWriter"
-                         commit-interval="1">
+            <batch:chunk reader="complexSpeciesArchive25Reader"
+                         writer="intactFileArchiveWriter"
+                         commit-interval="50">
                 <batch:streams>
-                    <batch:stream ref="intactPublicationReader"/>
-                    <batch:stream ref="intactPublicationXmlProcessor"/>
-                    <batch:stream ref="intactPublicationCompositeXmlWriter"/>
+                    <batch:stream ref="complexSpeciesArchive25Reader"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
+    <!-- step to zip each complex XML 3.0 files -->
+    <batch:step id="zip.singleComplexXml30Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
 
-    <!-- Export job -->
+            <batch:chunk reader="complexSpeciesArchive30Reader"
+                         writer="intactFileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="complexSpeciesArchive30Reader"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip all xml 2.5 complex files -->
+    <batch:step id="zip.allComplexesXml25Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" ref="compressorComplexesXml25Tasklet" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip all xml 3.0  complex files -->
+    <batch:step id="zip.allComplexesXml30Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" ref="compressorComplexesXml30Tasklet" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+        </batch:tasklet>
+    </batch:step>
 
+    <!-- Job which will export complexes in XML files -->
+    <batch:job id="exportComplexXmlJob" job-repository="basicBatchJobRepository">
+
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <!-- Export  complex in XML -->
+        <batch:step  id="exportComplexXml" parent="xml.complexStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
+
+        <!-- zip xml-->
+        <batch:split id="xml.zip" task-executor="asyncTaskExecutor" >
+            <!-- flow1: zip all individual xml25 files -->
+            <batch:flow>
+                <batch:step id="zip.complexXml25" parent="zip.singleComplexXml25Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+            <!-- flow2: zip all individual xml30 files -->
+            <batch:flow>
+                <batch:step  id="zip.complexXml30" parent="zip.singleComplexXml30Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
+            <!-- flow3: zip all files in one xml25 archive -->
+            <batch:flow>
+                <batch:step id="zip.allcomplexXml25" parent="zip.allComplexesXml25Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
+            <!-- flow4: zip all files in one xml30 archive -->
+            <batch:flow>
+                <batch:step id="zip.allcomplexXml30" parent="zip.allComplexesXml30Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
+            <batch:end on="FAILED"/>
+        </batch:split>
+    </batch:job>
 </beans>

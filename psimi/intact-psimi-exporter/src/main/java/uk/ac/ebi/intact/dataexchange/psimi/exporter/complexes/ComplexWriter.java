@@ -3,6 +3,10 @@ package uk.ac.ebi.intact.dataexchange.psimi.exporter.complexes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import psidev.psi.mi.jami.datasource.InteractionWriter;
 import psidev.psi.mi.jami.factory.InteractionWriterFactory;
@@ -10,6 +14,7 @@ import psidev.psi.mi.jami.factory.options.InteractionWriterOptions;
 import psidev.psi.mi.jami.model.Complex;
 import uk.ac.ebi.intact.dataexchange.psimi.mitab.IntactPsiMitab;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.IntactPsiXml;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +47,10 @@ public class ComplexWriter implements ItemWriter<ComplexFileEntry>, ItemStream {
     private Map<String, Object> writerOptions;
 
     private String extension = null;
+
+    @Autowired
+    @Qualifier("intactDao")
+    private IntactDao intactDao;
 
     public ComplexWriter(){
     }
@@ -98,6 +107,7 @@ public class ComplexWriter implements ItemWriter<ComplexFileEntry>, ItemStream {
     }
 
     @Override
+    @Transactional(value = "jamiTransactionManager", readOnly = true, propagation = Propagation.REQUIRED)
     public void write(List<? extends ComplexFileEntry> items) throws Exception {
 
         if (parentFolder == null){
@@ -128,7 +138,14 @@ public class ComplexWriter implements ItemWriter<ComplexFileEntry>, ItemStream {
 
             // write entry content
             psiWriter.start();
-            psiWriter.write(species.getComplex());
+            Complex complex;
+            if (!intactDao.getEntityManager().contains(species.getComplex())){
+                complex = intactDao.getEntityManager().merge(species.getComplex());
+            }
+            else{
+                complex = species.getComplex();
+            }
+            psiWriter.write(complex);
             psiWriter.end();
         }
     }
@@ -195,4 +212,15 @@ public class ComplexWriter implements ItemWriter<ComplexFileEntry>, ItemStream {
         return directory;
     }
 
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
+
+    public IntactDao getIntactDao() {
+        return intactDao;
+    }
 }

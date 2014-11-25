@@ -152,12 +152,6 @@
         <property name="compressor" ref="zipCompressor"/>
         <property name="errorLogName" value="${release.buildFolder}/archive_individual_file_error.log"/>
     </bean>
-    <!-- simple complex reader -->
-    <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true" scope="prototype">
-        <property name="queryString" value="select i from IntactComplex i
-        order by i.organism.ac, i.ac"/>
-        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-    </bean>
     <!-- reader of the publications, ordered by the species of the interactions, the large scale limit, the shortlabel of the publication,
     the taxid of the biosource and the number of interactions for a publication-->
     <bean id="intactPublicationOrderedBySpeciesReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification.PublicationSpeciesReader"
