@@ -4,7 +4,7 @@ import psidev.psi.mi.jami.html.MIHtml;
 import psidev.psi.mi.jami.model.Interaction;
 
 /**
- * IntAct JAMI html exporter
+ * IntAct JAMI html exporter which can export interactions from IntAct database to JAMI html
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

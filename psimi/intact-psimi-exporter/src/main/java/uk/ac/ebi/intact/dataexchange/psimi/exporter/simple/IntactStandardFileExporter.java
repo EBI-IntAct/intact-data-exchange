@@ -5,7 +5,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.mitab.IntactPsiMitab;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.IntactPsiXml;
 
 /**
- * IntAct JAMI db importer
+ * IntAct JAMI db importer which can export interactions loaded from the database in a single standard file
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

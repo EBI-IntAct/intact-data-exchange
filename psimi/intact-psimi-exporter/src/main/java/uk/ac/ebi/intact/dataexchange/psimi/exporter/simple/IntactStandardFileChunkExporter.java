@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * IntAct standard interaction chunk exporter
+ * IntAct standard interaction chunk exporter which can write collection of interactions in a single standard file
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

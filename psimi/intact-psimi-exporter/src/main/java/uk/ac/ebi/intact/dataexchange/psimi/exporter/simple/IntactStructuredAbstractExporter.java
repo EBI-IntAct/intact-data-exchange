@@ -4,7 +4,7 @@ import psidev.psi.mi.jami.model.Interaction;
 import uk.ac.ebi.intact.dataexchange.structuredabstract.IntactStructuredAbstract;
 
 /**
- * IntAct JAMI structured abstract
+ * IntAct JAMI structured abstract exporter which can export interactions loaded from the dataabse in a structured abstract output
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

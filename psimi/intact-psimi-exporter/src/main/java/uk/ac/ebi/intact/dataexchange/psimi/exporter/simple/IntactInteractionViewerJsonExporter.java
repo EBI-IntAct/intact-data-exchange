@@ -4,7 +4,7 @@ import psidev.psi.mi.jami.json.InteractionViewerJson;
 import psidev.psi.mi.jami.model.Interaction;
 
 /**
- * IntAct JAMI json exporter
+ * IntAct JAMI json exporter which can export interactions from IntAct database to interactionviewer JSON
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

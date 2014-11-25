@@ -1,7 +1,5 @@
 package uk.ac.ebi.intact.dataexchange.psimi.exporter.simple;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,7 @@ import uk.ac.ebi.intact.jami.dao.IntactDao;
 import java.util.List;
 
 /**
- * abstract IntAct interaction exporter
+ * abstract IntAct interaction exporter which can write in a single file and cane be restarted from where it stopped
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -30,8 +28,6 @@ public abstract class AbstractIntactInteractionExporter<T extends Interaction> e
 
 
     private InteractionWriter interactionWriter;
-
-    private static final Log logger = LogFactory.getLog(AbstractIntactInteractionExporter.class);
 
     @Autowired
     @Qualifier("intactDao")

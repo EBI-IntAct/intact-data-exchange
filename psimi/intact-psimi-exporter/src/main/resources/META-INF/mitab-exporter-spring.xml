@@ -14,6 +14,7 @@
 
     <import resource="classpath*:/META-INF/intact-exporter-base-spring.xml"/>
 
+    <!-- Mitab publication filter-->
     <bean id="releaseMitabPublicationFilter"  class="uk.ac.ebi.intact.dataexchange.psimi.exporter.util.PublicationFileFilter">
         <property name="separator" value="_"/>
         <property name="extension" value=".txt"/>
@@ -94,13 +95,13 @@
 
     <!-- interaction writer -->
     <bean id="miPositiveFileOutput" class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg value="${release.folder}/mitab/intact.txt"/>
+        <constructor-arg value="${release.folder}/psimitab/intact.txt"/>
     </bean>
     <bean id="miNegativeFileOutput" class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg value="${release.folder}/mitab/intact_negative.txt"/>
+        <constructor-arg value="${release.folder}/psimitab/intact_negative.txt"/>
     </bean>
 
-    <!-- mitab exporters -->
+    <!-- mitab global positive file exporter -->
     <bean id="intactMitabPositiveEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
         <property name="writerOptions">
             <map>
@@ -115,6 +116,7 @@
         </property>
         <property name="output" ref="miPositiveFileOutput"/>
     </bean>
+    <!-- mitab global negative file exporter -->
     <bean id="intactMitabNegativeEvidenceWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.simple.IntactStandardFileExporter" lazy-init="true">
         <property name="writerOptions">
             <map>
@@ -164,17 +166,12 @@
         </property>
     </bean>
 
-    <!-- Compressors -->
-    <bean id="zipCompressor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.Compressor">
-        <property name="compression" value="zip"/>
-    </bean>
-
     <!-- tasklet -->
     <!-- tasklet for compressing mitab publication files -->
     <bean id="compressorTab27Tasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorByFileExtensionsTasklet">
-        <property name="outputFile" value="${release.forder}/mitab/pmidMITAB27.zip"/>
+        <property name="outputFile" value="${release.forder}/psimitab/pmidMITAB27.zip"/>
         <property name="compressor" ref="zipCompressor"/>
-        <property name="directory" value="${release.forder}/mitab/pmid"/>
+        <property name="directory" value="${release.forder}/psimitab/pmid"/>
         <property name="extensions">
             <list>
                 <value>txt</value>
@@ -183,37 +180,18 @@
     </bean>
     <!-- tasklet for compressing mitab file -->
     <bean id="compressGlobalMitabTasklet" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.CompressorTasklet">
-        <property name="outputFile" value="${mi.output.zip}"/>
+        <property name="outputFile" value="${release.forder}/psimitab/intact.zip"/>
         <property name="compressor" ref="zipCompressor"/>
         <property name="filesToCompress">
             <list>
-                <value>${release.folder}/mitab/intact.txt</value>
-                <value>${release.folder}/mitab/intact_negative.txt</value>
+                <value>${release.folder}/psimitab/intact.txt</value>
+                <value>${release.folder}/psimitab/intact_negative.txt</value>
             </list>
         </property>
         <property name="deleteSourceFiles" value="false"/>
     </bean>
 
     <!-- Export Steps -->
-    <!-- export mitab 2.7 publication files -->
-    <batch:step id="mitab27.publicationStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener" />
-            </batch:listeners>
-
-            <batch:chunk reader="intactPublicationReader"
-                         processor="publicationMitabProcessor"
-                         writer="intactPublicationMitab27Writer"
-                         commit-interval="1">
-                <batch:streams>
-                    <batch:stream ref="intactPublicationReader"/>
-                    <batch:stream ref="publicationMitabProcessor"/>
-                    <batch:stream ref="intactPublicationMitab27Writer"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
     <!-- MITAB 2.7 positive interactions export-->
     <batch:step id="mitab27.positiveInteractionStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
@@ -256,6 +234,25 @@
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
+    <!-- export mitab 2.7 publication files -->
+    <batch:step id="mitab27.publicationStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPublicationReader"
+                         processor="publicationMitabProcessor"
+                         writer="intactPublicationMitab27Writer"
+                         commit-interval="1">
+                <batch:streams>
+                    <batch:stream ref="intactPublicationReader"/>
+                    <batch:stream ref="publicationMitabProcessor"/>
+                    <batch:stream ref="intactPublicationMitab27Writer"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
     <!-- step to zip all mitab publication files -->
     <batch:step id="zip.allPublicationTab27Step" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" ref="compressorTab27Tasklet" transaction-manager="basicBatchTransactionManager">
@@ -272,11 +269,11 @@
             </batch:listeners>
 
             <batch:chunk reader="publicationMitabArchiveReader"
-                         writer="fileArchiveWriter"
+                         writer="intactFileArchiveWriter"
                          commit-interval="50">
                 <batch:streams>
                     <batch:stream ref="publicationMitabArchiveReader"/>
-                    <batch:stream ref="fileArchiveWriter"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
@@ -392,7 +389,7 @@
         </batch:split>
     </batch:job>
     <!-- Job which will export interactions by species in mitab publication files -->
-    <batch:job id="mitab.speciesJob" restartable="true" job-repository="basicBatchJobRepository">
+    <batch:job id="exportSpeciesMitabJob" restartable="true" job-repository="basicBatchJobRepository">
         <batch:listeners>
             <batch:listener ref="basicJobLoggerListener"/>
         </batch:listeners>

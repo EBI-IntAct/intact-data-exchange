@@ -98,12 +98,6 @@
         </property>
         <property name="directory" value="${release.folder}/psi30/species"/>
     </bean>
-    <!-- simple complex reader -->
-    <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
-        <property name="queryString" value="select i from IntactComplex i
-        order by i.organism.ac, i.ac"/>
-        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-    </bean>
 
     <!-- processors -->
     <bean id="intactPublicationXmlProcessor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationExportChunkProcessor" lazy-init="true">
@@ -285,11 +279,11 @@
             </batch:listeners>
 
             <batch:chunk reader="publicationXml25ArchiveReader"
-                         writer="fileArchiveWriter"
+                         writer="intactFileArchiveWriter"
                          commit-interval="50">
                 <batch:streams>
                     <batch:stream ref="publicationXml25ArchiveReader"/>
-                    <batch:stream ref="fileArchiveWriter"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
@@ -301,11 +295,11 @@
             </batch:listeners>
 
             <batch:chunk reader="publicationXml30ArchiveReader"
-                         writer="fileArchiveWriter"
+                         writer="intactFileArchiveWriter"
                          commit-interval="50">
                 <batch:streams>
                     <batch:stream ref="publicationXml30ArchiveReader"/>
-                    <batch:stream ref="fileArchiveWriter"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
@@ -431,7 +425,7 @@
         </batch:step>
     </batch:job>
     <!-- Job which will export interactions by species in XML publication files -->
-    <batch:job id="xml.speciesJob" restartable="true" job-repository="basicBatchJobRepository">
+    <batch:job id="exportSpeciesXmlJob" restartable="true" job-repository="basicBatchJobRepository">
         <batch:listeners>
             <batch:listener ref="basicJobLoggerListener"/>
         </batch:listeners>

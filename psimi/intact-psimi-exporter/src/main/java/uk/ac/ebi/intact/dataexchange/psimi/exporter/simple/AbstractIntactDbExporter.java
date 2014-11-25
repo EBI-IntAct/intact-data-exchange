@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * abstract IntAct exporter
+ * abstract IntAct exporter which can write objects in a single file and be restarted from where it stopped
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
