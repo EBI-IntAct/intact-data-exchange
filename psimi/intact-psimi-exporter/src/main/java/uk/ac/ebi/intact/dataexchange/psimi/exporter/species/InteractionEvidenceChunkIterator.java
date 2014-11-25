@@ -5,7 +5,12 @@ import psidev.psi.mi.jami.model.InteractionEvidence;
 import java.util.Iterator;
 
 /**
- * A species file unit contain a list of positive and negative interactions to filter and merge
+ * Iterator of interaction evidences which wraps another interaction evidence iterator.
+ *
+ * If the largescale property of this iterator is not null, it will stop when it has reached this number of interaction evidences.
+ *
+ * The method hasNextChunk allows to know if this iterator sops because it reached the maximum number of interactions or if the delegate iterator does not
+ * have any more interactions
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

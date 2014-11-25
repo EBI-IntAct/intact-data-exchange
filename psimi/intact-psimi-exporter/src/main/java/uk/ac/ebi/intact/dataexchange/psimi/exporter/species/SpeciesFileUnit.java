@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A species file unit contain a list of files, the name of the species and the taxid
+ * A species file unit contain a list of files, the name of the species and the taxid and the number of interactions
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

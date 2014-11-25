@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The SmallScaleSpeciesWriter is an ItemStream and ItemWriter which can write the negative and positive interactions of each SpeciesFileUnit
+ * The SpeciesInteractionWriter is an ItemStream and ItemWriter which can write the negative and positive interactions of each SpeciesInteractionUnit
  * to the proper directory.
  *
  * Some properties can be customized :

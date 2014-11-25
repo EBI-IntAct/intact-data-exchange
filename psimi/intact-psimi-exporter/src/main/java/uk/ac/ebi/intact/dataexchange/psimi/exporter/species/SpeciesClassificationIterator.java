@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
- * Iterator for species without splitting the results in chunks
+ * Iterator for species file unit which can retrieve the files indexed in each species classification line
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

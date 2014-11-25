@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The SmallScaleSpeciesReader is an ItemStrem and ItemReader which can read a set of files starting with a common publication id and extract interactions containing
+ * The SpeciesClassificationReader is an ItemStrem and ItemReader which can read a set of files starting with a common publication id and extract interactions containing
  * species of interest.
  *
  * The reader returns a SpeciesInteractionUnit when it can gather all the files of a specific publication and species.

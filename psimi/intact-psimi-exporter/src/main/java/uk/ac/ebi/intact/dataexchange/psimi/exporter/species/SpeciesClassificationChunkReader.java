@@ -5,10 +5,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemStreamException;
 
 /**
- * The SmallScaleSpeciesChunkReader is an ItemStrem and ItemReader which can read a set of xml files starting with a common publication id and extract interactions containing
- * experiment of interest.
+ * The SpeciesClassificationChunkReader is an ItemStrem and ItemReader which can read a set of files starting with a common publication id and extract interactions containing
+ * species of interest.
  *
- * The reader returns a SpeciesFileUnit when it can gather all the files of a specific publication and species.
+ * The reader returns a SpeciesFileUnit when it can gather all the files of a specific publication and species and it truncates files if too many interactions are involved.
  *
  * Some properties can be customized :
  * - the large scale value which is the maximum number of interactions allowed for one single file.

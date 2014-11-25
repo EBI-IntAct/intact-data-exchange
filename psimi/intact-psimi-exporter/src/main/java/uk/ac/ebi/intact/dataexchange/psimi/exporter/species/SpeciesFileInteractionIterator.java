@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A species file unit contain a list of positive and negative interactions to filter and merge
+ * Iterator of interaction evidences that open files and filter by taxid
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The SmallScaleSpeciesWriter is an ItemStream and ItemWriter which can write the negative and positive interactions of each SpeciesFileUnit
+ * The SpeciesInteractionXmlWriter is an ItemStream and ItemWriter which can write the negative and positive interactions of each SpeciesInteractionUnit
  * to the proper directory.
+ *
+ * It will keep track of the generated identifiers for each interaction
  *
  * Some properties can be customized :
  * - the speciesParentFolderName which is the released directory where to copy the species files
@@ -34,16 +36,12 @@ public class SpeciesInteractionXmlWriter extends SpeciesInteractionWriter {
 
     private int currentId = 0;
 
-    /**
-     * Maximum limit of interactions per entry
-     */
-    private int largeScale = 2000;
 
     private List<InteractionEvidence> interactionsToWrite;
 
     public SpeciesInteractionXmlWriter(){
         super();
-        this.interactionsToWrite = new ArrayList<InteractionEvidence>(largeScale);
+        this.interactionsToWrite = new ArrayList<InteractionEvidence>();
     }
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
@@ -111,13 +109,5 @@ public class SpeciesInteractionXmlWriter extends SpeciesInteractionWriter {
         if (iterator.hasNextChunk() && getCurrentChunk() == 0){
             setCurrentChunk(1);
         }
-    }
-
-    public int getLargeScale() {
-        return largeScale;
-    }
-
-    public void setLargeScale(int largeScale) {
-        this.largeScale = largeScale;
     }
 }
