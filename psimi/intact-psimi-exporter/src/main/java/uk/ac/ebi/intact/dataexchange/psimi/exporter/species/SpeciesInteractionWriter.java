@@ -245,6 +245,7 @@ public class SpeciesInteractionWriter implements ItemWriter<SpeciesInteractionUn
     }
 
     protected void initialiseObjectWriter(File file) {
+        this.currentPosition = 0;
         // add mandatory options
         getWriterOptions().put(InteractionWriterOptions.OUTPUT_OPTION_KEY, file);
 
