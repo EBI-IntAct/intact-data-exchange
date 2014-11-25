@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * The PublicationDatasetWriter is an ItemWriter and an ItemStream.
  *
- * It can write a list of PublicationDatasetUnit which will be used to first retrieve the publication xml files
+ * It can write a list of PublicationDatasetUnit which will be used to first retrieve the publication  files
  * using the publication year (helps to retrieve publication subDirectory) and the publication id (helps to retrieve files
  * starting with the same publication id) and copy them in the proper dataset subDirectory.
  *

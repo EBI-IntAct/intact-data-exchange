@@ -1,7 +1,5 @@
 package uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemWriter;
 
 import java.util.ArrayList;
@@ -19,8 +17,6 @@ import java.util.SortedSet;
  */
 
 public class CompositePublicationFileEntryWriter implements ItemWriter<SortedSet<PublicationFileEntry>> {
-
-    private static final Log log = LogFactory.getLog(CompositePublicationFileEntryWriter.class);
 
     private List<PublicationFileEntryWriter> delegates;
 

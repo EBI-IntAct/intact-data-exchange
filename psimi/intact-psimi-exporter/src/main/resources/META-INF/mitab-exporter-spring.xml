@@ -89,6 +89,10 @@
         </property>
         <property name="directory" value="${release.folder}/psimitab/species"/>
     </bean>
+    <!-- dataset mitab archive reader -->
+    <bean id="intactDatasetArchiveMitabReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.SubDirectoryArchiveReader" lazy-init="true">
+        <property name="directory" value="${release.folder}/psimitab/datasets"/>
+    </bean>
 
     <!-- processors -->
     <!-- IntAct mitab processor which can read a publication and converts it in a sorted set of PublicationFileEntry -->
@@ -169,6 +173,15 @@
                 <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="binary"/>
             </map>
         </property>
+    </bean>
+
+    <!-- Mitab dataset writer -->
+    <bean id="intactPublicationDatasetMitabWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.dataset.PublicationDatasetWriter" lazy-init="true">
+        <property name="datasetParentFolderName" value="${release.folder}/psimitab/datasets"/>
+        <property name="pmidFolderName" value="${release.folder}/psimitab/pmid"/>
+        <property name="publicationFilter" ref="releasePublicationFilter"/>
+        <property name="datasetTruncation" ref="datasetNameTruncator"/>
+        <property name="errorLogName" value="${release.buildFolder}/error_dataset_writer25.log"/>
     </bean>
 
     <!-- tasklet -->
@@ -286,23 +299,6 @@
         </batch:tasklet>
     </batch:step>
 
-    <!-- step to zip each species file -->
-    <batch:step id="zip.singleSpeciesMitabStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener" />
-            </batch:listeners>
-
-            <batch:chunk reader="speciesMitabArchiveReader"
-                         writer="mitabSpeciesWriter"
-                         commit-interval="50">
-                <batch:streams>
-                    <batch:stream ref="speciesMitabArchiveReader"/>
-                    <batch:stream ref="mitabSpeciesWriter"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
     <!-- step to export mitab by species -->
     <batch:step id="mitab27.speciesStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
@@ -321,6 +317,58 @@
                 <batch:retryable-exception-classes>
                     <batch:include class="org.springframework.batch.item.ItemStreamException"/>
                 </batch:retryable-exception-classes>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip each species file -->
+    <batch:step id="zip.singleSpeciesMitabStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="speciesMitabArchiveReader"
+                         writer="intactFileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="speciesMitabArchiveReader"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+
+    <!-- step to export each dataset mitab file -->
+    <batch:step id="mitab.datasetStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPublicationOrderedByDatasetReader"
+                         writer="intactPublicationDatasetMitabWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="intactPublicationOrderedByDatasetReader"/>
+                    <batch:stream ref="intactPublicationDatasetMitabWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip datasets mitab -->
+    <batch:step id="zip.datasetMitabStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactDatasetArchiveMitabReader"
+                         writer="intactFileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="intactDatasetArchiveMitabReader"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
+                </batch:streams>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
@@ -413,6 +461,24 @@
             <batch:next on="*" to="zip.species"/>
         </batch:step>
         <batch:step id="zip.species" parent="zip.singleSpeciesMitabStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
+    </batch:job>
+
+    <!-- Job which will export interactions by dataset in mitab publication files -->
+    <batch:job id="xml.datasetJob" restartable="true" job-repository="basicBatchJobRepository">
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <batch:step id="p.createDatasets" parent="mitab.datasetStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="p.zipDatasetsMitab"/>
+        </batch:step>
+
+        <batch:step id="p.zipDatasetsMitab" parent="zip.datasetMitabStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
             <batch:end on="FAILED"/>
         </batch:step>

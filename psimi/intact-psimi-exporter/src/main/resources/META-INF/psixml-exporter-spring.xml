@@ -100,6 +100,14 @@
         </property>
         <property name="directory" value="${release.folder}/psi30/species"/>
     </bean>
+    <!-- dataset xml 2.5 archive reader -->
+    <bean id="intactDatasetArchiveXml25Reader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.SubDirectoryArchiveReader" lazy-init="true">
+        <property name="directory" value="${release.folder}/psi25/datasets"/>
+    </bean>
+    <!-- dataset xml 3.0 archive reader -->
+    <bean id="intactDatasetArchiveXml30Reader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.SubDirectoryArchiveReader" lazy-init="true">
+        <property name="directory" value="${release.folder}/psi30/datasets"/>
+    </bean>
 
     <!-- processors -->
     <!-- IntAct XML processor which can read a publication and converts it in a sorted set of PublicationFileEntry -->
@@ -159,7 +167,6 @@
         <property name="fileNameGenerator" ref="releaseFileNameGenerator"/>
         <property name="extension" value=".xml"/>
         <property name="appendToExistingFile" value="false"/>
-        <property name="largeScale" value="2000"/>
         <property name="writerOptions">
             <map>
                 <entry key="output_format_key" value="psimi_xml"/>
@@ -179,7 +186,6 @@
         <property name="fileNameGenerator" ref="releaseFileNameGenerator"/>
         <property name="extension" value=".xml"/>
         <property name="appendToExistingFile" value="false"/>
-        <property name="largeScale" value="2000"/>
         <property name="writerOptions">
             <map>
                 <entry key="output_format_key" value="psimi_xml"/>
@@ -190,6 +196,33 @@
                 <entry key="interaction_category_key" value-type="psidev.psi.mi.jami.model.InteractionCategory" value="evidence"/>
                 <entry key="complex_type_key" value-type="psidev.psi.mi.jami.model.ComplexType" value="n_ary"/>
             </map>
+        </property>
+    </bean>
+
+    <!-- xml 2.5 dataset writer -->
+    <bean id="intactPublicationDatasetXml25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.dataset.PublicationDatasetWriter" lazy-init="true">
+        <property name="datasetParentFolderName" value="${release.folder}/psi25/datasets"/>
+        <property name="pmidFolderName" value="${release.folder}/psi25/pmid"/>
+        <property name="publicationFilter" ref="releasePublicationFilter"/>
+        <property name="datasetTruncation" ref="datasetNameTruncator"/>
+        <property name="errorLogName" value="${release.buildFolder}/error_dataset_writer25.log"/>
+    </bean>
+    <!-- xml 3.0 dataset writer -->
+    <bean id="intactPublicationDatasetXml30Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.dataset.PublicationDatasetWriter" lazy-init="true">
+        <property name="datasetParentFolderName" value="${release.folder}/psi30/datasets"/>
+        <property name="pmidFolderName" value="${release.folder}/psi30/pmid"/>
+        <property name="publicationFilter" ref="releasePublicationFilter"/>
+        <property name="datasetTruncation" ref="datasetNameTruncator"/>
+        <property name="errorLogName" value="${release.buildFolder}/error_dataset_writer30.log"/>
+    </bean>
+    <!-- composite dataset writer -->
+    <bean id="intactCompositeDatasetXmlWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.dataset.CompositePublicationDatasetWriter"
+          lazy-init="true">
+        <property name="delegates">
+            <list>
+                <ref bean="intactPublicationDatasetXml25Writer"/>
+                <ref bean="intactPublicationDatasetXml30Writer"/>
+            </list>
         </property>
     </bean>
 
@@ -310,41 +343,6 @@
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
-
-    <!-- step to zip each publication -->
-    <batch:step id="zip.singleSpeciesXml25Step" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener" />
-            </batch:listeners>
-
-            <batch:chunk reader="speciesXml25ArchiveReader"
-                         writer="xml25SpeciesWriter"
-                         commit-interval="50">
-                <batch:streams>
-                    <batch:stream ref="speciesXml25ArchiveReader"/>
-                    <batch:stream ref="xml25SpeciesWriter"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
-    <!-- step to zip each species file -->
-    <batch:step id="zip.singleSpeciesXml30Step" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener" />
-            </batch:listeners>
-
-            <batch:chunk reader="speciesXml30ArchiveReader"
-                         writer="xml30SpeciesWriter"
-                         commit-interval="50">
-                <batch:streams>
-                    <batch:stream ref="speciesXml30ArchiveReader"/>
-                    <batch:stream ref="xml30SpeciesWriter"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
     <!-- step to zip all xml 2.5 publication files -->
     <batch:step id="zip.allPublicationXml25Step" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" ref="compressorXml25Tasklet" transaction-manager="basicBatchTransactionManager">
@@ -361,6 +359,7 @@
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
+
     <!-- step to export xml 2.5 by species -->
     <batch:step id="xml25.speciesStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
@@ -400,6 +399,127 @@
                 <batch:retryable-exception-classes>
                     <batch:include class="org.springframework.batch.item.ItemStreamException"/>
                 </batch:retryable-exception-classes>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip each species 2.5 file -->
+    <batch:step id="zip.singleSpeciesXml25Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="speciesXml25ArchiveReader"
+                         writer="intactFileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="speciesXml25ArchiveReader"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip each species 3.0 file -->
+    <batch:step id="zip.singleSpeciesXml30Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="speciesXml30ArchiveReader"
+                         writer="intactFileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="speciesXml30ArchiveReader"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+
+    <!-- step to export each dataset 2.5 file -->
+    <batch:step id="xml25.datasetStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPublicationOrderedByDatasetReader"
+                         writer="intactPublicationDatasetXml25Writer"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="intactPublicationOrderedByDatasetReader"/>
+                    <batch:stream ref="intactPublicationDatasetXml25Writer"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to export each dataset 3.0 file -->
+    <batch:step id="xml30.datasetStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPublicationOrderedByDatasetReader"
+                         writer="intactPublicationDatasetXml30Writer"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="intactPublicationOrderedByDatasetReader"/>
+                    <batch:stream ref="intactPublicationDatasetXml30Writer"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to export each dataset 2.5 and 3.0 file -->
+    <batch:step id="xml.datasetStep" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactPublicationOrderedByDatasetReader"
+                         writer="intactCompositeDatasetXmlWriter"
+                         commit-interval="1">
+                <batch:streams>
+                    <batch:stream ref="intactPublicationOrderedByDatasetReader"/>
+                    <batch:stream ref="intactPublicationDatasetXml25Writer"/>
+                    <batch:stream ref="intactPublicationDatasetXml30Writer"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip datasets xml 2.5 -->
+    <batch:step id="zip.datasetXml25Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactDatasetArchiveXml25Reader"
+                         writer="intactFileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="intactDatasetArchiveXml25Reader"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+    <!-- step to zip datasets xml 3.0 -->
+    <batch:step id="zip.datasetXml30Step" job-repository="basicBatchJobRepository">
+        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener" />
+            </batch:listeners>
+
+            <batch:chunk reader="intactDatasetArchiveXml30Reader"
+                         writer="intactFileArchiveWriter"
+                         commit-interval="50">
+                <batch:streams>
+                    <batch:stream ref="intactDatasetArchiveXml30Reader"/>
+                    <batch:stream ref="intactFileArchiveWriter"/>
+                </batch:streams>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
@@ -495,5 +615,28 @@
 
             <batch:end on="FAILED"/>
         </batch:split>
+    </batch:job>
+
+    <!-- Job which will export interactions by dataset in XML publication files -->
+    <batch:job id="xml.datasetJob" restartable="true" job-repository="basicBatchJobRepository">
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <batch:step id="p.createDatasets" parent="xml.datasetStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="p.zipDatasets25"/>
+        </batch:step>
+
+        <batch:step id="p.zipDatasets25" parent="zip.datasetXml25Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+            <batch:next on="*" to="p.zipDatasets30"/>
+        </batch:step>
+        <batch:step id="p.zipDatasets30" parent="zip.datasetXml30Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
     </batch:job>
 </beans>

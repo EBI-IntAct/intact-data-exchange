@@ -136,7 +136,7 @@
 
     <!-- readers -->
     <!-- simple publication reader ordered by created date. It excludes the IntAct paper -->
-    <bean id="intactPublicationReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+    <bean id="intactPublicationReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true" scope="prototype">
         <property name="queryString" value="select i from IntactPublication i
         where i.shortLabel &lt;&gt; :intactPub
         order by i.created, i.ac"/>
@@ -148,25 +148,32 @@
         </property>
     </bean>
     <!-- individual file archive writer -->
-    <bean id="intactFileArchiveWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.ArchiveFileWriter" lazy-init="true">
+    <bean id="intactFileArchiveWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.ArchiveFileWriter" lazy-init="true" scope="prototype">
         <property name="compressor" ref="zipCompressor"/>
         <property name="errorLogName" value="${release.buildFolder}/archive_individual_file_error.log"/>
     </bean>
     <!-- simple complex reader -->
-    <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+    <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true" scope="prototype">
         <property name="queryString" value="select i from IntactComplex i
         order by i.organism.ac, i.ac"/>
         <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
     </bean>
     <!-- reader of the publications, ordered by the species of the interactions, the large scale limit, the shortlabel of the publication,
     the taxid of the biosource and the number of interactions for a publication-->
-    <bean id="intactPublicationOrderedBySpeciesReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification.PublicationSpeciesReader" lazy-init="true">
+    <bean id="intactPublicationOrderedBySpeciesReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification.PublicationSpeciesReader"
+          lazy-init="true" scope="prototype">
+        <property name="dataSource" ref="jamiCoreDataSource"/>
+    </bean>
+    <!-- the reader will read publication shortlabel, publication created year and dataset. It will order the results first by dataset and then by publication id-->
+    <bean id="intactPublicationOrderedByDatasetReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.dataset.PublicationDatasetReader"
+          lazy-init="true" scope="prototype">
         <property name="dataSource" ref="jamiCoreDataSource"/>
     </bean>
 
     <!-- writers -->
     <!-- species classification writer -->
-    <bean id="intactPublicationSpeciesClassificationWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification.SpeciesClassificationWriter" lazy-init="true">
+    <bean id="intactPublicationSpeciesClassificationWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification.SpeciesClassificationWriter"
+          lazy-init="true" scope="prototype">
         <property name="speciesParentFolderName" value="${release.buildFolder}/species"/>
         <property name="extension" value="txt"/>
         <property name="taxidSeparator" value=":"/>
