@@ -21,16 +21,17 @@ import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
 import java.util.*;
 
 /**
- * Processor which will convert a publication into PublicationFileEntry.
+ * Processor which will convert a publication loaded from IntAct database into a sorted set of PublicationFileEntry with a limitation in the number of interactions
+ * per publicationFileEntry.
  *
- *
- * If the number of interactions is greater than the threshold value, the file will be split into several chunk files.
  * If the experiment contains a negative interaction, the file will be split into two different files : one for positive interactions, one for negative interactions
- * It will give a unique id for each processed object for the all step
+ * It will give a unique id for each processed object for the all step .
+ *
+ * If the number of interactions is superior to largescale property, the processor will split into chunk publicationFileEntry
  *
  * Some properties can be customized :
- * - largeScale : the maximum number of interactions per entrySet (by default is 100000)
  * - fileName generator which generates the proper file name (initialized by default)
+ * - largescale which controls the size of the batch per publicationFileEntry
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

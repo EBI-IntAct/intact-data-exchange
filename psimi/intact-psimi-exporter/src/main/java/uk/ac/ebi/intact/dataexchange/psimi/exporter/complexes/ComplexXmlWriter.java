@@ -56,6 +56,10 @@ public class ComplexXmlWriter extends ComplexWriter {
         Assert.notNull(executionContext, "ExecutionContext must not be null");
 
         // we can persist the current position
+        if (getWriterOptions().containsKey(PsiXmlWriterOptions.ELEMENT_WITH_ID_CACHE_OPTION)){
+            PsiXmlObjectCache previousCache = (PsiXmlObjectCache)getWriterOptions().get(PsiXmlWriterOptions.ELEMENT_WITH_ID_CACHE_OPTION);
+            this.currentId = previousCache.getLastGeneratedId();
+        }
         executionContext.putInt(SEQUENCE_ID, this.currentId);
 
         super.update(executionContext);

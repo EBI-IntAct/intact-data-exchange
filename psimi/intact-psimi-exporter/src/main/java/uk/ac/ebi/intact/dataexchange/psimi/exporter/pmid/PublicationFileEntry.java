@@ -2,13 +2,13 @@ package uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid;
 
 import psidev.psi.mi.jami.model.InteractionEvidence;
 
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
- * The publication entry is an intactEntry with a few information about the publication.
- * A publicationEntry only contains interactions of a same publication.
- * It contains the created date (folder where to write the entry) and the name of the entry (name of the file where to write this entry)
+ * The publication file entry contains a list of interaction evidences attached to the same publication with a few information about the publication.
+ * It contains the created date (folder where to write the entry)
+ * and the name of the entry (name of the file where to write this entry)
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
@@ -28,9 +28,9 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry> {
     /**
      * The interactions to write
      */
-    private Collection<InteractionEvidence> interactions;
+    private List<InteractionEvidence> interactions;
 
-    public PublicationFileEntry(Date createdDate, String pubId, Collection<InteractionEvidence> interactions){
+    public PublicationFileEntry(Date createdDate, String pubId, List<InteractionEvidence> interactions){
         super();
         this.createdDate = createdDate;
         this.entryName = pubId;
@@ -45,7 +45,7 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry> {
         return entryName;
     }
 
-    public Collection<InteractionEvidence> getInteractions() {
+    public List<InteractionEvidence> getInteractions() {
         return interactions;
     }
 

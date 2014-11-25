@@ -135,13 +135,7 @@
     </bean>
 
     <!-- readers -->
-    <!-- simple complex reader -->
-    <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
-        <property name="queryString" value="select i from IntactComplex i
-        order by i.organism.ac, i.ac"/>
-        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
-    </bean>
-    <!-- simple publication reader -->
+    <!-- simple publication reader ordered by created date. It excludes the IntAct paper -->
     <bean id="intactPublicationReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
         <property name="queryString" value="select i from IntactPublication i
         where i.shortLabel &lt;&gt; :intactPub
@@ -152,6 +146,12 @@
                 <entry key="intactPub" value="14681455"/>
             </map>
         </property>
+    </bean>
+    <!-- simple complex reader -->
+    <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
+        <property name="queryString" value="select i from IntactComplex i
+        order by i.organism.ac, i.ac"/>
+        <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
     </bean>
     <!-- reader of the publications, ordered by the species of the interactions, the large scale limit, the shortlabel of the publication and the shortlabel of the experiment-->
     <bean id="intactPublicationOrderedBySpeciesReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification.PublicationSpeciesReader" lazy-init="true">

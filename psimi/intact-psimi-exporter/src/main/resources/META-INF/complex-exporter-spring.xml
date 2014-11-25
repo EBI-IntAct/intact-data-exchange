@@ -482,7 +482,7 @@
         <property name="output" ref="miFileOutput"/>
     </bean>
     <!-- XML 25 publication writer -->
-    <bean id="intactPublicationXml25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionXmlWriter" lazy-init="true">
+    <bean id="intactPublicationXml25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationFileEntryXmlWriter" lazy-init="true">
         <property name="parentFolderPaths" value="#{releaseConfig.releaseDir}/psi25/pmid"/>
         <property name="fileExtension" value=".xml"/>
         <property name="writerOptions">
@@ -497,7 +497,7 @@
         </property>
     </bean>
     <!-- XML 30 publication writer -->
-    <bean id="intactPublicationXml30Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionXmlWriter" lazy-init="true">
+    <bean id="intactPublicationXml30Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationFileEntryXmlWriter" lazy-init="true">
         <property name="parentFolderPaths" value="#{releaseConfig.releaseDir}/psi30/pmid"/>
         <property name="fileExtension" value=".xml"/>
         <property name="writerOptions">
@@ -512,7 +512,7 @@
         </property>
     </bean>
     <!-- MITAB 2.7 publication writer -->
-    <bean id="intactPublicationMitab27Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionXmlWriter" lazy-init="true">
+    <bean id="intactPublicationMitab27Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationFileEntryXmlWriter" lazy-init="true">
         <property name="parentFolderPaths" value="#{releaseConfig.releaseDir}/psimitab/pmid"/>
         <property name="fileExtension" value=".txt"/>
         <property name="writerOptions">
@@ -527,7 +527,7 @@
         </property>
     </bean>
     <!-- composite publication writer -->
-    <bean id="intactPublicationCompositeXmlWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionCompositeWriter"
+    <bean id="intactPublicationCompositeXmlWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.CompositePublicationFileEntryWriter"
           lazy-init="true">
         <property name="delegates">
             <list>

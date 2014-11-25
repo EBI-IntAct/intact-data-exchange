@@ -10,16 +10,18 @@ import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.model.extension.factory.options.PsiXmlWriterOptions;
 
 /**
- * Extension of single publication interaction writer for PSI XML
+ * Extension of PublicationFileEntryWriter for PSI XML.
+ *
+ * It will keep track of generated ids
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>22/09/11</pre>
  */
 
-public class SinglePublicationInteractionXmlWriter extends SinglePublicationInteractionWriter {
+public class PublicationFileEntryXmlWriter extends PublicationFileEntryWriter {
 
-    private static final Log log = LogFactory.getLog(SinglePublicationInteractionXmlWriter.class);
+    private static final Log log = LogFactory.getLog(PublicationFileEntryXmlWriter.class);
 
     /**
      * The name of the sequence id which is persisted
@@ -50,6 +52,10 @@ public class SinglePublicationInteractionXmlWriter extends SinglePublicationInte
         Assert.notNull(executionContext, "ExecutionContext must not be null");
 
         // we can persist the current position
+        if (getWriterOptions().containsKey(PsiXmlWriterOptions.ELEMENT_WITH_ID_CACHE_OPTION)){
+            PsiXmlObjectCache previousCache = (PsiXmlObjectCache)getWriterOptions().get(PsiXmlWriterOptions.ELEMENT_WITH_ID_CACHE_OPTION);
+            this.currentId = previousCache.getLastGeneratedId();
+        }
         executionContext.putInt(SEQUENCE_ID, this.currentId);
         
         super.update(executionContext);

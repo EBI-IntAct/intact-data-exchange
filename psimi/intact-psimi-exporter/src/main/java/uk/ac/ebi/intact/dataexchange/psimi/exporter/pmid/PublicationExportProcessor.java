@@ -21,7 +21,7 @@ import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
 import java.util.*;
 
 /**
- * Processor which will convert a publication into PublicationFileEntry.
+ * Processor which will convert a publication loaded from IntAct database into a sorted set PublicationFileEntry.
  * *
  * If the experiment contains a negative interaction, the file will be split into two different files : one for positive interactions, one for negative interactions
  * It will give a unique id for each processed object for the all step
@@ -42,14 +42,14 @@ public class PublicationExportProcessor implements ItemProcessor<IntactPublicati
     private FileNameGenerator publicationNameGenerator;
 
     /*
-    * the currentIntactEntry for generating chunks
+    * the current list of positive interaction evidences
      */
-    private Collection<InteractionEvidence> currentIntactEntry;
+    private List<InteractionEvidence> currentIntactEntry;
 
     /*
-   * the currentNegativeIntactEntry for generating xml
+   * the current list of negative interaction evidences
     */
-    private Collection<InteractionEvidence> currentNegativeIntactEntry;
+    private List<InteractionEvidence> currentNegativeIntactEntry;
 
     private static final Log log = LogFactory.getLog(PublicationExportProcessor.class);
 
@@ -222,5 +222,9 @@ public class PublicationExportProcessor implements ItemProcessor<IntactPublicati
 
     public void setPublicationNameGenerator(FileNameGenerator publicationNameGenerator) {
         this.publicationNameGenerator = publicationNameGenerator;
+    }
+
+    public IntactDao getIntactDao() {
+        return intactDao;
     }
 }

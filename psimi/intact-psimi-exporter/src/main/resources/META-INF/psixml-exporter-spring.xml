@@ -14,6 +14,7 @@
 
     <import resource="classpath*:/META-INF/intact-exporter-base-spring.xml"/>
 
+    <!-- XML publication filter-->
     <bean id="releaseXmlPublicationFilter"  class="uk.ac.ebi.intact.dataexchange.psimi.exporter.util.PublicationFileFilter">
         <property name="separator" value="_"/>
         <property name="extension" value=".xml"/>
@@ -100,6 +101,7 @@
     </bean>
 
     <!-- processors -->
+    <!-- IntAct XML processor which can read a publication and converts it in a sorted set of PublicationFileEntry -->
     <bean id="intactPublicationXmlProcessor" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationExportChunkProcessor" lazy-init="true">
         <property name="largeScale" value="2000"/>
         <property name="publicationNameGenerator" ref="releaseFileNameGenerator"/>
@@ -107,11 +109,8 @@
 
     <!-- writers -->
     <!-- interaction writer -->
-    <bean id="miFileOutput" class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg value="${mi.output}"/>
-    </bean>
     <!-- XML 25 publication writer -->
-    <bean id="intactPublicationXml25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionXmlWriter" lazy-init="true">
+    <bean id="intactPublicationXml25Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationFileEntryXmlWriter" lazy-init="true">
         <property name="parentFolderPaths" value="${release.folder}/psi25/pmid"/>
         <property name="fileExtension" value=".xml"/>
         <property name="writerOptions">
@@ -127,7 +126,7 @@
         </property>
     </bean>
     <!-- XML 30 publication writer -->
-    <bean id="intactPublicationXml30Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionXmlWriter" lazy-init="true">
+    <bean id="intactPublicationXml30Writer" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.PublicationFileEntryXmlWriter" lazy-init="true">
         <property name="parentFolderPaths" value="${release.folder}/psi30/pmid"/>
         <property name="fileExtension" value=".xml"/>
         <property name="writerOptions">
@@ -143,7 +142,7 @@
         </property>
     </bean>
     <!-- composite publication writer -->
-    <bean id="intactPublicationCompositeXmlWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.SinglePublicationInteractionCompositeWriter"
+    <bean id="intactCompositePublicationXmlWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid.CompositePublicationFileEntryWriter"
           lazy-init="true">
         <property name="delegates">
             <list>
@@ -152,6 +151,7 @@
             </list>
         </property>
     </bean>
+
     <!-- XML 2.5 species writer -->
     <bean id="xml25SpeciesWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.SpeciesInteractionXmlWriter" lazy-init="true">
         <property name="parentFolderPaths" value="${release.folder}/psi25/species"/>
@@ -217,6 +217,7 @@
     </bean>
 
     <!-- Export Steps -->
+    <!-- step to export publication XML 2.5 files -->
     <batch:step id="xml25.publicationStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
@@ -235,6 +236,7 @@
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
+    <!-- step to export publication XML 3.0 files -->
     <batch:step id="xml30.publicationStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
@@ -253,6 +255,7 @@
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
+    <!-- step to export publication XML 2.5 and 3.0 files -->
     <batch:step id="xml.publicationStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
@@ -261,7 +264,7 @@
 
             <batch:chunk reader="intactPublicationReader"
                          processor="intactPublicationXmlProcessor"
-                         writer="intactPublicationCompositeXmlWriter"
+                         writer="intactCompositePublicationXmlWriter"
                          commit-interval="1">
                 <batch:streams>
                     <batch:stream ref="intactPublicationReader"/>
@@ -272,6 +275,7 @@
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
+    <!-- step to zip each publication XML 2.5 files -->
     <batch:step id="zip.singlePublicationXml25Step" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
@@ -288,6 +292,7 @@
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
+    <!-- step to zip each publication XML 3.0 files -->
     <batch:step id="zip.singlePublicationXml30Step" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
@@ -304,6 +309,7 @@
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
+
     <!-- step to zip each publication -->
     <batch:step id="zip.singleSpeciesXml25Step" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
@@ -409,21 +415,45 @@
         <batch:step  id="exportPublicationXml" parent="xml.publicationStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
             <batch:end on="FAILED"/>
-            <batch:next on="*" to="zip.publicationXml25"/>
         </batch:step>
 
         <!-- zip xml-->
-        <batch:step id="zip.publicationXml25" parent="zip.allPublicationXml25Step">
-            <batch:tasklet task-executor="syncTaskExecutor"/>
-            <batch:end on="FAILED"/>
-            <batch:next on="*" to="zip.allPublicationXml30Step"/>
-        </batch:step>
+        <batch:split id="xml.zip" task-executor="asyncTaskExecutor" >
+            <!-- flow1: zip all individual xml25 files -->
+            <batch:flow>
+                <batch:step id="zip.publicationXml25" parent="zip.singlePublicationXml25Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+            <!-- flow2: zip all individual xml30 files -->
+            <batch:flow>
+                <batch:step  id="zip.publicationXml30" parent="zip.singlePublicationXml30Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
 
-        <batch:step  id="zip.publicationXml30" parent="zip.allPublicationXml30Step">
-            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <!-- flow3: zip all files in one xml25 archive -->
+            <batch:flow>
+                <batch:step id="zip.allPublicationXml25" parent="zip.allPublicationXml25Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
+            <!-- flow4: zip all files in one xml30 archive -->
+            <batch:flow>
+                <batch:step id="zip.allPublicationXml30" parent="zip.allPublicationXml30Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+
             <batch:end on="FAILED"/>
-        </batch:step>
+        </batch:split>
     </batch:job>
+
     <!-- Job which will export interactions by species in XML publication files -->
     <batch:job id="exportSpeciesXmlJob" restartable="true" job-repository="basicBatchJobRepository">
         <batch:listeners>

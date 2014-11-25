@@ -3,6 +3,10 @@ package uk.ac.ebi.intact.dataexchange.psimi.exporter.pmid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import psidev.psi.mi.jami.datasource.InteractionWriter;
 import psidev.psi.mi.jami.factory.InteractionWriterFactory;
@@ -10,18 +14,16 @@ import psidev.psi.mi.jami.factory.options.InteractionWriterOptions;
 import psidev.psi.mi.jami.model.InteractionEvidence;
 import uk.ac.ebi.intact.dataexchange.psimi.mitab.IntactPsiMitab;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.IntactPsiXml;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * The SinglePublicationInteractionWriter is an ItemStream and ItemWriter which writes for each PublicationFileEntry a psi file.
+ * The PublicationFileEntryWriter is an ItemStream and ItemWriter which writes for each PublicationFileEntry a psi file.
  *
  * Several properties can be customized :
  * - parentFolderPath which is the absolute path name of the parent folder where to write the xml files
@@ -33,9 +35,9 @@ import java.util.Map;
  * @since <pre>22/09/11</pre>
  */
 
-public class SinglePublicationInteractionWriter implements ItemWriter<Collection<PublicationFileEntry>>, ItemStream {
+public class PublicationFileEntryWriter implements ItemWriter<SortedSet<PublicationFileEntry>>, ItemStream {
 
-    private static final Log log = LogFactory.getLog(SinglePublicationInteractionWriter.class);
+    private static final Log log = LogFactory.getLog(PublicationFileEntryWriter.class);
 
     private String parentFolderPaths;
 
@@ -49,7 +51,11 @@ public class SinglePublicationInteractionWriter implements ItemWriter<Collection
 
     private String fileExtension = null;
 
-    public SinglePublicationInteractionWriter(){
+    @Autowired
+    @Qualifier("intactDao")
+    private IntactDao intactDao;
+
+    public PublicationFileEntryWriter(){
         dateFormat = new SimpleDateFormat("yyyy");
     }
 
@@ -105,7 +111,8 @@ public class SinglePublicationInteractionWriter implements ItemWriter<Collection
     }
 
     @Override
-    public void write(List<? extends Collection<PublicationFileEntry>> items) throws Exception {
+    @Transactional(value = "jamiTransactionManager", readOnly = true, propagation = Propagation.REQUIRED)
+    public void write(List<? extends SortedSet<PublicationFileEntry>> items) throws Exception {
 
         if (parentFolder == null){
             throw new WriteFailedException("You must open the writer before writing files.");
@@ -143,7 +150,16 @@ public class SinglePublicationInteractionWriter implements ItemWriter<Collection
 
                     // write entry content
                     psiWriter.start();
-                    psiWriter.write(publicationEntry.getInteractions());
+                    Collection<InteractionEvidence> reloadedInteractions = new ArrayList<InteractionEvidence>(publicationEntry.getInteractions().size());
+                    for (InteractionEvidence interaction : publicationEntry.getInteractions()){
+                        if (!intactDao.getEntityManager().contains(interaction)){
+                            reloadedInteractions.add(intactDao.getEntityManager().merge(interaction));
+                        }
+                        else{
+                            reloadedInteractions.add(interaction);
+                        }
+                    }
+                    psiWriter.write(reloadedInteractions);
                     psiWriter.end();
                 }
             }
@@ -220,4 +236,7 @@ public class SinglePublicationInteractionWriter implements ItemWriter<Collection
         return directory;
     }
 
+    public IntactDao getIntactDao() {
+        return intactDao;
+    }
 }
