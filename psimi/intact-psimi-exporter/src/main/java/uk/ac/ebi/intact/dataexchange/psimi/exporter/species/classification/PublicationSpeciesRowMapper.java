@@ -6,9 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * This row mapper can extract publication id, publication date, species, experiment_label and the total number of interactions for this experiment from a query.
- * The query must return a column pubid (contains publication id), year (created date), species (the species existing in this experiment), experiment_label (the shortlabel of experiment)
- * and total_interactions (total number of interactions for this experiment)
+ * This row mapper can extract publication id, publication date, species, biosource taxid and the total number of interactions for this publication from a query.
+ * The query must return a column pubid (contains publication id), year (created date), species (the species existing in this experiment), taxid
+ * (the taxid of the interactor)
+ * and total_interactions (total number of interactions for this publication)
  *
  * All columns must returns values of type 'String' excepted the year column which must return an object of type int
  *

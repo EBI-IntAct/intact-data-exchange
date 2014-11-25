@@ -158,12 +158,14 @@
         order by i.organism.ac, i.ac"/>
         <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
     </bean>
-    <!-- reader of the publications, ordered by the species of the interactions, the large scale limit, the shortlabel of the publication and the shortlabel of the experiment-->
+    <!-- reader of the publications, ordered by the species of the interactions, the large scale limit, the shortlabel of the publication,
+    the taxid of the biosource and the number of interactions for a publication-->
     <bean id="intactPublicationOrderedBySpeciesReader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification.PublicationSpeciesReader" lazy-init="true">
         <property name="dataSource" ref="jamiCoreDataSource"/>
     </bean>
 
     <!-- writers -->
+    <!-- species classification writer -->
     <bean id="intactPublicationSpeciesClassificationWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification.SpeciesClassificationWriter" lazy-init="true">
         <property name="speciesParentFolderName" value="${release.buildFolder}/species"/>
         <property name="extension" value="txt"/>
@@ -171,6 +173,7 @@
     </bean>
 
     <!-- steps -->
+    <!-- export species classification files -->
     <batch:step id="species.classificationStep" job-repository="basicBatchJobRepository">
         <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
             <batch:listeners>
@@ -189,6 +192,7 @@
     </batch:step>
 
     <!-- jobs -->
+    <!-- job which export species classification files -->
     <batch:job id="species.classificationJob" restartable="true" job-repository="basicBatchJobRepository">
         <batch:listeners>
             <batch:listener ref="basicJobLoggerListener"/>

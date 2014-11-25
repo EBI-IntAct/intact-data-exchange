@@ -18,7 +18,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 
 /**
- * reader of the publications, ordered by the species of the interactions, the taxid of the species,
+ * reader of the publications, ordered by the species of the interactors, the taxid of the species,
  * the shortlabel of the publication and the total number of interactions
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  */

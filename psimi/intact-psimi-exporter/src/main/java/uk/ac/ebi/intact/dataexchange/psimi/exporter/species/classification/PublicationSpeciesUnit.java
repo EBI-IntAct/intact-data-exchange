@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.exporter.species.classification;
 
 /**
- * This publication unit contains the publication id, year, species, experiment label and number of interactions for this experiment.
+ * This publication unit contains the publication id, year, species, taxid and number of interactions for this publication.
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
