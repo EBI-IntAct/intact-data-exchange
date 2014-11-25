@@ -639,4 +639,115 @@
             <batch:end on="FAILED"/>
         </batch:step>
     </batch:job>
+
+    <!-- final job which will export all interaction evidences in a xml 2.5 and 3.0 -->
+    <batch:job id="xmlExportJob" job-repository="basicBatchJobRepository">
+
+        <batch:listeners>
+            <batch:listener ref="basicJobLoggerListener"/>
+        </batch:listeners>
+
+        <!-- Export interactions per publication in XML -->
+        <batch:step  id="export.publicationXml" parent="xml.publicationStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
+
+        <!-- split 2 : zip, export species, export datasets -->
+        <batch:split id="xml.split" task-executor="asyncTaskExecutor">
+            <!-- zip xml-->
+            <batch:flow>
+                <batch:split id="zip.split" task-executor="asyncTaskExecutor">
+                    <!-- zip xml-->
+                    <batch:flow>
+                        <batch:step id="zip.publication.xml25" parent="zip.singlePublicationXml25Step">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+                    <batch:flow>
+                        <batch:step id="zip.publication.xml30" parent="zip.singlePublicationXml25Step">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+                    <batch:flow>
+                        <batch:step id="zip.allPublication.xml25" parent="zip.allPublicationXml25Step">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+                    <batch:flow>
+                        <batch:step id="zip.allPublication.xml30" parent="zip.allPublicationXml30Step">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                        </batch:step>
+                    </batch:flow>
+
+                    <batch:end on="FAILED"/>
+                </batch:split>
+            </batch:flow>
+
+            <batch:flow>
+                <!-- export species -->
+                <batch:step id="p.create.SpeciesClassification" parent="species.classificationStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+                <batch:split id="species.split" task-executor="asyncTaskExecutor">
+                    <!-- zip xml-->
+                    <batch:flow>
+                        <batch:step id="p.create.species25" parent="xml25.speciesStep">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                            <batch:next on="*" to="zip.speciesXml25"/>
+                        </batch:step>
+                        <batch:step id="zip.speciesXml25" parent="zip.singleSpeciesXml25Step">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+                    <batch:flow>
+                        <batch:step id="p.create.species30" parent="xml30.speciesStep">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                            <batch:next on="*" to="zip.speciesXml30"/>
+                        </batch:step>
+                        <batch:step id="zip.speciesXml30" parent="zip.singleSpeciesXml30Step">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+
+                    <batch:end on="FAILED"/>
+                </batch:split>
+            </batch:flow>
+
+            <batch:flow>
+                <!-- export datasets -->
+                <batch:step id="p.create.datasets" parent="xml.datasetStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
+                </batch:step>
+                <batch:split id="dataset.split" task-executor="asyncTaskExecutor">
+                    <!-- zip xml-->
+                    <batch:flow>
+                        <batch:step id="p.zip.datasetsXml25" parent="zip.datasetXml25Step">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+                    <batch:flow>
+                        <batch:step id="p.zip.datasetsXml30" parent="zip.datasetXml30Step">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:end on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+
+                    <batch:end on="FAILED"/>
+                </batch:split>
+            </batch:flow>
+
+            <batch:end on="FAILED"/>
+        </batch:split>
+    </batch:job>
 </beans>
