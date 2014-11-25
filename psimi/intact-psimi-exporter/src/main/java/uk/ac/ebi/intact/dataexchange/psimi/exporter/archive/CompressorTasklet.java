@@ -24,10 +24,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * TODO comment this class header.
- *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
+ * A spring tasklet which can compress one to several files in one archive file
  */
 public class CompressorTasklet implements Tasklet {
 

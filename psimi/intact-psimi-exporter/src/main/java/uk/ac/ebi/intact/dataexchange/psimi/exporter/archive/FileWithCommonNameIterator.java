@@ -2,13 +2,14 @@ package uk.ac.ebi.intact.dataexchange.psimi.exporter.archive;
 
 import org.apache.commons.io.FileUtils;
 import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.FileUnit;
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.NameTruncation;
 import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.ReleaseUnitIterator;
 
 import java.io.File;
 import java.util.*;
 
 /**
- *
+ * This iterator will iterate through files with common names
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>17/10/11</pre>

@@ -1,9 +1,11 @@
 package uk.ac.ebi.intact.dataexchange.psimi.exporter.archive;
 
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.NameTruncation;
+
 import java.io.File;
 
 /**
- * TThis iterator will read FileUnit and the unit name will be the common abstract pathName
+ * This iterator will read FileUnit and the unit name will be the common abstract pathName
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$

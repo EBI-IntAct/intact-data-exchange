@@ -27,10 +27,8 @@ import java.io.*;
 import java.util.List;
 
 /**
- * TODO comment this class header.
+ * A class that can compress files.
  *
- * @author Bruno Aranda (baranda@ebi.ac.uk)
- * @version $Id$
  */
 public class Compressor {
 

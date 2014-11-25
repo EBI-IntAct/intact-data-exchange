@@ -5,7 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.*;
 import org.springframework.util.Assert;
-import uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.NameTruncation;
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.NameTruncation;
 import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.FileNameGenerator;
 import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.PublicationFileFilter;
 

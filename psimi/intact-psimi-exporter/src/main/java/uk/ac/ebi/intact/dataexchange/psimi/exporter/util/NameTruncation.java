@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.psimi.exporter.archive;
+package uk.ac.ebi.intact.dataexchange.psimi.exporter.util;
 
 /**
  * A NameTruncation is a class which truncates a name using a name separator.

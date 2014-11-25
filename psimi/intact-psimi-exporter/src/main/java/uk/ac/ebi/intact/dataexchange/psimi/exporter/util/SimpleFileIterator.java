@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.psimi.exporter.util;
 
 import org.apache.commons.io.FileUtils;
-import uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.NameTruncation;
 
 import java.io.File;
 import java.util.*;

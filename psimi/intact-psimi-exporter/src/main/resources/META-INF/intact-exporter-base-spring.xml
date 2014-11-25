@@ -117,7 +117,7 @@
 
     <bean id="asyncTaskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
 
-    <bean id="releaseFileNameTruncator" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.NameTruncation">
+    <bean id="releaseFileNameTruncator" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.util.NameTruncation">
         <property name="nameSeparator" value="_"/>
     </bean>
 
@@ -125,7 +125,7 @@
         <property name="separator" value="_"/>
     </bean>
 
-    <bean id="datasetNameTruncator" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.NameTruncation">
+    <bean id="datasetNameTruncator" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.util.NameTruncation">
         <property name="nameSeparator" value=" - "/>
     </bean>
 
@@ -147,6 +147,11 @@
             </map>
         </property>
     </bean>
+    <!-- individual file archive writer -->
+    <bean id="intactFileArchiveWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.ArchiveFileWriter" lazy-init="true">
+        <property name="compressor" ref="zipCompressor"/>
+        <property name="errorLogName" value="${release.buildFolder}/archive_individual_file_error.log"/>
+    </bean>
     <!-- simple complex reader -->
     <bean id="intactComplexOrderedBySpeciesReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
         <property name="queryString" value="select i from IntactComplex i
@@ -163,11 +168,6 @@
         <property name="speciesParentFolderName" value="${release.buildFolder}/species"/>
         <property name="extension" value="txt"/>
         <property name="taxidSeparator" value=":"/>
-    </bean>
-    <!-- individual file archive writer -->
-    <bean id="intactFileArchiveWriter" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.archive.ArchiveFileWriter" lazy-init="true">
-        <property name="compressor" ref="zipCompressor"/>
-        <property name="errorLogName" value="${release.buildFolder}/archive_individual_file_error.log"/>
     </bean>
 
     <!-- steps -->

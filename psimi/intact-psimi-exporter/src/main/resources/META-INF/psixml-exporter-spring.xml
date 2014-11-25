@@ -41,6 +41,7 @@
             </list>
         </property>
     </bean>
+
     <!-- publication file readers XML 2.5 per species -->
     <bean id="speciesClassificationXml25Reader" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.species.SpeciesClassificationChunkReader" lazy-init="true">
         <property name="fileNameGenerator" ref="releaseFileNameGenerator"/>
