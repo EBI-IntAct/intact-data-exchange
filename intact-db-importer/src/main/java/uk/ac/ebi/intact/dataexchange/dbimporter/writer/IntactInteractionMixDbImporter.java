@@ -2,8 +2,6 @@ package uk.ac.ebi.intact.dataexchange.dbimporter.writer;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.jami.model.Complex;
@@ -12,6 +10,7 @@ import psidev.psi.mi.jami.model.InteractionEvidence;
 import psidev.psi.mi.jami.model.ModelledInteraction;
 import uk.ac.ebi.intact.jami.service.IntactService;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,16 +24,13 @@ import java.util.logging.Logger;
 
 public class IntactInteractionMixDbImporter extends AbstractIntactDbImporter<Interaction>{
 
-    @Autowired
-    @Qualifier("interactionEvidenceService")
+    @Resource(name = "interactionEvidenceService")
     private IntactService<InteractionEvidence> interactionEvidenceService;
 
-    @Autowired
-    @Qualifier("modelledInteractionService")
+    @Resource(name = "modelledInteractionService")
     private IntactService<ModelledInteraction> modelledInteractionService;
 
-    @Autowired
-    @Qualifier("complexService")
+    @Resource(name = "complexService")
     private IntactService<Complex> complexService;
 
     private Logger log = Logger.getLogger(IntactInteractionMixDbImporter.class.getName());
