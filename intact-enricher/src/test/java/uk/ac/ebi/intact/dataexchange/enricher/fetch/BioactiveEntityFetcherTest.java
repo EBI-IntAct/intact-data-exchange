@@ -18,12 +18,12 @@ package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import psidev.psi.mi.jami.model.BioactiveEntity;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 
 /**
@@ -34,8 +34,7 @@ import java.util.Collection;
  */
 public class BioactiveEntityFetcherTest extends EnricherBasicTestCase {
 
-    @Autowired
-    @Qualifier("intactBioactiveEntityFetcher")
+    @Resource(name = "intactBioactiveEntityFetcher")
     private BioactiveEntityFetcher fetcher;
 
     @Autowired

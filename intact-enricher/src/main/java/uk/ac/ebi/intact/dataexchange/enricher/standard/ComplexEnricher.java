@@ -17,8 +17,6 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.bridges.fetcher.InteractorFetcher;
@@ -36,6 +34,8 @@ import psidev.psi.mi.jami.model.Complex;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.utils.IntactUtils;
 
+import javax.annotation.Resource;
+
 /**
  * Intact enricher for complexes
  *
@@ -49,8 +49,7 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
      */
     private static final Log log = LogFactory.getLog(ComplexEnricher.class);
 
-    @Autowired
-    @Qualifier("intactCvObjectEnricher")
+    @Resource(name = "intactCvObjectEnricher")
     private CvObjectEnricher intactCvObjectEnricher;
 
     private OrganismEnricher intactBioSourceEnricher;

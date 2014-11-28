@@ -18,12 +18,13 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.model.*;
 import psidev.psi.mi.jami.model.impl.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
+
+import javax.annotation.Resource;
 
 /**
  * TODO comment this
@@ -33,8 +34,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
  */
 public class InteractionEnricherTest extends EnricherBasicTestCase {
 
-    @Autowired
-    @Qualifier("intactInteractionEvidenceEnricher")
+    @Resource(name = "intactInteractionEvidenceEnricher")
     private InteractionEvidenceEnricher enricher;
 
     @Autowired

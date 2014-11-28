@@ -1,7 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
@@ -16,6 +15,9 @@ import psidev.psi.mi.jami.model.FeatureEvidence;
 import psidev.psi.mi.jami.model.Parameter;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+
+import javax.annotation.Resource;
+import java.util.Collections;
 
 /**
  * Provides full enrichment of feature evidence.
@@ -33,12 +35,12 @@ public class FeatureEvidenceEnricher extends MinimalFeatureEvidenceEnricher {
     @Autowired
     private EnricherContext enricherContext;
 
-    @Autowired
-    @Qualifier("intactFeatureEnricher")
+    @Resource(name = "intactFeatureEnricher")
     private FeatureEnricher intactFeatureEnricher;
 
     public FeatureEvidenceEnricher(){
         super();
+        setFeaturesWithRangesToUpdate(Collections.EMPTY_LIST);
     }
 
     @Override

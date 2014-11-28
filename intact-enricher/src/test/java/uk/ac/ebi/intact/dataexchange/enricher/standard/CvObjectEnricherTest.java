@@ -17,13 +17,13 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.Participant;
 import psidev.psi.mi.jami.model.impl.DefaultCvTerm;
 import psidev.psi.mi.jami.utils.CvTermUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
+
+import javax.annotation.Resource;
 
 /**
  * TODO comment this
@@ -33,8 +33,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
  */
 public class CvObjectEnricherTest extends EnricherBasicTestCase {
 
-    @Autowired
-    @Qualifier("miCvObjectEnricher")
+    @Resource(name = "miCvObjectEnricher")
     private MiCvObjectEnricher enricher;
 
     @Test

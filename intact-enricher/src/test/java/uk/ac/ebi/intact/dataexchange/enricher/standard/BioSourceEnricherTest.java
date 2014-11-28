@@ -17,13 +17,13 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.Organism;
 import psidev.psi.mi.jami.model.impl.DefaultCvTerm;
 import psidev.psi.mi.jami.model.impl.DefaultOrganism;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
+
+import javax.annotation.Resource;
 
 /**
  * TODO comment this
@@ -33,8 +33,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
  */
 public class BioSourceEnricherTest extends EnricherBasicTestCase {
 
-    @Autowired
-    @Qualifier("intactBioSourceEnricher")
+    @Resource(name = "intactBioSourceEnricher")
     private BioSourceEnricher enricher;
 
     @Test

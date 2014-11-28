@@ -219,9 +219,9 @@ public class ProteinEnricher extends FullProteinEnricher {
     @Override
     public InteractorEnricherListener<Protein> getListener() {
         if (super.getListener() == null){
-            super.setListener(new ProteinEnricherListenerManager(new ProteinEnricherLogger(),
-                    (ProteinEnricherListener)ApplicationContextProvider.getBean("intactFeatureEvidenceEnricher"),
-                    (ProteinEnricherListener)ApplicationContextProvider.getBean("intactModelledFeatureEnricher")));
+            FeatureEvidenceEnricher featureEvidenceEnricher = ApplicationContextProvider.getBean("intactFeatureEvidenceEnricher");
+            ModelledFeatureEnricher modelledFeatureEnricher = ApplicationContextProvider.getBean("intactModelledFeatureEnricher");
+            super.setListener(new ProteinEnricherListenerManager(new ProteinEnricherLogger(),featureEvidenceEnricher,modelledFeatureEnricher));
         }
         return super.getListener();
     }

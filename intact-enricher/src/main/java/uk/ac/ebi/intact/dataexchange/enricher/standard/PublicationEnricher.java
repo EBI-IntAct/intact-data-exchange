@@ -33,6 +33,7 @@ import psidev.psi.mi.jami.utils.XrefUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.PublicationFetcher;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -53,12 +54,10 @@ public class PublicationEnricher extends FullPublicationEnricher {
     @Autowired
     private EnricherContext enricherContext;
 
-    @Autowired
-    @Qualifier("miCvObjectEnricher")
+    @Resource(name = "miCvObjectEnricher")
     private MiCvObjectEnricher miCvObjectEnricher;
 
-    @Autowired
-    @Qualifier("intactInstitutionEnricher")
+    @Resource(name = "intactInstitutionEnricher")
     private InstitutionEnricher institutionEnricher;
 
     @Autowired

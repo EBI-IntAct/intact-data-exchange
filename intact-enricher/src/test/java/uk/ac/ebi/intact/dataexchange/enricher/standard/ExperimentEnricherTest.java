@@ -17,8 +17,6 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Experiment;
@@ -31,6 +29,8 @@ import psidev.psi.mi.jami.model.impl.DefaultSource;
 import psidev.psi.mi.jami.utils.AnnotationUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 
+import javax.annotation.Resource;
+
 /**
  * TODO comment this
  *
@@ -40,8 +40,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 
 public class ExperimentEnricherTest extends EnricherBasicTestCase {
 
-    @Autowired
-    @Qualifier("intactExperimentEnricher")
+    @Resource(name = "intactExperimentEnricher")
     private ExperimentEnricher enricher;
 
     @Test

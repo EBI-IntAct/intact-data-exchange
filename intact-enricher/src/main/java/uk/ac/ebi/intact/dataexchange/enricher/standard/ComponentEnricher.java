@@ -52,6 +52,7 @@ public class ComponentEnricher extends FullParticipantEvidenceEnricher<Participa
     @Override
     public void enrich(ParticipantEvidence participantToEnrich) throws EnricherException {
         // enrich full feature
+        this.intactParticipantEnricher.setFeatureEnricher(getFeatureEnricher());
         intactParticipantEnricher.enrich(participantToEnrich);
         // enrich other properties
         super.enrich(participantToEnrich);
@@ -61,6 +62,7 @@ public class ComponentEnricher extends FullParticipantEvidenceEnricher<Participa
     public void enrich(ParticipantEvidence objectToEnrich, ParticipantEvidence objectSource) throws EnricherException {
         // enrich full feature
         intactParticipantEnricher.enrich(objectToEnrich, objectSource);
+        this.intactParticipantEnricher.setFeatureEnricher(getFeatureEnricher());
         // enrich other properties
         super.enrich(objectToEnrich, objectSource);
     }

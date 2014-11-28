@@ -17,12 +17,12 @@ package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
 import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.Participant;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
+
+import javax.annotation.Resource;
 
 /**
  * MiCvObjectFetcher Tester.
@@ -32,8 +32,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
  */
 public class MiCvObjectFetcherTest extends EnricherBasicTestCase {
 
-    @Autowired
-    @Qualifier("miCvObjectFetcher")
+    @Resource(name = "miCvObjectFetcher")
     private MiCvObjectFetcher fetcher;
 
     @Test

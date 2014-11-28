@@ -18,7 +18,6 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.model.BioactiveEntity;
 import psidev.psi.mi.jami.model.Xref;
@@ -27,6 +26,8 @@ import psidev.psi.mi.jami.utils.AliasUtils;
 import psidev.psi.mi.jami.utils.XrefUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
+
+import javax.annotation.Resource;
 
 /**
  * InteractorEnricher Tester.
@@ -37,8 +38,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 
 public class BioactiveEntityEnricherTest extends EnricherBasicTestCase {
 
-    @Autowired
-    @Qualifier("intactBioactiveEntityEnricher")
+    @Resource(name = "intactBioactiveEntityEnricher")
     private BioActiveEntityEnricher enricher;
 
     @Autowired

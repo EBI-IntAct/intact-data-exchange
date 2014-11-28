@@ -14,6 +14,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Provides full enrichment of feature.
@@ -38,6 +39,7 @@ public class FeatureEnricher<F extends Feature> extends FullFeatureEnricher<F> {
 
     public FeatureEnricher(){
         super();
+        setFeaturesWithRangesToUpdate(Collections.EMPTY_LIST);
     }
 
     protected void processRole(F featureToEnrich) throws EnricherException {

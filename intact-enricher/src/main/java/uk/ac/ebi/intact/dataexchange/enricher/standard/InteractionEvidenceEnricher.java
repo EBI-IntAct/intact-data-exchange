@@ -50,6 +50,7 @@ public class InteractionEvidenceEnricher extends FullInteractionEvidenceEnricher
     @Autowired
     public InteractionEvidenceEnricher(@Qualifier("intactInteractionEnricher")InteractionEnricher<InteractionEvidence> interactionEnricher) {
         super(interactionEnricher);
+        getInteractionEnricher().setParticipantEnricher(getParticipantEnricher());
     }
 
     @Override
