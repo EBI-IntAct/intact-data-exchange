@@ -3,8 +3,6 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner.actions;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -23,6 +21,7 @@ import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
 import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
 import uk.ac.ebi.intact.jami.utils.IntactUtils;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.*;
 
@@ -37,9 +36,8 @@ import java.util.*;
 @ContextConfiguration(locations = {"classpath*:/META-INF/intact-jami-test.spring.xml",
         "classpath*:/META-INF/imex-test.spring.xml"})
 public class IntactPublicationCollectorImplTest {
-    
-    @Autowired
-    @Qualifier("intactPublicationCollector")
+
+    @Resource(name = "intactPublicationCollector")
     private IntactPublicationCollector publicationCollectorTest;
     
     @Test

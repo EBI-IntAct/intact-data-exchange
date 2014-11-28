@@ -6,8 +6,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -27,6 +25,7 @@ import uk.ac.ebi.intact.jami.synchronizer.FinderException;
 import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
 import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
 
+import javax.annotation.Resource;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -44,8 +43,7 @@ import java.util.Set;
         "classpath*:/META-INF/imex-test.spring.xml"})
 public class GlobalImexPublicationUpdaterTest{
 
-    @Autowired
-    @Qualifier("globalImexPublicationUpdater")
+    @Resource(name = "globalImexPublicationUpdater")
     private GlobalImexPublicationUpdater globalImexUpdaterTest;
 
     @Before

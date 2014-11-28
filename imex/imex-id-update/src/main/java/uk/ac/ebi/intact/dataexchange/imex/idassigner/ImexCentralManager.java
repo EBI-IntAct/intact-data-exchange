@@ -2,8 +2,6 @@ package uk.ac.ebi.intact.dataexchange.imex.idassigner;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -38,6 +36,7 @@ import uk.ac.ebi.intact.jami.synchronizer.FinderException;
 import uk.ac.ebi.intact.jami.synchronizer.PersisterException;
 import uk.ac.ebi.intact.jami.synchronizer.SynchronizerException;
 
+import javax.annotation.Resource;
 import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.IOException;
@@ -54,16 +53,13 @@ import java.util.regex.Pattern;
 @Service
 @Scope( BeanDefinition.SCOPE_PROTOTYPE )
 public class ImexCentralManager {
-    @Autowired
-    @Qualifier("intactDao")
+    @Resource(name = "intactDao")
     private IntactDao intactDao;
 
-    @Autowired
-    @Qualifier("intactTransactionSynchronization")
+    @Resource(name = "intactTransactionSynchronization")
     private IntactTransactionSynchronization afterCommitExecutor;
 
-    @Autowired
-    @Qualifier("imexUpdateConfig")
+    @Resource(name = "imexUpdateConfig")
     private ImexAssignerConfig imexUpdateConfig;
 
     private IntactImexPublicationUpdater publicationUpdater;
