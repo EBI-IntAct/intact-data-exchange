@@ -2,8 +2,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.exporter.simple;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -14,6 +12,7 @@ import psidev.psi.mi.jami.factory.options.InteractionWriterOptions;
 import psidev.psi.mi.jami.model.Interaction;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -29,8 +28,7 @@ public abstract class AbstractIntactInteractionExporter<T extends Interaction> e
 
     private InteractionWriter interactionWriter;
 
-    @Autowired
-    @Qualifier("intactDao")
+    @Resource(name ="intactDao")
     private IntactDao intactDao;
 
     @Override

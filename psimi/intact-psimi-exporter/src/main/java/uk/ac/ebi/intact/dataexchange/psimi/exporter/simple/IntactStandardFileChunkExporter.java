@@ -4,8 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -18,6 +16,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.mitab.IntactPsiMitab;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.IntactPsiXml;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,8 +36,7 @@ public class IntactStandardFileChunkExporter<T extends Interaction> extends Abst
 
     private static final Log logger = LogFactory.getLog(AbstractIntactInteractionExporter.class);
 
-    @Autowired
-    @Qualifier("intactDao")
+    @Resource(name ="intactDao")
     private IntactDao intactDao;
 
     @Override

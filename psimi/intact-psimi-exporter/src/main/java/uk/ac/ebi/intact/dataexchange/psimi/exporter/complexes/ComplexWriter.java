@@ -3,8 +3,6 @@ package uk.ac.ebi.intact.dataexchange.psimi.exporter.complexes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -16,6 +14,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.mitab.IntactPsiMitab;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.IntactPsiXml;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -48,8 +47,7 @@ public class ComplexWriter implements ItemWriter<ComplexFileEntry>, ItemStream {
 
     private String extension = null;
 
-    @Autowired
-    @Qualifier("intactDao")
+    @Resource(name = "intactDao")
     private IntactDao intactDao;
 
     public ComplexWriter(){

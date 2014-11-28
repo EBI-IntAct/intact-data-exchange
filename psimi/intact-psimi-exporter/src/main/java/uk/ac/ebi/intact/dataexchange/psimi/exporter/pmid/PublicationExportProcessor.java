@@ -6,8 +6,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -18,6 +16,7 @@ import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.model.extension.IntactExperiment;
 import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -53,8 +52,7 @@ public class PublicationExportProcessor implements ItemProcessor<IntactPublicati
 
     private static final Log log = LogFactory.getLog(PublicationExportProcessor.class);
 
-    @Autowired
-    @Qualifier("intactDao")
+    @Resource(name ="intactDao")
     private IntactDao intactDao;
 
     public PublicationExportProcessor(){
