@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.cttv.write;
+package uk.ac.ebi.intact.dataexchange.cttv.writer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import psidev.psi.mi.jami.datasource.InteractionWriter;

@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.cttv.write;
+package uk.ac.ebi.intact.dataexchange.cttv.writer;
 
 import psidev.psi.mi.jami.factory.options.InteractionWriterOptions;
 
