@@ -22,13 +22,6 @@ public class ComplexDiseaseWriter implements InteractionWriter<Complex> {
     private Boolean first = true;
     private ComplexCttvConverter converter = null;
 
-    public ComplexDiseaseWriter() {
-        this.mapper = new ObjectMapper();
-        Map<String, Object> options= new HashMap<String, Object>();
-        options.put(ComplexDiseaseWriterOptions.OUTPUT_OPTION_KEY, "default_output_file.json");
-        options.put(ComplexDiseaseWriterOptions.COMPLEX_CTTV_CONVERTER, new DefaultComplexCttvConverter());
-    }
-
     public ComplexDiseaseWriter(Map<String, Object> options) {
         this.mapper = new ObjectMapper();
         initialiseContext(options);

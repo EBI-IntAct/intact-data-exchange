@@ -64,6 +64,7 @@ public class IntactComplexDiseaseWriter implements ItemWriter<IntactComplex>, It
                 //Open
                 this.position = 0;
                 this.fileChannel = new FileOutputStream(this.filename).getChannel();
+                this.writer.start();
             }
         } catch (IOException e) {
             throw new ItemStreamException("Impossible to get the last position of the writer", e);
@@ -85,13 +86,15 @@ public class IntactComplexDiseaseWriter implements ItemWriter<IntactComplex>, It
 
     @Override
     public void close() throws ItemStreamException {
-        if (this.fileChannel != null) try {
-            this.fileChannel.close();
-            this.writer.flush();
-            this.writer.close();
-        } catch (IOException e) {
-            throw new ItemStreamException("Impossible to close the file chanel", e);
-        }
+        if (this.fileChannel != null)
+            try {
+                this.writer.end();
+                this.fileChannel.close();
+                this.writer.flush();
+                this.writer.close();
+            } catch (IOException e) {
+                throw new ItemStreamException("Impossible to close the file chanel", e);
+            }
     }
 
     @Override

@@ -45,10 +45,10 @@ public class DefaultComplexCttvConverter implements ComplexCttvConverter {
         ProvenanceType provenanceType = new ProvenanceType(new ProvenanceLiterature(), new ProvenanceExpert(true), new ProvenanceDatabase("IntAct", "1.0")); //This version is hardcoded
         List<String> evidenceCodes = new ArrayList<String>();
         //This two are hardcoded
-        evidenceCodes.add(this.identifiersUrl + "eco/0000205");
-        evidenceCodes.add(this.identifiersUrl + "eco/0000001");
+        evidenceCodes.add(this.identifiersUrl + "eco/ECO:0000205");
+        evidenceCodes.add(this.identifiersUrl + "eco/ECO:0000001");
         //The ECO code of the complex
-        evidenceCodes.add(this.identifiersUrl + XrefUtils.collectFirstIdentifierWithDatabase(complex.getEvidenceType().getIdentifiers(), ecoMI, eco).getId());
+        evidenceCodes.add(this.identifiersUrl + "eco/" + XrefUtils.collectFirstIdentifierWithDatabase(complex.getEvidenceType().getIdentifiers(), ecoMI, eco).getId());
         Evidence evidence = new Evidence(complex.getUpdatedDate(), true, provenanceType, evidenceCodes, provenanceUrls);
         //
         //Biological Object
