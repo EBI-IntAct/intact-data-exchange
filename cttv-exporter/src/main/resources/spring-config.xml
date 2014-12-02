@@ -10,6 +10,8 @@
     <context:component-scan base-package="uk.ac.ebi.intact.jami" />
     <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.cttv" />
 
+    <context:property-placeholder location="classpath*:jami-batch-complex.properties"/>
+
     <import resource="classpath*:/META-INF/psimi-batch-spring.xml"/>
 
     <tx:annotation-driven proxy-target-class="true"/>
@@ -110,7 +112,7 @@
     </bean>
 
     <!-- Complex Writer -->
-    <bean id="complexDiseaseWriter" class="uk.ac.ebi.intact.dataexchange.cttv.write.IntactComplexDiseaseWriter">
+    <bean id="complexDiseaseWriter" class="uk.ac.ebi.intact.dataexchange.cttv.writer.IntactComplexDiseaseWriter">
         <constructor-arg name="filename" value="${target.file}"/>
     </bean>
 
