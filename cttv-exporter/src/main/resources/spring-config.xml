@@ -99,7 +99,7 @@
     <!-- Complex Reader -->
     <bean id="complexDiseaseReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
         <!--TODO: Create a proper JAMI HQL query to retrieve all the complexes-->
-        <property name="queryString" value="select i from IntactComplex i join i.dbXrefs as x
+        <property name="queryString" value="select distinct i from IntactComplex i join i.dbXrefs as x
         where x.database.shortName = :efo or x.database.shortName = :orphanet order by i.created, i.ac"/>
         <property name="parameterValues">
             <map>
