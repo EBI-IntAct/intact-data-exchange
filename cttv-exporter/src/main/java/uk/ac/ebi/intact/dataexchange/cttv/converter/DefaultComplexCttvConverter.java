@@ -17,7 +17,9 @@ public class DefaultComplexCttvConverter implements ComplexCttvConverter {
     private final String efo = "efo";
     private final String efoMI = "MI:1337";
     private final String orphanet = "orphanet";
-    private final String orphanetMI = "MI:0356";
+    private final String orphanetMI = "IA:2828";
+    private final String intact = "intact";
+    private final String intactMI = "MI:0469";
 
     @Override
     public EvidenceString convertToEvidenceStringFromComplex(Complex complex) {
@@ -41,20 +43,22 @@ public class DefaultComplexCttvConverter implements ComplexCttvConverter {
         //Evidence (Before known as Provenance)
         //
         ProvenanceUrls provenanceUrls = new ProvenanceUrls();
-        provenanceUrls.addLinkOut(new LinkOut("IntAct Complex Portal", "http://www.ebi.ac.uk/intact/complex-ws/details/" + complex.getPreferredIdentifier().getId()));
+        provenanceUrls.addLinkOut(new LinkOut("IntAct Complex Portal", "http://www.ebi.ac.uk/intact/complex-ws/details/" + getIntActID(complex).getId()));
         ProvenanceType provenanceType = new ProvenanceType(new ProvenanceLiterature(), new ProvenanceExpert(true), new ProvenanceDatabase("IntAct", "1.0")); //This version is hardcoded
         List<String> evidenceCodes = new ArrayList<String>();
         //This two are hardcoded
         evidenceCodes.add(this.identifiersUrl + "eco/ECO:0000205");
         evidenceCodes.add(this.identifiersUrl + "eco/ECO:0000001");
         //The ECO code of the complex
-        evidenceCodes.add(this.identifiersUrl + "eco/" + XrefUtils.collectFirstIdentifierWithDatabase(complex.getEvidenceType().getIdentifiers(), ecoMI, eco).getId());
+        for (Xref xref_eco : XrefUtils.collectAllXrefsHavingDatabase(complex.getEvidenceType().getIdentifiers(), ecoMI, eco)) {
+            evidenceCodes.add(this.identifiersUrl + "eco/" + xref_eco.getId());
+        }
         Evidence evidence = new Evidence(complex.getUpdatedDate(), true, provenanceType, evidenceCodes, provenanceUrls);
         //
         //Biological Object
         //
         BiologicalObject biologicalObject = null;
-        for (Xref xref : XrefUtils.collectAllXrefsHavingDatabase(complex.getXrefs(), efoMI, efo)) {
+        for (Xref xref : XrefUtils.collectAllXrefsHavingDatabase(complex.getIdentifiers(), efoMI, efo)) {
             if (biologicalObject == null) {
                 biologicalObject = new BiologicalObject(this.identifiersUrl + "efo/" + xref.getId());
             }
@@ -62,19 +66,20 @@ public class DefaultComplexCttvConverter implements ComplexCttvConverter {
                 biologicalObject.addAbout(this.identifiersUrl + "efo/" + xref.getId());
             }
         }
+        if (biologicalObject == null) {
+            biologicalObject = new BiologicalObject(this.identifiersUrl + "efo/EFO:0000000");
+        }
         for (Xref xref : XrefUtils.collectAllXrefsHavingDatabase(complex.getXrefs(), orphanetMI, orphanet)) {
-            if (biologicalObject == null) {
-                biologicalObject = new BiologicalObject(this.identifiersUrl + "orphanet" + xref.getId());
-            }
-            else {
-                biologicalObject.addAbout(this.identifiersUrl + "orphanet" + xref.getId());
-            }
+            biologicalObject.addAbout(this.identifiersUrl + "orphanet/" + xref.getId());
         }
         Map<String, String> uniqueAssociationFields = new HashMap<String, String>();
-        uniqueAssociationFields.put("intact_id",this.identifiersUrl + "intact/" + complex.getPreferredIdentifier().getId());
+        uniqueAssociationFields.put("intact_id", this.identifiersUrl + "intact/" + getIntActID(complex).getId());
         uniqueAssociationFields.put("biological_subjects", StringUtils.join(biologicalSubject.getAbout(), ","));
-        if (biologicalObject != null)
-            uniqueAssociationFields.put("biological_objects", StringUtils.join(biologicalObject.getAbout(), ","));
+        uniqueAssociationFields.put("biological_objects", StringUtils.join(biologicalObject.getAbout(), ","));
         return new EvidenceString(biologicalSubject, evidence, biologicalObject, uniqueAssociationFields);
+    }
+
+    private Xref getIntActID(Complex complex) {
+        return XrefUtils.collectFirstIdentifierWithDatabase(complex.getIdentifiers(), this.intactMI, this.intact);
     }
 }

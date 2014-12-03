@@ -122,7 +122,7 @@ public class ComplexDiseaseWriter implements InteractionWriter<Complex> {
                 first = false;
             }
             else {
-                this.writer.write(this.mapper.writeValueAsString("," + this.converter.convertToEvidenceStringFromComplex(complex)));
+                this.writer.write("," + this.mapper.writeValueAsString(this.converter.convertToEvidenceStringFromComplex(complex)));
             }
         } catch (IOException e) {
             throw new MIIOException("Impossible to uk.ac.ebi.intact.dataexchange.cttv.write an object in the JSON file", e);

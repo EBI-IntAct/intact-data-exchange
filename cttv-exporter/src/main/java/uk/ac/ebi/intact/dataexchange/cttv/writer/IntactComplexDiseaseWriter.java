@@ -41,7 +41,7 @@ public class IntactComplexDiseaseWriter implements ItemWriter<IntactComplex>, It
     private static final Log log = LogFactory.getLog(IntactComplexDiseaseWriter.class);
 
     public IntactComplexDiseaseWriter() throws FileNotFoundException {
-        this("default_output_file.json");
+//        this("default_output_file.json");
     }
 
     public IntactComplexDiseaseWriter(String filename) throws FileNotFoundException {
@@ -58,7 +58,7 @@ public class IntactComplexDiseaseWriter implements ItemWriter<IntactComplex>, It
         try {
             if (executionContext.containsKey(this.CURRENT_POSITION)) {
                 //ReOpen
-                    updatePosition();
+                updatePosition();
             }
             else {
                 //Open
