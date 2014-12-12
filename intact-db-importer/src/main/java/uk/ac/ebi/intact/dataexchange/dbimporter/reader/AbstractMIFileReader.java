@@ -130,4 +130,8 @@ public abstract class AbstractMIFileReader<I extends Interaction> implements Ite
     protected void setInteractionDataSource(InteractionStream interactionDataSource) {
         this.interactionDataSource = interactionDataSource;
     }
+
+    public Resource getResource() {
+        return resource;
+    }
 }
