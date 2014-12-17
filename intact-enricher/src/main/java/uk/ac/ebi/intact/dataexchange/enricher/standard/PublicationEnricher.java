@@ -164,7 +164,7 @@ public class PublicationEnricher extends FullPublicationEnricher {
 
     @Override
     protected void processIdentifiers(Publication objectToEnrich, Publication fetched) throws EnricherException {
-        if (objectToEnrich != null){
+        if (fetched != null){
             super.processIdentifiers(objectToEnrich, fetched);
         }
 
