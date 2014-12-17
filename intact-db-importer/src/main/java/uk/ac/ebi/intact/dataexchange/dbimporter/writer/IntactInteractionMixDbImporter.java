@@ -9,6 +9,7 @@ import psidev.psi.mi.jami.model.ModelledInteraction;
 import uk.ac.ebi.intact.jami.service.IntactService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -59,20 +60,32 @@ public class IntactInteractionMixDbImporter extends AbstractIntactDbImporter<Int
         if (this.complexService == null){
             throw new IllegalStateException("The writer must have a non null complex service");
         }
-
+        List<InteractionEvidence> evidences = new ArrayList<InteractionEvidence>(is.size());
+        List<ModelledInteraction> modelledInteractions = new ArrayList<ModelledInteraction>(is.size());
+        List<Complex> complexes = new ArrayList<Complex>(is.size());
         for (Interaction i : is){
             if (i instanceof InteractionEvidence){
-                this.interactionEvidenceService.saveOrUpdate((InteractionEvidence)i);
+                evidences.add((InteractionEvidence)i);
             }
             else if (i instanceof Complex){
-                this.complexService.saveOrUpdate((Complex)i);
+                complexes.add((Complex)i);
             }
             else if (i instanceof ModelledInteraction){
-                this.modelledInteractionService.saveOrUpdate((ModelledInteraction)i);
+                modelledInteractions.add((ModelledInteraction)i);
             }
             else{
                 log.severe("Did not recognize interaction type : "+is.getClass().getSimpleName()+" so ignored it.");
             }
+        }
+
+        if (!evidences.isEmpty()){
+            this.interactionEvidenceService.saveOrUpdate(evidences);
+        }
+        if (!modelledInteractions.isEmpty()){
+            this.modelledInteractionService.saveOrUpdate(modelledInteractions);
+        }
+        if (!complexes.isEmpty()){
+            this.complexService.saveOrUpdate(complexes);
         }
     }
 
