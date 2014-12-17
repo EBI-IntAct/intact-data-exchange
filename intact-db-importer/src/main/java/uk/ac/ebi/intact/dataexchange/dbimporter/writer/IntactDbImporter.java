@@ -2,8 +2,6 @@ package uk.ac.ebi.intact.dataexchange.dbimporter.writer;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.jami.service.IntactService;
 
 import java.util.List;
@@ -33,7 +31,6 @@ public class IntactDbImporter<I> extends AbstractIntactDbImporter<I>{
     }
 
     @Override
-    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public void write(List<? extends I> is) throws Exception {
         if (this.intactService == null){
             throw new IllegalStateException("The writer must have a non null interaction service");
