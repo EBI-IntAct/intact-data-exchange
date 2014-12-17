@@ -16,10 +16,10 @@ import psidev.psi.mi.jami.model.ModelledInteraction;
 
 public class IntactInteractionEnricherCompositeProcessor implements ItemProcessor<Interaction, Interaction> {
 
-    private IntactEnricherProcessor<InteractionEvidence> interactionEvidenceProcessor;
-    private IntactEnricherProcessor<Complex> complexProcessor;
-    private IntactEnricherProcessor<ModelledInteraction> modelledInteractionProcessor;
-    private IntactEnricherProcessor<Interaction> interactionProcessor;
+    private ItemProcessor<InteractionEvidence,InteractionEvidence> interactionEvidenceProcessor;
+    private ItemProcessor<Complex,Complex> complexProcessor;
+    private ItemProcessor<ModelledInteraction,ModelledInteraction> modelledInteractionProcessor;
+    private ItemProcessor<Interaction,InteractionEvidence> interactionProcessor;
 
     public Interaction process(Interaction item) throws Exception {
         if (this.interactionEvidenceProcessor == null && this.complexProcessor == null && this.modelledInteractionProcessor == null
@@ -47,35 +47,35 @@ public class IntactInteractionEnricherCompositeProcessor implements ItemProcesso
         return null;
     }
 
-    public IntactEnricherProcessor<InteractionEvidence> getInteractionEvidenceProcessor() {
+    public ItemProcessor<InteractionEvidence,InteractionEvidence> getInteractionEvidenceProcessor() {
         return interactionEvidenceProcessor;
     }
 
-    public void setInteractionEvidenceProcessor(IntactEnricherProcessor<InteractionEvidence> interactionEvidenceProcessor) {
+    public void setInteractionEvidenceProcessor(ItemProcessor<InteractionEvidence,InteractionEvidence> interactionEvidenceProcessor) {
         this.interactionEvidenceProcessor = interactionEvidenceProcessor;
     }
 
-    public IntactEnricherProcessor<Complex> getComplexProcessor() {
+    public ItemProcessor<Complex, Complex> getComplexProcessor() {
         return complexProcessor;
     }
 
-    public void setComplexProcessor(IntactEnricherProcessor<Complex> complexProcessor) {
+    public void setComplexProcessor(ItemProcessor<Complex, Complex> complexProcessor) {
         this.complexProcessor = complexProcessor;
     }
 
-    public IntactEnricherProcessor<ModelledInteraction> getModelledInteractionProcessor() {
+    public ItemProcessor<ModelledInteraction, ModelledInteraction> getModelledInteractionProcessor() {
         return modelledInteractionProcessor;
     }
 
-    public void setModelledInteractionProcessor(IntactEnricherProcessor<ModelledInteraction> modelledInteractionProcessor) {
+    public void setModelledInteractionProcessor(ItemProcessor<ModelledInteraction, ModelledInteraction> modelledInteractionProcessor) {
         this.modelledInteractionProcessor = modelledInteractionProcessor;
     }
 
-    public IntactEnricherProcessor<Interaction> getInteractionProcessor() {
+    public ItemProcessor<Interaction, InteractionEvidence> getInteractionProcessor() {
         return interactionProcessor;
     }
 
-    public void setInteractionProcessor(IntactEnricherProcessor<Interaction> interactionProcessor) {
+    public void setInteractionProcessor(ItemProcessor<Interaction, InteractionEvidence> interactionProcessor) {
         this.interactionProcessor = interactionProcessor;
     }
 }

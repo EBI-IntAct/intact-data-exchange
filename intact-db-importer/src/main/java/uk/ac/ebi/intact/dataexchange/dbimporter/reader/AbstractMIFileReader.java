@@ -25,7 +25,7 @@ import java.util.Map;
  * @since <pre>17/11/14</pre>
  */
 
-public abstract class AbstractMIFileReader<I extends Interaction> implements ItemReader<I>, ItemStream {
+public abstract class AbstractMIFileReader<I extends Interaction> implements MIFileReader<I> {
 
     private InteractionStream<I> interactionDataSource;
     private int interactionCount = 0;
