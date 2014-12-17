@@ -37,7 +37,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.fetch.AbstractCvObjectFetcher;
 public class CvObjectEnricher extends AbstractCvObjectEnricher<CvTerm> {
 
     @Autowired
-    public CvObjectEnricher(@Qualifier("olsCvObjectFetcher") CvTermFetcher<CvTerm> intactCvObjectFetcher) {
+    public CvObjectEnricher(@Qualifier("intactOlsCvObjectFetcher") CvTermFetcher<CvTerm> intactCvObjectFetcher) {
         super((AbstractCvObjectFetcher)intactCvObjectFetcher);
     }
 
