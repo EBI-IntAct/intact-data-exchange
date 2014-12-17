@@ -15,27 +15,27 @@ import java.util.List;
 
 public class CompositePublicationDatasetWriter implements ItemWriter<PublicationDatasetUnit> {
 
-    private List<PublicationDatasetWriter> delegates;
+    private List<ItemWriter<PublicationDatasetUnit>> delegates;
 
     public CompositePublicationDatasetWriter(){
-        delegates = new ArrayList<PublicationDatasetWriter>();
+        delegates = new ArrayList<ItemWriter<PublicationDatasetUnit>>();
     }
 
     @Override
     public void write(List<? extends PublicationDatasetUnit> items) throws Exception {
 
-        for (PublicationDatasetWriter delegate : this.delegates){
+        for (ItemWriter<PublicationDatasetUnit> delegate : this.delegates){
             delegate.write(items);
         }
     }
 
-    public List<PublicationDatasetWriter> getDelegates() {
+    public List<ItemWriter<PublicationDatasetUnit>> getDelegates() {
         return delegates;
     }
 
-    public void setDelegates(List<PublicationDatasetWriter> delegates) {
+    public void setDelegates(List<ItemWriter<PublicationDatasetUnit>> delegates) {
         if (delegates == null){
-            this.delegates = new ArrayList<PublicationDatasetWriter>();
+            this.delegates = new ArrayList<ItemWriter<PublicationDatasetUnit>>();
         }
         this.delegates = delegates;
     }

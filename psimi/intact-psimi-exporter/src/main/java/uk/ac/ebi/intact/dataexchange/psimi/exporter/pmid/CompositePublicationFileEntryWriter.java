@@ -18,27 +18,27 @@ import java.util.SortedSet;
 
 public class CompositePublicationFileEntryWriter implements ItemWriter<SortedSet<PublicationFileEntry>> {
 
-    private List<PublicationFileEntryWriter> delegates;
+    private List<ItemWriter<SortedSet<PublicationFileEntry>>> delegates;
 
     public CompositePublicationFileEntryWriter(){
-        delegates = new ArrayList<PublicationFileEntryWriter>();
+        delegates = new ArrayList<ItemWriter<SortedSet<PublicationFileEntry>>>();
     }
 
     @Override
     public void write(List<? extends SortedSet<PublicationFileEntry>> items) throws Exception {
 
-        for (PublicationFileEntryWriter delegate : this.delegates){
+        for (ItemWriter<SortedSet<PublicationFileEntry>> delegate : this.delegates){
             delegate.write(items);
         }
     }
 
-    public List<PublicationFileEntryWriter> getDelegates() {
+    public List<ItemWriter<SortedSet<PublicationFileEntry>>> getDelegates() {
         return delegates;
     }
 
-    public void setDelegates(List<PublicationFileEntryWriter> delegates) {
+    public void setDelegates(List<ItemWriter<SortedSet<PublicationFileEntry>>> delegates) {
         if (delegates == null){
-            this.delegates = new ArrayList<PublicationFileEntryWriter>();
+            this.delegates = new ArrayList<ItemWriter<SortedSet<PublicationFileEntry>>>();
         }
         this.delegates = delegates;
     }

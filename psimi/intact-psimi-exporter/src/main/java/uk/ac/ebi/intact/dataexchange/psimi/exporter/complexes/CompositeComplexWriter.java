@@ -16,27 +16,27 @@ import java.util.List;
 
 public class CompositeComplexWriter implements ItemWriter<ComplexFileEntry> {
 
-    private List<ComplexWriter> delegates;
+    private List<ItemWriter<ComplexFileEntry>> delegates;
 
     public CompositeComplexWriter(){
-        delegates = new ArrayList<ComplexWriter>();
+        delegates = new ArrayList<ItemWriter<ComplexFileEntry>>();
     }
 
     @Override
     public void write(List<? extends ComplexFileEntry> items) throws Exception {
 
-        for (ComplexWriter delegate : this.delegates){
+        for (ItemWriter<ComplexFileEntry> delegate : this.delegates){
             delegate.write(items);
         }
     }
 
-    public List<ComplexWriter> getDelegates() {
+    public List<ItemWriter<ComplexFileEntry>> getDelegates() {
         return delegates;
     }
 
-    public void setDelegates(List<ComplexWriter> delegates) {
+    public void setDelegates(List<ItemWriter<ComplexFileEntry>> delegates) {
         if (delegates == null){
-            this.delegates = new ArrayList<ComplexWriter>();
+            this.delegates = new ArrayList<ItemWriter<ComplexFileEntry>>();
         }
         this.delegates = delegates;
     }
