@@ -28,6 +28,8 @@ public class IntactDbImporter<I> extends AbstractIntactDbImporter<I>{
         if (intactService == null){
             throw new IllegalStateException("The interaction service must be provided. ");
         }
+
+        this.intactService.getIntactDao().getSynchronizerContext().initialiseDbSynchronizerListener(getSynchronizerListener());
     }
 
     @Override

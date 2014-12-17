@@ -47,6 +47,10 @@ public class IntactInteractionMixDbImporter extends AbstractIntactDbImporter<Int
         if (complexService == null){
             throw new IllegalStateException("The complex service must be provided. ");
         }
+
+        this.interactionEvidenceService.getIntactDao().getSynchronizerContext().initialiseDbSynchronizerListener(getSynchronizerListener());
+        this.modelledInteractionService.getIntactDao().getSynchronizerContext().initialiseDbSynchronizerListener(getSynchronizerListener());
+        this.complexService.getIntactDao().getSynchronizerContext().initialiseDbSynchronizerListener(getSynchronizerListener());
     }
 
     @Override

@@ -42,7 +42,9 @@ public abstract class AbstractMIFileReader<I extends Interaction> implements MIF
             throw new IllegalStateException("The reader must be opened before reading interactions.");
         }
 
-        return interactionIterator.hasNext() ? interactionIterator.next() : null;
+        I nextObject = interactionIterator.hasNext() ? interactionIterator.next() : null;
+        this.interactionCount++;
+        return nextObject;
     }
 
     public void open(ExecutionContext executionContext) throws ItemStreamException {
