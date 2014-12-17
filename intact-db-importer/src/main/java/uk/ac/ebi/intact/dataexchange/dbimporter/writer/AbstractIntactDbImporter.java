@@ -24,11 +24,11 @@ public abstract class AbstractIntactDbImporter<T> implements ItemWriter<T>,ItemS
 
     private Logger log = Logger.getLogger(AbstractIntactDbImporter.class.getName());
 
-    private final static String PERSIST_MAP_COUNT = "persisted.map";
-    private final static String MERGE_MAP_COUNT = "merged.map";
-    private final static String DELETED_MAP_COUNT = "deleted.map";
-    private final static String MERGED_TRANSIENT_MAP_COUNT = "merged.transient.map";
-    private final static String REPLACED_TRANSIENT_MAP_COUNT = "transient.replaced.map";
+    public final static String PERSIST_MAP_COUNT = "persisted.map";
+    public final static String MERGE_MAP_COUNT = "merged.map";
+    public final static String DELETED_MAP_COUNT = "deleted.map";
+    public final static String MERGED_TRANSIENT_MAP_COUNT = "merged.transient.map";
+    public final static String REPLACED_TRANSIENT_MAP_COUNT = "transient.replaced.map";
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
