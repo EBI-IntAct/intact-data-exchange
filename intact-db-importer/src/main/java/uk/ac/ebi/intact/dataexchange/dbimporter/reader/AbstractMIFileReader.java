@@ -10,7 +10,9 @@ import psidev.psi.mi.jami.commons.PsiJami;
 import psidev.psi.mi.jami.datasource.InteractionStream;
 import psidev.psi.mi.jami.exception.MIIOException;
 import psidev.psi.mi.jami.factory.MIDataSourceFactory;
+import psidev.psi.mi.jami.factory.options.MIFileDataSourceOptions;
 import psidev.psi.mi.jami.model.Interaction;
+import uk.ac.ebi.intact.dataexchange.dbimporter.listener.IntactStrictParserListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -124,7 +126,9 @@ public abstract class AbstractMIFileReader<I extends Interaction> implements MIF
     }
 
     protected Map<String, Object> createDatasourceOptions(InputStream inputStreamToAnalyse, MIDataSourceOptionFactory optionFactory) throws IOException {
-        return optionFactory.getDefaultOptions(inputStreamToAnalyse);
+        Map<String, Object> options = optionFactory.getDefaultOptions(inputStreamToAnalyse);
+        options.put(MIFileDataSourceOptions.PARSER_LISTENER_OPTION_KEY, new IntactStrictParserListener());
+        return options;
     }
 
     protected void setInteractionDataSource(InteractionStream interactionDataSource) {
