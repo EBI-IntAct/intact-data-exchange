@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.bridges.fetcher.GeneFetcher;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.OrganismEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
@@ -44,7 +45,7 @@ public class GeneEnricher extends FullGeneEnricher {
     private EnricherContext enricherContext;
 
     @Autowired
-    public GeneEnricher(@Qualifier("intactGeneFetcher") uk.ac.ebi.intact.dataexchange.enricher.fetch.GeneFetcher proteinFetcher) {
+    public GeneEnricher(@Qualifier("intactGeneFetcher") GeneFetcher proteinFetcher) {
         super(proteinFetcher);
     }
 

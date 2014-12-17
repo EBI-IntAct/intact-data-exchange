@@ -31,7 +31,6 @@ import psidev.psi.mi.jami.model.Publication;
 import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.jami.utils.XrefUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
-import uk.ac.ebi.intact.dataexchange.enricher.fetch.PublicationFetcher;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -61,7 +60,7 @@ public class PublicationEnricher extends FullPublicationEnricher {
     private InstitutionEnricher institutionEnricher;
 
     @Autowired
-    public PublicationEnricher(@Qualifier("intactPublicationFetcher") PublicationFetcher intactPublicationFetcher) {
+    public PublicationEnricher(@Qualifier("intactPublicationFetcher") psidev.psi.mi.jami.bridges.fetcher.PublicationFetcher intactPublicationFetcher) {
         super(intactPublicationFetcher);
     }
 

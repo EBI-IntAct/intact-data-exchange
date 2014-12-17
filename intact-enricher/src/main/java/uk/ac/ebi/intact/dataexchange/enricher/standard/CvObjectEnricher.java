@@ -19,11 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.bridges.fetcher.CvTermFetcher;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.listener.CvTermEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.impl.log.CvTermEnricherLogger;
 import psidev.psi.mi.jami.model.CvTerm;
-import uk.ac.ebi.intact.dataexchange.enricher.fetch.OlsCvObjectFetcher;
+import uk.ac.ebi.intact.dataexchange.enricher.fetch.AbstractCvObjectFetcher;
 
 /**
  * CvObject enricher.
@@ -36,8 +37,8 @@ import uk.ac.ebi.intact.dataexchange.enricher.fetch.OlsCvObjectFetcher;
 public class CvObjectEnricher extends AbstractCvObjectEnricher<CvTerm> {
 
     @Autowired
-    public CvObjectEnricher(@Qualifier("olsCvObjectFetcher") OlsCvObjectFetcher intactCvObjectFetcher) {
-        super(intactCvObjectFetcher);
+    public CvObjectEnricher(@Qualifier("olsCvObjectFetcher") CvTermFetcher<CvTerm> intactCvObjectFetcher) {
+        super((AbstractCvObjectFetcher)intactCvObjectFetcher);
     }
 
     @Override

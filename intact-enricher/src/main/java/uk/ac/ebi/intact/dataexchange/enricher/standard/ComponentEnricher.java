@@ -16,7 +16,6 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
@@ -28,6 +27,8 @@ import psidev.psi.mi.jami.enricher.listener.impl.log.ParticipantEvidenceEnricher
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+
+import javax.annotation.Resource;
 
 /**
  * TODO comment this
@@ -42,8 +43,7 @@ public class ComponentEnricher extends FullParticipantEvidenceEnricher<Participa
     @Autowired
     private EnricherContext enricherContext;
 
-    @Autowired
-    @Qualifier("intactParticipantEnricher")
+    @Resource(name = "intactParticipantEnricher")
     private ParticipantEnricher intactParticipantEnricher;
 
     public ComponentEnricher() {

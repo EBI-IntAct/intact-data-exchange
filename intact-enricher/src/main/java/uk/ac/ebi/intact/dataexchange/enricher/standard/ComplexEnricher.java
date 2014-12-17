@@ -20,10 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.bridges.fetcher.InteractorFetcher;
-import psidev.psi.mi.jami.enricher.ModelledInteractionEnricher;
-import psidev.psi.mi.jami.enricher.OrganismEnricher;
-import psidev.psi.mi.jami.enricher.ParticipantEnricher;
-import psidev.psi.mi.jami.enricher.SourceEnricher;
+import psidev.psi.mi.jami.enricher.*;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.listener.ComplexEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.InteractionEnricherListener;
@@ -31,6 +28,7 @@ import psidev.psi.mi.jami.enricher.listener.InteractorEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.ModelledInteractionEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.impl.log.ComplexEnricherLogger;
 import psidev.psi.mi.jami.model.Complex;
+import psidev.psi.mi.jami.model.CvTerm;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.utils.IntactUtils;
 
@@ -50,7 +48,7 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
     private static final Log log = LogFactory.getLog(ComplexEnricher.class);
 
     @Resource(name = "intactCvObjectEnricher")
-    private CvObjectEnricher intactCvObjectEnricher;
+    private CvTermEnricher<CvTerm> intactCvObjectEnricher;
 
     private OrganismEnricher intactBioSourceEnricher;
     private SourceEnricher intactSourceEnricher;
@@ -199,7 +197,7 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
     }
 
     @Override
-    public ParticipantEnricher getParticipantEnricher() {
+    public psidev.psi.mi.jami.enricher.ParticipantEnricher getParticipantEnricher() {
         if (super.getParticipantEnricher() == null){
             super.setParticipantEnricher((ParticipantEnricher) ApplicationContextProvider.getBean("intactModelledParticipantEnricher"));
         }

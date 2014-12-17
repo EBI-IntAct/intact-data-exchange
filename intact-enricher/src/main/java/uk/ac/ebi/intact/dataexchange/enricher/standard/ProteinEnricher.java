@@ -32,7 +32,6 @@ import psidev.psi.mi.jami.enricher.listener.impl.log.ProteinEnricherLogger;
 import psidev.psi.mi.jami.enricher.util.EnricherUtils;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
-import uk.ac.ebi.intact.dataexchange.enricher.fetch.ProteinFetcher;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 /**
@@ -49,7 +48,7 @@ public class ProteinEnricher extends FullProteinEnricher {
     private EnricherContext enricherContext;
 
     @Autowired
-    public ProteinEnricher(@Qualifier("intactProteinFetcher")ProteinFetcher proteinFetcher) {
+    public ProteinEnricher(@Qualifier("intactProteinFetcher") psidev.psi.mi.jami.bridges.fetcher.ProteinFetcher proteinFetcher) {
         super(proteinFetcher);
     }
 

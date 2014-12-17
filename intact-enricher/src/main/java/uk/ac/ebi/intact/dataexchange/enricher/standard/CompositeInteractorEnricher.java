@@ -10,6 +10,7 @@ import psidev.psi.mi.jami.enricher.InteractorEnricher;
 import psidev.psi.mi.jami.enricher.InteractorPoolEnricher;
 import psidev.psi.mi.jami.enricher.ProteinEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
+import psidev.psi.mi.jami.enricher.impl.AbstractInteractorEnricher;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
@@ -31,9 +32,9 @@ public class CompositeInteractorEnricher extends psidev.psi.mi.jami.enricher.imp
     private EnricherContext enricherContext;
 
     @Autowired
-    public CompositeInteractorEnricher(@Qualifier("intactInteractorEnricher") uk.ac.ebi.intact.dataexchange.enricher.standard.InteractorEnricher
+    public CompositeInteractorEnricher(@Qualifier("intactInteractorEnricher") InteractorEnricher
                                                    interactorEnricher){
-        super(interactorEnricher);
+        super((AbstractInteractorEnricher)interactorEnricher);
     }
 
     public InteractorPoolEnricher getInteractorPoolEnricher() {
