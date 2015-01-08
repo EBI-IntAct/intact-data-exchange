@@ -16,6 +16,11 @@ import java.io.Writer;
  */
 
 public class StructuredAbstractTextComplexWriter extends AbstractStructuredAbstractComplexWriter{
+
+    public StructuredAbstractTextComplexWriter() {
+        super();
+    }
+
     public StructuredAbstractTextComplexWriter(Writer writer) {
         super(writer);
     }

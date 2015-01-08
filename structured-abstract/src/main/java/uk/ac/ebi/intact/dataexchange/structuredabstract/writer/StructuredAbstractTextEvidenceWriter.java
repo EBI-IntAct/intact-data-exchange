@@ -16,6 +16,11 @@ import java.io.Writer;
  */
 
 public class StructuredAbstractTextEvidenceWriter extends AbstractStructuredAbstractEvidenceWriter{
+
+    public StructuredAbstractTextEvidenceWriter() {
+        super();
+    }
+
     public StructuredAbstractTextEvidenceWriter(Writer writer) {
         super(writer);
     }

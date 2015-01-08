@@ -19,6 +19,11 @@ import java.util.Iterator;
  */
 
 public abstract class AbstractStructuredAbstractEvidenceWriter extends AbstractStructuredAbstractWriter<InteractionEvidence> {
+
+    public AbstractStructuredAbstractEvidenceWriter() {
+        super();
+    }
+
     public AbstractStructuredAbstractEvidenceWriter(Writer writer) {
         super(writer);
     }

@@ -18,6 +18,9 @@ import java.io.Writer;
 
 public class StructuredAbstractHtmlComplexWriter extends AbstractStructuredAbstractComplexWriter{
 
+    public StructuredAbstractHtmlComplexWriter() {
+        super();
+    }
 
     public StructuredAbstractHtmlComplexWriter(Writer writer) {
         super(writer);

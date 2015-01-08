@@ -18,6 +18,9 @@ import java.io.Writer;
 
 public class StructuredAbstractHtmlEvidenceWriter extends AbstractStructuredAbstractEvidenceWriter{
 
+    public StructuredAbstractHtmlEvidenceWriter() {
+        super();
+    }
 
     public StructuredAbstractHtmlEvidenceWriter(Writer writer) {
         super(writer);
