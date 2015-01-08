@@ -1,14 +1,12 @@
 package uk.ac.ebi.intact.dataexchange.structuredabstract.writer;
 
 import psidev.psi.mi.jami.model.*;
-import uk.ac.ebi.intact.dataexchange.structuredabstract.model.Sentence;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Abstract writer for structured abstract for interaction evidences
@@ -60,16 +58,6 @@ public abstract class AbstractStructuredAbstractEvidenceWriter extends AbstractS
 
         // write all collected sentences
         writeSentences();
-    }
-
-    protected void writeSentences() throws IOException {
-        Iterator<Sentence> sentenceIterator = getSentenceMap().values().iterator();
-        while (sentenceIterator.hasNext()) {
-            writeSentence(sentenceIterator.next());
-            if (sentenceIterator.hasNext()){
-                writeLineSeparator();
-            }
-        }
     }
 
     protected abstract void writeLineSeparator() throws IOException;
