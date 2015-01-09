@@ -18,7 +18,9 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.OrganismEnricher;
@@ -35,6 +37,7 @@ import uk.ac.ebi.intact.jami.ApplicationContextProvider;
  */
 @Component(value = "intactInteractorPoolEnricher")
 @Lazy
+@Scope( BeanDefinition.SCOPE_PROTOTYPE )
 public class InteractorPoolEnricher extends FullInteractorPoolEnricher {
 
     private static final Log log = LogFactory.getLog(InteractorPoolEnricher.class);

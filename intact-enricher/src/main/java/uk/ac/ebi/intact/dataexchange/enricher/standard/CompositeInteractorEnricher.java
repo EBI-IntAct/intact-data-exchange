@@ -2,7 +2,9 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.ComplexEnricher;
 import psidev.psi.mi.jami.enricher.*;
@@ -26,6 +28,7 @@ import java.util.Collection;
  */
 @Component(value = "intactCompositeInteractorEnricher")
 @Lazy
+@Scope( BeanDefinition.SCOPE_PROTOTYPE )
 public class CompositeInteractorEnricher extends psidev.psi.mi.jami.enricher.impl.CompositeInteractorEnricher {
 
     @Autowired

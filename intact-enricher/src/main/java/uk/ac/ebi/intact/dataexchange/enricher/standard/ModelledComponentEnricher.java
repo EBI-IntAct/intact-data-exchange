@@ -15,7 +15,9 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.model.ModelledFeature;
 import psidev.psi.mi.jami.model.ModelledParticipant;
@@ -28,6 +30,7 @@ import uk.ac.ebi.intact.jami.ApplicationContextProvider;
  */
 @Component(value = "intactModelledParticipantEnricher")
 @Lazy
+@Scope( BeanDefinition.SCOPE_PROTOTYPE )
 public class ModelledComponentEnricher extends ParticipantEnricher<ModelledParticipant, ModelledFeature>{
 
     public ModelledComponentEnricher() {

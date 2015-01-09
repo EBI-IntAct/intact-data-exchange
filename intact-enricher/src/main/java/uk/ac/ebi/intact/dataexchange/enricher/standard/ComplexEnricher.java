@@ -17,7 +17,9 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.bridges.fetcher.InteractorFetcher;
 import psidev.psi.mi.jami.enricher.*;
@@ -40,6 +42,7 @@ import javax.annotation.Resource;
  */
 @Component(value = "intactComplexEnricher")
 @Lazy
+@Scope( BeanDefinition.SCOPE_PROTOTYPE )
 public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implements psidev.psi.mi.jami.enricher.ComplexEnricher{
 
     /**

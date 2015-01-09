@@ -17,7 +17,9 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.ParticipantEnricher;
 import psidev.psi.mi.jami.enricher.SourceEnricher;
@@ -37,6 +39,7 @@ import javax.annotation.Resource;
  */
 @Component(value = "intactModelledInteractionEnricher")
 @Lazy
+@Scope( BeanDefinition.SCOPE_PROTOTYPE )
 public class ModelledInteractionEnricher extends AbstractInteractionEnricher<ModelledInteraction> implements psidev.psi.mi.jami.enricher.ModelledInteractionEnricher<ModelledInteraction>{
 
     /**

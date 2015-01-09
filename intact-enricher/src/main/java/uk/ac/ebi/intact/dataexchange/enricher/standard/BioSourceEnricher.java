@@ -17,7 +17,9 @@ package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
@@ -39,6 +41,7 @@ import uk.ac.ebi.intact.jami.ApplicationContextProvider;
  */
 @Component(value = "intactBioSourceEnricher")
 @Lazy
+@Scope( BeanDefinition.SCOPE_PROTOTYPE )
 public class BioSourceEnricher extends FullOrganismEnricher {
     @Autowired
     private EnricherContext enricherContext;

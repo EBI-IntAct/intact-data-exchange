@@ -1,7 +1,9 @@
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
@@ -30,6 +32,7 @@ import java.util.Collections;
  */
 @Component(value = "intactFeatureEvidenceEnricher")
 @Lazy
+@Scope( BeanDefinition.SCOPE_PROTOTYPE )
 public class FeatureEvidenceEnricher extends MinimalFeatureEvidenceEnricher {
 
     @Autowired
