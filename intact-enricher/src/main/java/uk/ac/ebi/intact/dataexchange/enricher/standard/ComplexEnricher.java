@@ -218,4 +218,8 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
     public void setOrganismEnricher(OrganismEnricher intactBioSourceEnricher) {
         this.intactBioSourceEnricher = intactBioSourceEnricher;
     }
+
+    public void setSourceEnricher(SourceEnricher intactSourceEnricher) {
+        this.intactSourceEnricher = intactSourceEnricher;
+    }
 }
