@@ -214,4 +214,8 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
         }
         return super.getInteractionEnricherListener();
     }
+
+    public void setOrganismEnricher(OrganismEnricher intactBioSourceEnricher) {
+        this.intactBioSourceEnricher = intactBioSourceEnricher;
+    }
 }
