@@ -193,6 +193,16 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
     }
 
     @Override
+    public void setListener(InteractorEnricherListener<Complex> listener) {
+        if ( listener instanceof ComplexEnricherListener){
+            setInteractionEnricherListener((ComplexEnricherListener)listener);
+        }
+        else{
+            setInteractionEnricherListener(null);
+        }
+    }
+
+    @Override
     public SourceEnricher getSourceEnricher() {
         if (this.intactSourceEnricher == null){
             this.intactSourceEnricher = ApplicationContextProvider.getBean("intactInstitutionEnricher");

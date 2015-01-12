@@ -57,6 +57,11 @@ public class InstitutionEnricher extends AbstractCvObjectEnricher<Source> implem
     }
 
     @Override
+    public void setPublicationEnricher(PublicationEnricher enricher) {
+
+    }
+
+    @Override
     public CvTermEnricherListener<Source> getCvTermEnricherListener() {
         if (super.getCvTermEnricherListener() == null){
             super.setCvTermEnricherListener(new SourceEnricherLogger());

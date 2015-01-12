@@ -20,8 +20,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import psidev.psi.mi.jami.enricher.*;
+import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.FeatureEnricher;
+import psidev.psi.mi.jami.enricher.OrganismEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.CompositeInteractorEnricher;
 import psidev.psi.mi.jami.enricher.impl.full.FullParticipantEvidenceEnricher;
@@ -185,9 +186,7 @@ public class ComponentEnricher extends FullParticipantEvidenceEnricher<Participa
     public psidev.psi.mi.jami.enricher.FeatureEnricher<FeatureEvidence> getFeatureEnricher() {
         if (super.getFeatureEnricher() == null){
             super.setFeatureEnricher((FeatureEvidenceEnricher) ApplicationContextProvider.getBean("intactFeatureEvidenceEnricher"));
-            if (intactParticipantEnricher instanceof ParticipantEnricher){
-                ((ParticipantEnricher) intactParticipantEnricher).setFeatureEnricher(super.getFeatureEnricher());
-            }
+            intactParticipantEnricher.setFeatureEnricher(super.getFeatureEnricher());
         }
         return super.getFeatureEnricher();
     }
@@ -196,9 +195,7 @@ public class ComponentEnricher extends FullParticipantEvidenceEnricher<Participa
     public CvTermEnricher<CvTerm> getCvTermEnricher() {
         if (super.getCvTermEnricher() == null){
             super.setCvTermEnricher((CvTermEnricher<CvTerm>) ApplicationContextProvider.getBean("miCvObjectEnricher"));
-            if (intactParticipantEnricher instanceof ParticipantEnricher){
-                ((ParticipantEnricher) intactParticipantEnricher).setCvTermEnricher(super.getCvTermEnricher());
-            }
+            intactParticipantEnricher.setCvTermEnricher(super.getCvTermEnricher());
         }
         return super.getCvTermEnricher();
     }
@@ -206,44 +203,34 @@ public class ComponentEnricher extends FullParticipantEvidenceEnricher<Participa
     @Override
     public EntityEnricherListener getParticipantEnricherListener() {
         if (super.getParticipantEnricherListener() == null){
-            super.setParticipantListener(new ParticipantEvidenceEnricherLogger());
-            if (intactParticipantEnricher instanceof ParticipantEnricher){
-                ((ParticipantEnricher) intactParticipantEnricher).setParticipantListener(super.getParticipantEnricherListener());
-            }
+            super.setParticipantEnricherListener(new ParticipantEvidenceEnricherLogger());
+            intactParticipantEnricher.setParticipantEnricherListener(super.getParticipantEnricherListener());
         }
         return super.getParticipantEnricherListener();
     }
 
     @Override
-    public void setParticipantListener(EntityEnricherListener listener) {
-        super.setParticipantListener(listener);
-        if (intactParticipantEnricher instanceof ParticipantEnricher){
-            ((ParticipantEnricher) intactParticipantEnricher).setParticipantListener(listener);
-        }
+    public void setParticipantEnricherListener(EntityEnricherListener listener) {
+        super.setParticipantEnricherListener(listener);
+        intactParticipantEnricher.setParticipantEnricherListener(listener);
     }
 
     @Override
     public void setFeatureEnricher(FeatureEnricher<FeatureEvidence> featureEnricher) {
         super.setFeatureEnricher(featureEnricher);
-        if (intactParticipantEnricher instanceof ParticipantEnricher){
-            ((ParticipantEnricher) intactParticipantEnricher).setFeatureEnricher(featureEnricher);
-        }
+        intactParticipantEnricher.setFeatureEnricher(featureEnricher);
     }
 
     @Override
     public void setInteractorEnricher(CompositeInteractorEnricher interactorEnricher) {
         super.setInteractorEnricher(interactorEnricher);
-        if (intactParticipantEnricher instanceof ParticipantEnricher){
-            ((ParticipantEnricher) intactParticipantEnricher).setInteractorEnricher(interactorEnricher);
-        }
+        intactParticipantEnricher.setInteractorEnricher(interactorEnricher);
     }
 
     @Override
     public void setCvTermEnricher(CvTermEnricher<CvTerm> cvTermEnricher) {
         super.setCvTermEnricher(cvTermEnricher);
-        if (intactParticipantEnricher instanceof ParticipantEnricher){
-            ((ParticipantEnricher) intactParticipantEnricher).setCvTermEnricher(cvTermEnricher);
-        }
+        intactParticipantEnricher.setCvTermEnricher(cvTermEnricher);
     }
 
     @Override
