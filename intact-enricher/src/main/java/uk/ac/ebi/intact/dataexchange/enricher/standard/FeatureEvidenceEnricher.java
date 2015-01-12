@@ -19,7 +19,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 import javax.annotation.Resource;
-import java.util.Collections;
+import java.util.Collection;
 
 /**
  * Provides full enrichment of feature evidence.
@@ -39,17 +39,16 @@ public class FeatureEvidenceEnricher extends MinimalFeatureEvidenceEnricher {
     private EnricherContext enricherContext;
 
     @Resource(name = "intactFeatureEnricher")
-    private FeatureEnricher intactFeatureEnricher;
+    private psidev.psi.mi.jami.enricher.FeatureEnricher intactFeatureEnricher;
 
     public FeatureEvidenceEnricher(){
         super();
-        setFeaturesWithRangesToUpdate(Collections.EMPTY_LIST);
     }
 
     @Override
     public void enrich(FeatureEvidence featureToEnrich) throws EnricherException {
         // enrich full feature
-        intactFeatureEnricher.enrich(featureToEnrich);
+        getIntactFeatureEnricher().enrich(featureToEnrich);
         // enrich other properties
         super.enrich(featureToEnrich);
     }
@@ -57,7 +56,7 @@ public class FeatureEvidenceEnricher extends MinimalFeatureEvidenceEnricher {
     @Override
     public void enrich(FeatureEvidence objectToEnrich, FeatureEvidence objectSource) throws EnricherException {
         // enrich full feature
-        intactFeatureEnricher.enrich(objectToEnrich, objectSource);
+        getIntactFeatureEnricher().enrich(objectToEnrich, objectSource);
         // enrich other properties
         super.enrich(objectToEnrich, objectSource);
     }
@@ -123,5 +122,38 @@ public class FeatureEvidenceEnricher extends MinimalFeatureEvidenceEnricher {
             super.setFeatureEnricherListener(new FeatureEvidenceEnricherLogger());
         }
         return super.getFeatureEnricherListener();
+    }
+
+    @Override
+    public void setFeaturesWithRangesToUpdate(Collection<FeatureEvidence> features) {
+        super.setFeaturesWithRangesToUpdate(features);
+        getIntactFeatureEnricher().setFeaturesWithRangesToUpdate(features);
+    }
+
+    @Override
+    public void setFeatureEnricherListener(FeatureEnricherListener<FeatureEvidence> featureEnricherListener) {
+        super.setFeatureEnricherListener(featureEnricherListener);
+        if (getIntactFeatureEnricher() instanceof FeatureEnricher){
+            ((FeatureEnricher)getIntactFeatureEnricher()).setFeatureEnricherListener(featureEnricherListener);
+        }
+    }
+
+    @Override
+    public void setCvTermEnricher(CvTermEnricher cvTermEnricher) {
+        super.setCvTermEnricher(cvTermEnricher);
+        if (getIntactFeatureEnricher() instanceof FeatureEnricher){
+            ((FeatureEnricher)getIntactFeatureEnricher()).setCvTermEnricher(cvTermEnricher);
+        }
+    }
+
+    public psidev.psi.mi.jami.enricher.FeatureEnricher getIntactFeatureEnricher() {
+        if (this.intactFeatureEnricher == null){
+           this.intactFeatureEnricher = ApplicationContextProvider.getBean("intactFeatureEnricher");
+        }
+        return intactFeatureEnricher;
+    }
+
+    public void setIntactFeatureEnricher(psidev.psi.mi.jami.enricher.FeatureEnricher intactFeatureEnricher) {
+        this.intactFeatureEnricher = intactFeatureEnricher;
     }
 }

@@ -24,11 +24,14 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.enricher.CvTermEnricher;
+import psidev.psi.mi.jami.enricher.SourceEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullPublicationEnricher;
 import psidev.psi.mi.jami.enricher.listener.PublicationEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.impl.log.PublicationEnricherLogger;
 import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.Publication;
 import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.jami.utils.XrefUtils;
@@ -57,10 +60,10 @@ public class PublicationEnricher extends FullPublicationEnricher {
     private EnricherContext enricherContext;
 
     @Resource(name = "miCvObjectEnricher")
-    private MiCvObjectEnricher miCvObjectEnricher;
+    private CvTermEnricher<CvTerm> miCvObjectEnricher;
 
     @Resource(name = "intactInstitutionEnricher")
-    private InstitutionEnricher institutionEnricher;
+    private SourceEnricher institutionEnricher;
 
     @Autowired
     public PublicationEnricher(@Qualifier("intactPublicationFetcher") psidev.psi.mi.jami.bridges.fetcher.PublicationFetcher intactPublicationFetcher) {
@@ -246,5 +249,21 @@ public class PublicationEnricher extends FullPublicationEnricher {
             super.setPublicationEnricherListener(new PublicationEnricherLogger());
         }
         return super.getPublicationEnricherListener();
+    }
+
+    public CvTermEnricher<CvTerm> getMiCvObjectEnricher() {
+        return miCvObjectEnricher;
+    }
+
+    public void setMiCvObjectEnricher(CvTermEnricher<CvTerm> miCvObjectEnricher) {
+        this.miCvObjectEnricher = miCvObjectEnricher;
+    }
+
+    public SourceEnricher getInstitutionEnricher() {
+        return institutionEnricher;
+    }
+
+    public void setInstitutionEnricher(SourceEnricher institutionEnricher) {
+        this.institutionEnricher = institutionEnricher;
     }
 }

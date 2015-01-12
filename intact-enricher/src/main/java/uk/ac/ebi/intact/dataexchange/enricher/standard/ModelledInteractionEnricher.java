@@ -31,8 +31,6 @@ import psidev.psi.mi.jami.model.ModelledInteraction;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.utils.IntactUtils;
 
-import javax.annotation.Resource;
-
 /**
  * Intact enricher for complexes
  *
@@ -46,9 +44,6 @@ public class ModelledInteractionEnricher extends AbstractInteractionEnricher<Mod
      * Sets up a logger for that class.
      */
     private static final Log log = LogFactory.getLog(ModelledInteractionEnricher.class);
-
-    @Resource(name = "intactCvObjectEnricher")
-    private CvObjectEnricher intactCvObjectEnricher;
 
     private SourceEnricher intactSourceEnricher;
 
@@ -115,4 +110,10 @@ public class ModelledInteractionEnricher extends AbstractInteractionEnricher<Mod
         }
         return super.getInteractionEnricherListener();
     }
+
+    public void setSourceEnricher(SourceEnricher enricher){
+        this.intactSourceEnricher = enricher;
+    }
+
+
 }

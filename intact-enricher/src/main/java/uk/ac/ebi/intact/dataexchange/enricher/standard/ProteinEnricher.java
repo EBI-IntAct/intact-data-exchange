@@ -36,6 +36,8 @@ import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
+import java.util.Collections;
+
 /**
  * This class enriches ie adds additional information to the protein
  *
@@ -222,6 +224,7 @@ public class ProteinEnricher extends FullProteinEnricher {
     public InteractorEnricherListener<Protein> getListener() {
         if (super.getListener() == null){
             FeatureEvidenceEnricher featureEvidenceEnricher = ApplicationContextProvider.getBean("intactFeatureEvidenceEnricher");
+            featureEvidenceEnricher.setFeaturesWithRangesToUpdate(Collections.EMPTY_LIST);
             ModelledFeatureEnricher modelledFeatureEnricher = ApplicationContextProvider.getBean("intactModelledFeatureEnricher");
             super.setListener(new ProteinEnricherListenerManager(new ProteinEnricherLogger(),featureEvidenceEnricher,modelledFeatureEnricher));
         }
