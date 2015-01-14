@@ -34,8 +34,7 @@ public class IntactPsiXmlElementWriterFactory {
                                                                         PsiXmlElementWriter<Alias> aliasWriter,
                                                                         PsiXmlElementWriter<Annotation> attributeWriter,
                                                                         PsiXmlXrefWriter primaryRefWriter,
-                                                                        PsiXmlElementWriter<Confidence> confidenceWriter,
-                                                                        PsiXmlElementWriter<Confidence> modelledConfidenceWriter,
+                                                                        PsiXmlElementWriter[] confidenceWriters,
                                                                         PsiXmlElementWriter<Checksum> checksumWriter,
                                                                         PsiXmlVariableNameWriter<CvTerm> interactionTypeWriter,
                                                                         PsiXmlVariableNameWriter<CvTerm> openCvWriter,
@@ -47,24 +46,24 @@ public class IntactPsiXmlElementWriterFactory {
 
         PsiXmlParameterWriter[] parameterWriters = elementWriterFactory.createParameterWriters(streamWriter, extended, objectIndex, version, publicationWriter);
         PsiXmlParticipantWriter[] participantWriters = createParticipantWriter(streamWriter, extended, objectIndex, version, xmlType, interactionCategory,
-                aliasWriter, attributeWriter, primaryRefWriter, confidenceWriter, interactorWriter, interactionTypeWriter, openCvWriter, parameterWriters[0]);
+                aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters[0], interactorWriter, interactionTypeWriter, openCvWriter, parameterWriters[0]);
         PsiXmlElementWriter inferredInteractionWriter = elementWriterFactory.createInferredInteractionWriter(streamWriter, objectIndex);
 
         if (extended){
             return elementWriterFactory.createExtendedPsiXmlInteractionWriters(streamWriter, objectIndex, version, xmlType, interactionCategory, complexType,
-                    aliasWriter, attributeWriter, primaryRefWriter, modelledConfidenceWriter, checksumWriter, interactionTypeWriter,
+                    aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters, checksumWriter, interactionTypeWriter,
                     experimentWriter, availabilityWriter, parameterWriters, participantWriters, inferredInteractionWriter, publicationWriter,
                     openCvWriter);
         }
         else if (named){
             return elementWriterFactory.createNamedPsiXmlInteractionWriters(streamWriter, objectIndex, version, xmlType, interactionCategory, complexType,
-                    aliasWriter, attributeWriter, primaryRefWriter, modelledConfidenceWriter, checksumWriter, interactionTypeWriter,
+                    aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters, checksumWriter, interactionTypeWriter,
                     experimentWriter, availabilityWriter, parameterWriters, participantWriters, inferredInteractionWriter, publicationWriter,
                     openCvWriter);
         }
         else{
             return createDefaultPsiXmlInteractionWriters(streamWriter, objectIndex, version, xmlType, interactionCategory, complexType,
-                    aliasWriter, attributeWriter, primaryRefWriter, modelledConfidenceWriter, checksumWriter, interactionTypeWriter,
+                    aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters, checksumWriter, interactionTypeWriter,
                     experimentWriter, availabilityWriter, parameterWriters, participantWriters, inferredInteractionWriter, publicationWriter,
                     openCvWriter);
         }
@@ -495,7 +494,7 @@ public class IntactPsiXmlElementWriterFactory {
                                                                                   PsiXmlElementWriter<Alias> aliasWriter,
                                                                                   PsiXmlElementWriter<Annotation> attributeWriter,
                                                                                   PsiXmlXrefWriter primaryRefWriter,
-                                                                                  PsiXmlElementWriter<Confidence> modelledConfidenceWriter,
+                                                                                  PsiXmlElementWriter[] confidenceWriters,
                                                                                   PsiXmlElementWriter<Checksum> checksumWriter,
                                                                                   PsiXmlVariableNameWriter<CvTerm> interactionTypeWriter,
                                                                                   PsiXmlExperimentWriter experimentWriter,
@@ -514,7 +513,7 @@ public class IntactPsiXmlElementWriterFactory {
                         switch (complexType){
                             case binary:
                                 return elementWriterFactory.createDefaultPsiXmlInteractionWriters(streamWriter, objectIndex, version, xmlType, interactionCategory,
-                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, modelledConfidenceWriter, checksumWriter,
+                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters, checksumWriter,
                                         interactionTypeWriter, experimentWriter, availabilityWriter, parameterWriters, participantWriters,
                                         inferredInteractionWriter, publicationWriter, openCvWriter);
                             default:
@@ -532,7 +531,7 @@ public class IntactPsiXmlElementWriterFactory {
                                 modelledWriter2.setAttributeWriter(attributeWriter);
                                 modelledWriter2.setXrefWriter(primaryRefWriter);
                                 modelledWriter2.setInteractionTypeWriter(interactionTypeWriter);
-                                modelledWriter2.setConfidenceWriter(modelledConfidenceWriter);
+                                modelledWriter2.setConfidenceWriter(confidenceWriters[1]);
                                 modelledWriter2.setInferredInteractionWriter(inferredInteractionWriter);
                                 modelledWriter2.setParticipantWriter(participantWriters[1]);
                                 modelledWriter2.setChecksumWriter(checksumWriter);
@@ -553,7 +552,7 @@ public class IntactPsiXmlElementWriterFactory {
                                         writer2.setAttributeWriter(attributeWriter);
                                         writer2.setXrefWriter(primaryRefWriter);
                                         writer2.setInteractionTypeWriter(interactionTypeWriter);
-                                        writer2.setConfidenceWriter(modelledConfidenceWriter);
+                                        writer2.setConfidenceWriter(confidenceWriters[0]);
                                         writer2.setInferredInteractionWriter(inferredInteractionWriter);
                                         writer2.setParticipantWriter(participantWriters[0]);
                                         writer2.setChecksumWriter(checksumWriter);
@@ -572,7 +571,7 @@ public class IntactPsiXmlElementWriterFactory {
                         switch (complexType){
                             case binary:
                                 return elementWriterFactory.createDefaultPsiXmlInteractionWriters(streamWriter, objectIndex, version, xmlType, interactionCategory,
-                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, modelledConfidenceWriter, checksumWriter,
+                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters, checksumWriter,
                                         interactionTypeWriter, experimentWriter, availabilityWriter, parameterWriters, participantWriters,
                                         inferredInteractionWriter, publicationWriter, openCvWriter);
                             default:
@@ -590,7 +589,7 @@ public class IntactPsiXmlElementWriterFactory {
                                 modelledWriter3.setAttributeWriter(attributeWriter);
                                 modelledWriter3.setXrefWriter(primaryRefWriter);
                                 modelledWriter3.setInteractionTypeWriter(interactionTypeWriter);
-                                modelledWriter3.setConfidenceWriter(modelledConfidenceWriter);
+                                modelledWriter3.setConfidenceWriter(confidenceWriters[1]);
                                 modelledWriter3.setInferredInteractionWriter(inferredInteractionWriter);
                                 modelledWriter3.setParticipantWriter(participantWriters[1]);
                                 modelledWriter3.setChecksumWriter(checksumWriter);
@@ -611,7 +610,7 @@ public class IntactPsiXmlElementWriterFactory {
                                         writer2.setAttributeWriter(attributeWriter);
                                         writer2.setXrefWriter(primaryRefWriter);
                                         writer2.setInteractionTypeWriter(interactionTypeWriter);
-                                        writer2.setConfidenceWriter(modelledConfidenceWriter);
+                                        writer2.setConfidenceWriter(confidenceWriters[0]);
                                         writer2.setInferredInteractionWriter(inferredInteractionWriter);
                                         writer2.setParticipantWriter(participantWriters[0]);
                                         writer2.setChecksumWriter(checksumWriter);
@@ -633,7 +632,7 @@ public class IntactPsiXmlElementWriterFactory {
                         switch (complexType){
                             case binary:
                                 return elementWriterFactory.createDefaultPsiXmlInteractionWriters(streamWriter, objectIndex, version, xmlType, interactionCategory,
-                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, modelledConfidenceWriter, checksumWriter,
+                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters, checksumWriter,
                                         interactionTypeWriter, experimentWriter, availabilityWriter, parameterWriters, participantWriters,
                                         inferredInteractionWriter, publicationWriter, openCvWriter);
                             default:
@@ -643,7 +642,7 @@ public class IntactPsiXmlElementWriterFactory {
                                 modelledWriter2.setAttributeWriter(attributeWriter);
                                 modelledWriter2.setXrefWriter(primaryRefWriter);
                                 modelledWriter2.setInteractionTypeWriter(interactionTypeWriter);
-                                modelledWriter2.setConfidenceWriter(modelledConfidenceWriter);
+                                modelledWriter2.setConfidenceWriter(confidenceWriters[1]);
                                 modelledWriter2.setInferredInteractionWriter(inferredInteractionWriter);
                                 modelledWriter2.setParticipantWriter(participantWriters[1]);
                                 modelledWriter2.setChecksumWriter(checksumWriter);
@@ -672,7 +671,7 @@ public class IntactPsiXmlElementWriterFactory {
                                         writer2.setAttributeWriter(attributeWriter);
                                         writer2.setXrefWriter(primaryRefWriter);
                                         writer2.setInteractionTypeWriter(interactionTypeWriter);
-                                        writer2.setConfidenceWriter(modelledConfidenceWriter);
+                                        writer2.setConfidenceWriter(confidenceWriters[0]);
                                         writer2.setInferredInteractionWriter(inferredInteractionWriter);
                                         writer2.setParticipantWriter(participantWriters[0]);
                                         writer2.setChecksumWriter(checksumWriter);
@@ -689,7 +688,7 @@ public class IntactPsiXmlElementWriterFactory {
                         switch (complexType){
                             case binary:
                                 return elementWriterFactory.createDefaultPsiXmlInteractionWriters(streamWriter, objectIndex, version, xmlType, interactionCategory,
-                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, modelledConfidenceWriter, checksumWriter,
+                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters, checksumWriter,
                                         interactionTypeWriter, experimentWriter, availabilityWriter, parameterWriters, participantWriters,
                                         inferredInteractionWriter, publicationWriter, openCvWriter);
                             default:
@@ -699,7 +698,7 @@ public class IntactPsiXmlElementWriterFactory {
                                 modelledWriter3.setAttributeWriter(attributeWriter);
                                 modelledWriter3.setXrefWriter(primaryRefWriter);
                                 modelledWriter3.setInteractionTypeWriter(interactionTypeWriter);
-                                modelledWriter3.setConfidenceWriter(modelledConfidenceWriter);
+                                modelledWriter3.setConfidenceWriter(confidenceWriters[1]);
                                 modelledWriter3.setInferredInteractionWriter(inferredInteractionWriter);
                                 modelledWriter3.setParticipantWriter(participantWriters[1]);
                                 modelledWriter3.setChecksumWriter(checksumWriter);
@@ -728,7 +727,7 @@ public class IntactPsiXmlElementWriterFactory {
                                         writer2.setAttributeWriter(attributeWriter);
                                         writer2.setXrefWriter(primaryRefWriter);
                                         writer2.setInteractionTypeWriter(interactionTypeWriter);
-                                        writer2.setConfidenceWriter(modelledConfidenceWriter);
+                                        writer2.setConfidenceWriter(confidenceWriters[0]);
                                         writer2.setInferredInteractionWriter(inferredInteractionWriter);
                                         writer2.setParticipantWriter(participantWriters[0]);
                                         writer2.setChecksumWriter(checksumWriter);

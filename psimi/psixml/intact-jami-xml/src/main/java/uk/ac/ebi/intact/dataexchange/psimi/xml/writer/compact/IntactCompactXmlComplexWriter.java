@@ -89,7 +89,7 @@ public class IntactCompactXmlComplexWriter extends CompactXmlComplexWriter {
         // initialise interaction
         PsiXmlInteractionWriter[] interactionWriters = intactFactory.createInteractionWritersFor(getStreamWriter(), getElementCache(),
                 getVersion(), PsiXmlType.compact, InteractionCategory.complex, ComplexType.n_ary, false, false, aliasWriter, attributeWriter, xrefWriter,
-                confidenceWriters[0], confidenceWriters[1], checksumWriter, cvWriter, openCvWriter, experimentWriter, availabilityWriter,
+                confidenceWriters, checksumWriter, cvWriter, openCvWriter, experimentWriter, availabilityWriter,
                 interactorWriter, publicationWriter);
         setInteractionWriter(interactionWriters[0]);
         // initialise complex
