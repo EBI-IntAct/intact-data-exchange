@@ -62,6 +62,22 @@ public class FeatureEnricher<F extends Feature> extends FullFeatureEnricher<F> {
         }
     }
 
+    @Override
+    protected void processRangeStatus(CvTerm status) throws EnricherException {
+        if(enricherContext.getConfig().isUpdateCvTerms()
+                && getCvTermEnricher() != null
+                && status != null) {
+            getCvTermEnricher().enrich( status );
+        }
+    }
+
+    @Override
+    protected void processRanges(F featureToEnrich, F fetched) throws EnricherException {
+        if(fetched != null){
+            super.processRanges(featureToEnrich, fetched);
+        }
+    }
+
     protected void processXrefs(F objectToEnrich, F fetched) throws EnricherException{
         if(fetched != null){
             super.processXrefs(objectToEnrich, fetched);
