@@ -146,6 +146,19 @@ public class FeatureEvidenceEnricher extends MinimalFeatureEvidenceEnricher {
         }
     }
 
+    public CvTermEnricher<CvTerm> getIntactCvObjectEnricher() {
+        if (intactFeatureEnricher instanceof FeatureEnricher){
+            return ((FeatureEnricher) intactFeatureEnricher).getIntactCvObjectEnricher();
+        }
+        return null;
+    }
+
+    public void setIntactCvObjectEnricher(CvTermEnricher<CvTerm> intactCvObjectEnricher) {
+        if (intactFeatureEnricher instanceof FeatureEnricher){
+            ((FeatureEnricher) intactFeatureEnricher).setIntactCvObjectEnricher(intactCvObjectEnricher);
+        }
+    }
+
     public psidev.psi.mi.jami.enricher.FeatureEnricher getIntactFeatureEnricher() {
         if (this.intactFeatureEnricher == null){
            this.intactFeatureEnricher = ApplicationContextProvider.getBean("intactFeatureEnricher");

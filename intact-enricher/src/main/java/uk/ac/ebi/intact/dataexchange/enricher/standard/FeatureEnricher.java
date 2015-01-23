@@ -15,6 +15,7 @@ import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -40,6 +41,9 @@ public class FeatureEnricher<F extends Feature> extends FullFeatureEnricher<F> {
     @Autowired
     private EnricherContext enricherContext;
 
+    @Resource(name = "intactCvObjectEnricher")
+    private CvTermEnricher<CvTerm> intactCvObjectEnricher;
+
     public FeatureEnricher(){
         super();
         setFeaturesWithRangesToUpdate(Collections.EMPTY_LIST);
@@ -56,9 +60,9 @@ public class FeatureEnricher<F extends Feature> extends FullFeatureEnricher<F> {
     @Override
     protected void processFeatureType(F featureToEnrich) throws EnricherException {
         if(enricherContext.getConfig().isUpdateCvTerms()
-                && getOlsCvTermEnricher() != null
+                && getIntactCvObjectEnricher() != null
                 && featureToEnrich.getType() != null) {
-            getOlsCvTermEnricher().enrich(featureToEnrich.getType());
+            getIntactCvObjectEnricher().enrich(featureToEnrich.getType());
         }
     }
 
@@ -176,8 +180,12 @@ public class FeatureEnricher<F extends Feature> extends FullFeatureEnricher<F> {
         return super.getCvTermEnricher();
     }
 
-    public CvTermEnricher getOlsCvTermEnricher() {
-        return ((CvTermEnricher<CvTerm>) ApplicationContextProvider.getBean("intactCvObjectEnricher"));
+    public CvTermEnricher<CvTerm> getIntactCvObjectEnricher() {
+        return intactCvObjectEnricher;
+    }
+
+    public void setIntactCvObjectEnricher(CvTermEnricher<CvTerm> intactCvObjectEnricher) {
+        this.intactCvObjectEnricher = intactCvObjectEnricher;
     }
 
     protected EnricherContext getEnricherContext() {

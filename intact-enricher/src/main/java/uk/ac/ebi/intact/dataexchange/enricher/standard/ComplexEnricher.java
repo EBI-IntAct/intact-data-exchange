@@ -234,4 +234,12 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
     public void setSourceEnricher(SourceEnricher intactSourceEnricher) {
         this.intactSourceEnricher = intactSourceEnricher;
     }
+
+    public CvTermEnricher<CvTerm> getIntactCvObjectEnricher() {
+        return intactCvObjectEnricher;
+    }
+
+    public void setIntactCvObjectEnricher(CvTermEnricher<CvTerm> intactCvObjectEnricher) {
+        this.intactCvObjectEnricher = intactCvObjectEnricher;
+    }
 }
