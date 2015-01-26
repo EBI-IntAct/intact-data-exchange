@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullFeatureEnricher;
-import psidev.psi.mi.jami.enricher.listener.FeatureEnricherListener;
-import psidev.psi.mi.jami.enricher.listener.impl.log.FeatureEnricherLogger;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
@@ -190,13 +188,5 @@ public class FeatureEnricher<F extends Feature> extends FullFeatureEnricher<F> {
 
     protected EnricherContext getEnricherContext() {
         return enricherContext;
-    }
-
-    @Override
-    public FeatureEnricherListener<F> getFeatureEnricherListener() {
-        if (super.getFeatureEnricherListener() == null){
-            super.setFeatureEnricherListener(new FeatureEnricherLogger<F>());
-        }
-        return super.getFeatureEnricherListener();
     }
 }

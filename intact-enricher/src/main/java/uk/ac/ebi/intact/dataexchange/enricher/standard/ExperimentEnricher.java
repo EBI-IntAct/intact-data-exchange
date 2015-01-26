@@ -28,8 +28,6 @@ import psidev.psi.mi.jami.enricher.OrganismEnricher;
 import psidev.psi.mi.jami.enricher.PublicationEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullExperimentEnricher;
-import psidev.psi.mi.jami.enricher.listener.ExperimentEnricherListener;
-import psidev.psi.mi.jami.enricher.listener.impl.log.ExperimentEnricherLogger;
 import psidev.psi.mi.jami.model.*;
 import psidev.psi.mi.jami.utils.AnnotationUtils;
 import psidev.psi.mi.jami.utils.XrefUtils;
@@ -228,13 +226,5 @@ public class ExperimentEnricher extends FullExperimentEnricher {
             super.setOrganismEnricher((OrganismEnricher) ApplicationContextProvider.getBean("intactBioSourceEnricher"));
         }
         return super.getOrganismEnricher();
-    }
-
-    @Override
-    public ExperimentEnricherListener getExperimentEnricherListener() {
-        if (super.getExperimentEnricherListener() == null){
-            super.setExperimentEnricherListener(new ExperimentEnricherLogger());
-        }
-        return super.getExperimentEnricherListener();
     }
 }

@@ -23,8 +23,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.bridges.fetcher.CvTermFetcher;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
-import psidev.psi.mi.jami.enricher.listener.CvTermEnricherListener;
-import psidev.psi.mi.jami.enricher.listener.impl.log.CvTermEnricherLogger;
 import psidev.psi.mi.jami.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.AbstractCvObjectFetcher;
 
@@ -47,13 +45,5 @@ public class MiCvObjectEnricher extends AbstractCvObjectEnricher<CvTerm> {
     @Override
     protected CvTermEnricher<CvTerm> getCvEnricher() {
         return this;
-    }
-
-    @Override
-    public CvTermEnricherListener<CvTerm> getCvTermEnricherListener() {
-        if (super.getCvTermEnricherListener() == null){
-            super.setCvTermEnricherListener(new CvTermEnricherLogger<CvTerm>());
-        }
-        return super.getCvTermEnricherListener();
     }
 }

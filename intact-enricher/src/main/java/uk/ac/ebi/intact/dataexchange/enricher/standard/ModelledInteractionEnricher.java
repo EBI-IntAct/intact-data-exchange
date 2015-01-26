@@ -24,9 +24,7 @@ import org.springframework.stereotype.Component;
 import psidev.psi.mi.jami.enricher.ParticipantEnricher;
 import psidev.psi.mi.jami.enricher.SourceEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
-import psidev.psi.mi.jami.enricher.listener.InteractionEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.ModelledInteractionEnricherListener;
-import psidev.psi.mi.jami.enricher.listener.impl.log.ModelledInteractionEnricherLogger;
 import psidev.psi.mi.jami.model.ModelledInteraction;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.utils.IntactUtils;
@@ -101,14 +99,6 @@ public class ModelledInteractionEnricher extends AbstractInteractionEnricher<Mod
             super.setParticipantEnricher((ParticipantEnricher) ApplicationContextProvider.getBean("intactModelledParticipantEnricher"));
         }
         return super.getParticipantEnricher();
-    }
-
-    @Override
-    public InteractionEnricherListener<ModelledInteraction> getInteractionEnricherListener() {
-        if (super.getInteractionEnricherListener() == null){
-            super.setInteractionEnricherListener(new ModelledInteractionEnricherLogger<ModelledInteraction>());
-        }
-        return super.getInteractionEnricherListener();
     }
 
     public void setSourceEnricher(SourceEnricher enricher){

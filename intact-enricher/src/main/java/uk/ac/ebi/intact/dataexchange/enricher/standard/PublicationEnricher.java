@@ -29,8 +29,6 @@ import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.SourceEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullPublicationEnricher;
-import psidev.psi.mi.jami.enricher.listener.PublicationEnricherListener;
-import psidev.psi.mi.jami.enricher.listener.impl.log.PublicationEnricherLogger;
 import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.Publication;
@@ -242,14 +240,6 @@ public class PublicationEnricher extends FullPublicationEnricher implements Cura
                         add(XrefUtils.createXrefWithQualifier(Xref.DOI, Xref.DOI_MI, doi.getId(), Xref.PRIMARY, Xref.PRIMARY_MI));
             }
         }
-    }
-
-    @Override
-    public PublicationEnricherListener getPublicationEnricherListener() {
-        if (super.getPublicationEnricherListener() == null){
-            super.setPublicationEnricherListener(new PublicationEnricherLogger());
-        }
-        return super.getPublicationEnricherListener();
     }
 
     public CvTermEnricher<CvTerm> getMiCvObjectEnricher() {

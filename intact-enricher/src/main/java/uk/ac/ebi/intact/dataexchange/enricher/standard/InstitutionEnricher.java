@@ -25,8 +25,6 @@ import psidev.psi.mi.jami.bridges.fetcher.CvTermFetcher;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.PublicationEnricher;
 import psidev.psi.mi.jami.enricher.SourceEnricher;
-import psidev.psi.mi.jami.enricher.listener.CvTermEnricherListener;
-import psidev.psi.mi.jami.enricher.listener.impl.log.SourceEnricherLogger;
 import psidev.psi.mi.jami.model.CvTerm;
 import psidev.psi.mi.jami.model.Source;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.AbstractCvObjectFetcher;
@@ -59,13 +57,5 @@ public class InstitutionEnricher extends AbstractCvObjectEnricher<Source> implem
     @Override
     public void setPublicationEnricher(PublicationEnricher enricher) {
 
-    }
-
-    @Override
-    public CvTermEnricherListener<Source> getCvTermEnricherListener() {
-        if (super.getCvTermEnricherListener() == null){
-            super.setCvTermEnricherListener(new SourceEnricherLogger());
-        }
-        return super.getCvTermEnricherListener();
     }
 }

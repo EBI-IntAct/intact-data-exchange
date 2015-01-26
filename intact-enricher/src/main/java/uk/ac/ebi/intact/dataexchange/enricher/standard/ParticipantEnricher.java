@@ -24,10 +24,8 @@ import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.CompositeInteractorEnricher;
 import psidev.psi.mi.jami.enricher.impl.full.FullParticipantEnricher;
-import psidev.psi.mi.jami.enricher.listener.EntityEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.ProteinEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.impl.ProteinEnricherListenerManager;
-import psidev.psi.mi.jami.enricher.listener.impl.log.ParticipantEnricherLogger;
 import psidev.psi.mi.jami.enricher.listener.impl.log.ProteinEnricherLogger;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
@@ -150,13 +148,5 @@ public class ParticipantEnricher<P extends Participant, F extends Feature> exten
                     new ProteinEnricherListenerManager(new ProteinEnricherLogger(),(ProteinEnricherListener)getFeatureEnricher()));
         }
         return super.getInteractorEnricher();
-    }
-
-    @Override
-    public EntityEnricherListener getParticipantEnricherListener() {
-        if (super.getParticipantEnricherListener() == null){
-            super.setParticipantEnricherListener(new ParticipantEnricherLogger());
-        }
-        return super.getParticipantEnricherListener();
     }
 }
