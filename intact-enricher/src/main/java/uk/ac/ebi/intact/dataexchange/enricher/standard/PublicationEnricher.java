@@ -24,6 +24,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import psidev.psi.mi.jami.enricher.CuratedPublicationEnricher;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.SourceEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
@@ -49,7 +50,7 @@ import java.util.Iterator;
 @Component(value = "intactPublicationEnricher")
 @Lazy
 @Scope( BeanDefinition.SCOPE_PROTOTYPE )
-public class PublicationEnricher extends FullPublicationEnricher {
+public class PublicationEnricher extends FullPublicationEnricher implements CuratedPublicationEnricher{
 
     /**
      * Sets up a logger for that class.
@@ -259,11 +260,13 @@ public class PublicationEnricher extends FullPublicationEnricher {
         this.miCvObjectEnricher = miCvObjectEnricher;
     }
 
-    public SourceEnricher getInstitutionEnricher() {
+    @Override
+    public SourceEnricher getSourceEnricher() {
         return institutionEnricher;
     }
 
-    public void setInstitutionEnricher(SourceEnricher institutionEnricher) {
-        this.institutionEnricher = institutionEnricher;
+    @Override
+    public void setSourceEnricher(SourceEnricher enricher) {
+        this.institutionEnricher = enricher;
     }
 }
