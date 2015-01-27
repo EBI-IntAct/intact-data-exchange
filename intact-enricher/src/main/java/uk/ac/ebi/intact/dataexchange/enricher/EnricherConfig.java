@@ -30,12 +30,11 @@ public class EnricherConfig {
     private boolean updateInteractorPool = true;
     private boolean updateGenes = true;
     private boolean updateExperiments = true;
-    private boolean updateInteractionShortLabels = false;
-    //private String oboUrl = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
+    private boolean updateInteractionShortLabels = true;
     private String oboUrl = "http://psidev.cvs.sourceforge.net/viewvc/psidev/psi/mi/rel25/data/psi-mi25.obo";
     private boolean updateCvTerms = true;
     private boolean updateCellTypesAndTissues = false;
-    private boolean updateCvInXrefsAliasesAnnotations = false;
+    private boolean updateCvInXrefsAliasesAnnotations = true;
 
     public EnricherConfig() {
     }

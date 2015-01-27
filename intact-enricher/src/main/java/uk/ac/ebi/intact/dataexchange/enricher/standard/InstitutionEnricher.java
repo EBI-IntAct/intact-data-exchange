@@ -45,8 +45,11 @@ public class InstitutionEnricher extends AbstractCvObjectEnricher<Source> implem
     }
 
     @Override
-    protected CvTermEnricher<CvTerm> getCvEnricher() {
-        return ApplicationContextProvider.getBean("miCvObjectEnricher");
+    public CvTermEnricher<CvTerm> getCvEnricher() {
+        if (super.getCvEnricher() == null){
+            super.setCvEnricher((CvTermEnricher<CvTerm>)ApplicationContextProvider.getBean("simpleMiCvObjectEnricher"));
+        }
+        return super.getCvEnricher();
     }
 
     @Override

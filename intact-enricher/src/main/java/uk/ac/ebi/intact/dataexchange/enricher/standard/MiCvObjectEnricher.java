@@ -25,6 +25,7 @@ import psidev.psi.mi.jami.bridges.fetcher.CvTermFetcher;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.model.CvTerm;
 import uk.ac.ebi.intact.dataexchange.enricher.fetch.AbstractCvObjectFetcher;
+import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 /**
  * CvObject enricher.
@@ -43,7 +44,10 @@ public class MiCvObjectEnricher extends AbstractCvObjectEnricher<CvTerm> {
     }
 
     @Override
-    protected CvTermEnricher<CvTerm> getCvEnricher() {
-        return this;
+    public CvTermEnricher<CvTerm> getCvEnricher() {
+        if (super.getCvEnricher() == null){
+            super.setCvEnricher((CvTermEnricher<CvTerm>)ApplicationContextProvider.getBean("simpleMiCvObjectEnricher"));
+        }
+        return super.getCvEnricher();
     }
 }

@@ -163,7 +163,7 @@ public class BioActiveEntityEnricher extends FullBioactiveEntityEnricher {
         }
 
         if (enricherContext.getConfig().isUpdateCvInXrefsAliasesAnnotations() && getCvTermEnricher() != null){
-            for (Object obj : objectToEnrich.getIdentifiers()) {
+            for (Object obj : objectToEnrich.getChecksums()) {
                 Checksum check = (Checksum)obj;
                 getCvTermEnricher().enrich(check.getMethod());
             }

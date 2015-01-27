@@ -37,6 +37,7 @@ public abstract class AbstractCvObjectEnricher<T extends CvTerm> extends FullCvT
 
     @Autowired
     private EnricherContext enricherContext;
+    private CvTermEnricher<CvTerm> simpleCvEnricher;
 
     public AbstractCvObjectEnricher(AbstractCvObjectFetcher intactCvObjectFetcher) {
         super(intactCvObjectFetcher);
@@ -149,5 +150,11 @@ public abstract class AbstractCvObjectEnricher<T extends CvTerm> extends FullCvT
         super.onEnrichedVersionNotFound(cvTermToEnrich);
     }
 
-    protected abstract CvTermEnricher<CvTerm> getCvEnricher();
+    public CvTermEnricher<CvTerm> getCvEnricher(){
+        return this.simpleCvEnricher;
+    }
+
+    public void setCvEnricher(CvTermEnricher<CvTerm> simpleCvEnricher) {
+        this.simpleCvEnricher = simpleCvEnricher;
+    }
 }
