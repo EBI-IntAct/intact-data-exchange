@@ -29,8 +29,8 @@ import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.listener.ComplexEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.InteractorEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.ModelledInteractionEnricherListener;
-import psidev.psi.mi.jami.model.Complex;
-import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.enricher.util.EnricherUtils;
+import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.utils.IntactUtils;
 
@@ -76,6 +76,10 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
         processInteractorType(interactionToEnrich);
         // process source
         processSource(interactionToEnrich);
+        // process confidences
+        processConfidences(interactionToEnrich, null);
+        // process parameters
+        processParameters(interactionToEnrich, null);
     }
 
     protected void processSource(Complex interactionToEnrich) throws EnricherException{
@@ -118,6 +122,10 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
         processInteractorType(objectToEnrich, objectSource);
         // process source
         processSource(objectToEnrich, objectSource);
+        // process confidences
+        processConfidences(objectToEnrich, objectSource);
+        // process parameters
+        processParameters(objectToEnrich, objectSource);
     }
 
     protected void processSource(Complex objectToEnrich, Complex objectSource) throws EnricherException{
@@ -167,6 +175,33 @@ public class ComplexEnricher extends AbstractInteractionEnricher<Complex> implem
             objectToEnrich.setFullName(objectSource.getFullName());
             if(getInteractionEnricherListener() instanceof ComplexEnricherListener)
                 ((ComplexEnricherListener)getInteractionEnricherListener()).onFullNameUpdate(objectToEnrich , null);
+        }
+    }
+
+    protected void processParameters(Complex objectToEnrich, Complex objectSource) throws EnricherException {
+        if (objectSource != null){
+            EnricherUtils.mergeParameters(objectToEnrich, objectToEnrich.getModelledParameters(), objectSource.getModelledParameters(), false,
+                    (getInteractionEnricherListener() instanceof ModelledInteractionEnricherListener ? (ModelledInteractionEnricherListener)getInteractionEnricherListener():null));        }
+
+        if (getEnricherContext().getConfig().isUpdateCvTerms() && getCvTermEnricher() != null){
+            for (Parameter parameter : objectToEnrich.getModelledParameters()) {
+                getCvTermEnricher().enrich(parameter.getType());
+                if (parameter.getUnit() != null){
+                    getCvTermEnricher().enrich(parameter.getUnit());
+                }
+            }
+        }
+    }
+
+    protected void processConfidences(Complex objectToEnrich, Complex objectSource) throws EnricherException {
+        if (objectSource != null){
+            EnricherUtils.mergeConfidences(objectToEnrich, objectToEnrich.getModelledConfidences(), objectSource.getModelledConfidences(), false,
+                    (getInteractionEnricherListener() instanceof ModelledInteractionEnricherListener ? (ModelledInteractionEnricherListener) getInteractionEnricherListener() : null));        }
+
+        if (getEnricherContext().getConfig().isUpdateCvTerms() && getCvTermEnricher() != null){
+            for (Confidence confidence : objectToEnrich.getModelledConfidences()) {
+                getCvTermEnricher().enrich(confidence.getType());
+            }
         }
     }
 
