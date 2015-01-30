@@ -2,6 +2,8 @@ package uk.ac.ebi.intact.dataexchange.dbimporter.writer;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.jami.model.Complex;
 import psidev.psi.mi.jami.model.Interaction;
 import psidev.psi.mi.jami.model.InteractionEvidence;
@@ -54,6 +56,7 @@ public class IntactInteractionMixDbImporter extends AbstractIntactDbImporter<Int
     }
 
     @Override
+    @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public void write(List<? extends Interaction> is) throws Exception {
         if (this.interactionEvidenceService == null){
             throw new IllegalStateException("The writer must have a non null interaction evidence service");
