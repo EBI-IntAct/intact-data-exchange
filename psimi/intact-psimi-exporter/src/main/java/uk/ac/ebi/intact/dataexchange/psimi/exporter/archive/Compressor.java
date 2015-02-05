@@ -21,7 +21,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import uk.ac.ebi.intact.commons.util.CompressionUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.exporter.util.CompressionUtils;
 
 import java.io.*;
 import java.util.List;
