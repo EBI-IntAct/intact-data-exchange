@@ -57,8 +57,8 @@
           class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean" lazy-init="true">
         <property name="transactionManager" ref="jamiTransactionManager"/>
         <property name="jobRepository" ref="basicBatchJobRepository"/>
-        <property name="startLimit" value="${batch.step.startLimit}"/>
-        <property name="commitInterval" value="${batch.step.commitInterval}"/>
+        <property name="startLimit" value="5"/>
+        <property name="commitInterval" value="50"/>
     </bean>
 
     <!-- Basic Job configuration -->
