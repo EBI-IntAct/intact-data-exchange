@@ -16,6 +16,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
+        <db.hbm2ddl>none</db.hbm2ddl>
     </properties>
 
     <profiles>
