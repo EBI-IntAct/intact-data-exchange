@@ -213,7 +213,7 @@
     <!-- Export Steps -->
     <!-- MITAB 2.7 positive interactions export-->
     <batch:step id="mitab27.positiveInteractionStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -230,7 +230,7 @@
     </batch:step>
     <!-- MITAB 2.7 negative interactions export-->
     <batch:step id="mitab27.negativeInteractionStep" job-repository="basicBatchJobRepository" >
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -247,7 +247,7 @@
     </batch:step>
     <!-- step to zip global mitab file -->
     <batch:step id="zip.globalMitabStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" ref="compressGlobalMitabTasklet" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" ref="compressGlobalMitabTasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -256,7 +256,7 @@
 
     <!-- export mitab 2.7 publication files -->
     <batch:step id="mitab27.publicationStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -275,7 +275,7 @@
     </batch:step>
     <!-- step to zip each publication -->
     <batch:step id="zip.singlePublicationMitabStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -292,7 +292,7 @@
     </batch:step>
     <!-- step to zip all mitab publication files -->
     <batch:step id="zip.allPublicationTab27Step" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" ref="compressorTab27Tasklet" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" ref="compressorTab27Tasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -301,7 +301,7 @@
 
     <!-- step to export mitab by species -->
     <batch:step id="mitab27.speciesStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -322,7 +322,7 @@
     </batch:step>
     <!-- step to zip each species file -->
     <batch:step id="zip.singleSpeciesMitabStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -340,7 +340,7 @@
 
     <!-- step to export each dataset mitab file -->
     <batch:step id="mitab.datasetStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -357,7 +357,7 @@
     </batch:step>
     <!-- step to zip datasets mitab -->
     <batch:step id="zip.datasetMitabStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>

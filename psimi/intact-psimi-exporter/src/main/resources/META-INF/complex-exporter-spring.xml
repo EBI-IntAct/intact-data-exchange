@@ -99,7 +99,7 @@
     <!-- steps -->
     <!-- step to export complex XML 2.5 files -->
     <batch:step id="xml25.complexStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -117,7 +117,7 @@
     </batch:step>
     <!-- step to export complex XML 3.0 files -->
     <batch:step id="xml30.complexStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -135,7 +135,7 @@
     </batch:step>
     <!-- step to export complex XML 2.5 and 3.0 files -->
     <batch:step id="xml.complexStep" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -154,7 +154,7 @@
     </batch:step>
     <!-- step to zip each complex XML 2.5 files -->
     <batch:step id="zip.singleComplexXml25Step" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -171,7 +171,7 @@
     </batch:step>
     <!-- step to zip each complex XML 3.0 files -->
     <batch:step id="zip.singleComplexXml30Step" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -188,7 +188,7 @@
     </batch:step>
     <!-- step to zip all xml 2.5 complex files -->
     <batch:step id="zip.allComplexesXml25Step" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" ref="compressorComplexesXml25Tasklet" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" ref="compressorComplexesXml25Tasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
@@ -196,7 +196,7 @@
     </batch:step>
     <!-- step to zip all xml 3.0  complex files -->
     <batch:step id="zip.allComplexesXml30Step" job-repository="basicBatchJobRepository">
-        <batch:tasklet start-limit="100" ref="compressorComplexesXml30Tasklet" transaction-manager="basicBatchTransactionManager">
+        <batch:tasklet start-limit="100" ref="compressorComplexesXml30Tasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
             </batch:listeners>
