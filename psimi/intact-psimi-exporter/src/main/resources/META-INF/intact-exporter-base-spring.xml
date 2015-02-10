@@ -20,6 +20,7 @@
     <!-- basic job repository -->
     <bean id="basicBatchJobRepository"
           class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+          p:isolationLevelForCreate="ISOLATION_DEFAULT"
           p:dataSource-ref="jamiCoreDataSource" p:transactionManager-ref="jamiTransactionManager" />
 
     <!-- basic batch job launcher -->
