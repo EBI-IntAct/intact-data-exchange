@@ -37,7 +37,6 @@ import psidev.psi.mi.jami.utils.XrefUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -199,19 +198,8 @@ public class PublicationEnricher extends FullPublicationEnricher implements Cura
         if (publication.getPubmedId() != null){
             Xref pubmed = XrefUtils.collectFirstIdentifierWithDatabaseAndId(publication.getIdentifiers(), Xref.PUBMED_MI, Xref.PUBMED, publication.getPubmedId());
 
-            if (pubmed != null){
+            if (pubmed != null && XrefUtils.doesXrefHaveQualifier(pubmed, Xref.IDENTITY_MI, Xref.IDENTITY)){
                 log.warn( "Fixing pubmed xref with identity qualifier: "+pubmed.getId() );
-
-                publication.getIdentifiers().remove(pubmed);
-                publication.getIdentifiers().
-                        add(XrefUtils.createXrefWithQualifier(Xref.PUBMED, Xref.PUBMED_MI, pubmed.getId(), Xref.PRIMARY, Xref.PRIMARY_MI));
-            }
-        }
-        else{
-            Collection<Xref> pubmeds = XrefUtils.collectAllXrefsHavingDatabase(publication.getXrefs(), Xref.PUBMED_MI, Xref.PUBMED);
-            if (pubmeds.size() == 1){
-                Xref pubmed = pubmeds.iterator().next();
-                log.warn( "Fixing pubmed xref with no qualifier: "+pubmed.getId() );
 
                 publication.getIdentifiers().remove(pubmed);
                 publication.getIdentifiers().
@@ -221,18 +209,7 @@ public class PublicationEnricher extends FullPublicationEnricher implements Cura
 
         if (publication.getDoi() != null){
             Xref doi = XrefUtils.collectFirstIdentifierWithDatabaseAndId(publication.getIdentifiers(), Xref.DOI_MI, Xref.DOI, publication.getDoi());
-            if (doi != null){
-                log.warn( "Fixing doi xref with identity qualifier: "+doi.getId() );
-
-                publication.getIdentifiers().remove(doi);
-                publication.getIdentifiers().
-                        add(XrefUtils.createXrefWithQualifier(Xref.DOI, Xref.DOI_MI, doi.getId(), Xref.PRIMARY, Xref.PRIMARY_MI));
-            }
-        }
-        else{
-            Collection<Xref> dois = XrefUtils.collectAllXrefsHavingDatabase(publication.getXrefs(), Xref.DOI_MI, Xref.DOI);
-            if (dois.size() == 1){
-                Xref doi = dois.iterator().next();
+            if (doi != null && XrefUtils.doesXrefHaveQualifier(doi, Xref.IDENTITY_MI, Xref.IDENTITY)){
                 log.warn( "Fixing doi xref with identity qualifier: "+doi.getId() );
 
                 publication.getIdentifiers().remove(doi);
