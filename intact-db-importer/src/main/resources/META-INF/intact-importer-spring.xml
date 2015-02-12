@@ -297,6 +297,10 @@
                 <batch:streams>
                     <batch:stream ref="interactionReader"/>
                     <batch:stream ref="interactionMixImporter"/>
+                    <batch:stream ref="interactionEvidenceProcessor"/>
+                    <batch:stream ref="modelledInteractionProcessor"/>
+                    <batch:stream ref="complexProcessor"/>
+                    <batch:stream ref="interactionProcessor"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
