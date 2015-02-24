@@ -19,9 +19,9 @@
     <url>http://www.ebi.ac.uk/~intact/devsite/dataexchange</url>
 
     <properties>
-        <core.version>2.6.10-SNAPSHOT</core.version>
-        <bridges.version>2.1.12-SNAPSHOT</bridges.version>
-        <commons.version>2.1.11-SNAPSHOT</commons.version>
+        <core.version>2.6.9</core.version>
+        <bridges.version>2.1.11</bridges.version>
+        <commons.version>2.1.10</commons.version>
     </properties>
 
     <scm>
