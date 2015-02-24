@@ -19,39 +19,39 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.1.1</version>
         </dependency>
 
         <!-- JAMI bridges -->
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-obo</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-ols</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-picr</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-europubmedcentral</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-uniprot-taxonomy</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.axis</groupId>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-uniprot</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-chebi</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.sun.xml.bind</groupId>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>uk.ac.ebi.uniprot.kraken</groupId>
             <artifactId>uniprotjapi</artifactId>
-            <version>LATEST</version>
+            <version>2015.02</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>

@@ -18,7 +18,7 @@
 
     <properties>
         <currentVersion>${project.version}</currentVersion>
-        <psimi.version>1.8.6-SNAPSHOT</psimi.version>
+        <psimi.version>1.8.5</psimi.version>
     </properties>
 
     <modules>
@@ -26,6 +26,7 @@
         <module>intact-solr</module>
         <module>intact-solr-home</module>
         <module>intact-calimocho-converters</module>
+    <module>intact-jami-mitab</module>
   </modules>
 
     <dependencyManagement>

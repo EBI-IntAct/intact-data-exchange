@@ -41,6 +41,7 @@
         <module>intact-mi-cluster-score</module>
     <module>structured-abstract</module>
     <module>intact-db-importer</module>
+    <module>cttv-exporter</module>
   </modules>
 
     <build>
