@@ -76,6 +76,12 @@
             <artifactId>intact-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot.kraken</groupId>
+            <artifactId>uniprotjapi</artifactId>
+            <version>2015.02</version>
+        </dependency>
+
     </dependencies>
     <repositories>
         <repository>
