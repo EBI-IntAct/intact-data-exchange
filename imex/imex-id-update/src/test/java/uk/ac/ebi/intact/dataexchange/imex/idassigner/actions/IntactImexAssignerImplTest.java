@@ -239,7 +239,7 @@ public class IntactImexAssignerImplTest{
 
         List<String> expAcs = assignerTest.collectExperimentsToUpdateFrom(intactPub, "IM-1");
         // only two experiments updated
-        Assert.assertEquals(1, expAcs.size());
+        Assert.assertEquals(2, expAcs.size());
 
         Set<String> expAcsUpdated = new HashSet<String>(expAcs.size());
         assignerTest.assignImexIdentifierToExperiments(expAcs, "IM-1", null, expAcsUpdated);
