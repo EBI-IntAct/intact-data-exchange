@@ -5,12 +5,12 @@
   <parent>
     <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
     <artifactId>intact-psixml</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1-SNAPSHOT</version>
   </parent>
 
   <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
   <artifactId>intact-jami-xml</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1-SNAPSHOT</version>
 
     <name>PSI :: Intact JAMI - XML</name>
     <description>Intact extensions of XML writers/parsers</description>
@@ -24,20 +24,20 @@
       <dependency>
           <groupId>psidev.psi.mi.jami</groupId>
           <artifactId>jami-commons</artifactId>
-          <version>1.1.1</version>
+          <version>1.1.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
           <groupId>psidev.psi.mi.jami</groupId>
           <artifactId>jami-xml</artifactId>
-          <version>1.1.1</version>
+          <version>1.1.2-SNAPSHOT</version>
       </dependency>
 
       <!-- intact jami -->
       <dependency>
           <groupId>uk.ac.ebi.intact.jami</groupId>
           <artifactId>intact-jami</artifactId>
-          <version>1.2.1</version>
+          <version>1.2.2-SNAPSHOT</version>
       </dependency>
 
     <dependency>
