@@ -113,7 +113,7 @@ public class ImexCentralManagerTest {
         intactPub.getXrefs().add(XrefUtils.createXrefWithQualifier(Xref.IMEX, Xref.IMEX_MI, "IM-3", Xref.IMEX_PRIMARY, Xref.IMEX_PRIMARY_MI));
         pubService.saveOrUpdate(intactPub);
 
-        Assert.assertEquals(2, intactPub.getXrefs().size());
+        Assert.assertEquals(1, intactPub.getXrefs().size());
 
         imexManagerTest.updateIntactPublicationHavingIMEx(intactPub.getAc());
         IntactPublication intactPubReloaded = dao.getPublicationDao().getByAc(intactPub.getAc());
