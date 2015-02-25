@@ -6,7 +6,7 @@
 
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>cttv-exporter</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <profiles>
         <profile>

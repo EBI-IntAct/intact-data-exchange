@@ -5,12 +5,12 @@
   <parent>
     <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
     <artifactId>psimitab-master</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
   </parent>
 
   <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
   <artifactId>intact-jami-mitab</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.0.0</version>
     <name>PSI :: Intact JAMI - MITAB</name>
     <description>Intact extensions of MITAB writers/parsers</description>
 
