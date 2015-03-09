@@ -533,51 +533,34 @@
         </batch:listeners>
 
         <!-- Export interactions per publication in XML -->
-        <batch:split id="xml.export" task-executor="asyncTaskExecutor" >
-            <!-- flow1: export all individual xml25 files -->
-            <batch:flow>
-                <batch:step  id="exportPublicationXml" parent="xml.publicationStep">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
+        <batch:step  id="exportPublicationXml" parent="xml.publicationStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
             <batch:fail on="FAILED"/>
-        </batch:split>
-
-        <!-- zip xml-->
-        <batch:split id="xml.zip" task-executor="asyncTaskExecutor" >
-            <!-- flow1: zip all individual xml25 files -->
-            <batch:flow>
-                <batch:step id="zip.publicationXml25" parent="zip.singlePublicationXml25Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-            <!-- flow2: zip all individual xml30 files -->
-            <batch:flow>
-                <batch:step  id="zip.publicationXml30" parent="zip.singlePublicationXml30Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-
-            <!-- flow3: zip all files in one xml25 archive -->
-            <batch:flow>
-                <batch:step id="zip.allPublicationXml25" parent="zip.allPublicationXml25Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-
-            <!-- flow4: zip all files in one xml30 archive -->
-            <batch:flow>
-                <batch:step id="zip.allPublicationXml30" parent="zip.allPublicationXml30Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
+            <batch:next on="*" to="zip.publicationXml25"/>
+        </batch:step>
+        <!-- flow1: zip all individual xml25 files -->
+        <batch:step id="zip.publicationXml25" parent="zip.singlePublicationXml25Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
             <batch:fail on="FAILED"/>
-        </batch:split>
+            <batch:next on="*" to="zip.publicationXml30"/>
+        </batch:step>
+        <!-- flow2: zip all individual xml30 files -->
+        <batch:step  id="zip.publicationXml30" parent="zip.singlePublicationXml30Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+            <batch:next on="*" to="zip.allPublicationXml25"/>
+        </batch:step>
+        <!-- flow3: zip all files in one xml25 archive -->
+        <batch:step id="zip.allPublicationXml25" parent="zip.allPublicationXml25Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+            <batch:next on="*" to="zip.allPublicationXml30"/>
+        </batch:step>
+        <!-- flow4: zip all files in one xml30 archive -->
+        <batch:step id="zip.allPublicationXml30" parent="zip.allPublicationXml30Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+        </batch:step>
     </batch:job>
 
     <!-- Job which will export interactions by species in XML publication files -->
@@ -586,45 +569,30 @@
             <batch:listener ref="basicJobLoggerListener"/>
         </batch:listeners>
 
-        <batch:split id="species.export" task-executor="asyncTaskExecutor" >
-            <!-- flow1: export all individual species files -->
-            <batch:flow>
-                <batch:step id="p.createSpeciesClassification" parent="species.classificationStep">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
+        <batch:step id="p.createSpeciesClassification" parent="species.classificationStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
             <batch:fail on="FAILED"/>
-        </batch:split>
-
-        <batch:split id="species.split1" task-executor="asyncTaskExecutor">
-            <!-- flow1 : export xml 2.5 -->
-            <batch:flow>
-                <batch:step id="p25.createSpecies" parent="xml25.speciesStep">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                    <batch:next on="*" to="zip.species25"/>
-                </batch:step>
-                <batch:step id="zip.species25" parent="zip.singleSpeciesXml25Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-
-            <!-- flow2: export xml 3.0 -->
-            <batch:flow>
-                <batch:step id="p30.createSpecies" parent="xml30.speciesStep">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                    <batch:next on="*" to="zip.species30"/>
-                </batch:step>
-                <batch:step id="zip.species30" parent="zip.singleSpeciesXml30Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
+            <batch:next on="*" to="p25.createSpecies"/>
+        </batch:step>
+        <batch:step id="p25.createSpecies" parent="xml25.speciesStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
             <batch:fail on="FAILED"/>
-        </batch:split>
+            <batch:next on="*" to="zip.species25"/>
+        </batch:step>
+        <batch:step id="zip.species25" parent="zip.singleSpeciesXml25Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+            <batch:next on="*" to="p30.createSpecies"/>
+        </batch:step>
+        <batch:step id="p30.createSpecies" parent="xml30.speciesStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+            <batch:next on="*" to="zip.species30"/>
+        </batch:step>
+        <batch:step id="zip.species30" parent="zip.singleSpeciesXml30Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+        </batch:step>
     </batch:job>
 
     <!-- Job which will export interactions by dataset in XML publication files -->
@@ -657,13 +625,20 @@
             <batch:listener ref="basicJobLoggerListener"/>
         </batch:listeners>
 
-        <!-- Export interactions per publication in XML -->
+        <!-- Export interactions per publication/species in XML -->
         <batch:split id="xml.export2" task-executor="asyncTaskExecutor" >
             <!-- flow1: export all individual species files -->
             <batch:flow>
                 <batch:step  id="export.publicationXml" parent="xml.publicationStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
                     <batch:fail on="FAILED"/>
+                </batch:step>
+            </batch:flow>
+            <!-- export species -->
+            <batch:flow>
+                <batch:step id="p.create.SpeciesClassification" parent="species.classificationStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:end on="FAILED"/>
                 </batch:step>
             </batch:flow>
             <batch:fail on="FAILED"/>
@@ -704,11 +679,6 @@
             </batch:flow>
 
             <batch:flow>
-                <!-- export species -->
-                <batch:step id="p.create.SpeciesClassification" parent="species.classificationStep">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
-                </batch:step>
                 <batch:split id="species.split" task-executor="asyncTaskExecutor">
                     <!-- zip xml-->
                     <batch:flow>

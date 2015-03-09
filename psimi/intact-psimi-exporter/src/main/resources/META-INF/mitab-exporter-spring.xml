@@ -417,37 +417,22 @@
         </batch:listeners>
 
         <!-- Export interactions per publication in MITAB 2.7 -->
-        <batch:split id="mitab.export" task-executor="asyncTaskExecutor" >
-            <!-- flow1: export all individual species files -->
-            <batch:flow>
-                <batch:step  id="exportPublicationMitab" parent="mitab27.publicationStep">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
+        <batch:step  id="exportPublicationMitab" parent="mitab27.publicationStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
             <batch:fail on="FAILED"/>
-        </batch:split>
-
-        <!-- zip mitab-->
-        <batch:split id="psimitab.zip" task-executor="asyncTaskExecutor" >
-            <!-- flow1: zip all individual mitab files -->
-            <batch:flow>
-                <batch:step id="zip.publicationMitab" parent="zip.singlePublicationMitabStep">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-
-            <!-- flow2: zip all files in one mitab archive -->
-            <batch:flow>
-                <batch:step id="zip.allPublicationMitab" parent="zip.allPublicationTab27Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-
+            <batch:next on="*" to="zip.publicationMitab"/>
+        </batch:step>
+        <!-- flow1: zip all individual mitab files -->
+        <batch:step id="zip.publicationMitab" parent="zip.singlePublicationMitabStep">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
             <batch:fail on="FAILED"/>
-        </batch:split>
+            <batch:next on="*" to="zip.allPublicationMitab"/>
+        </batch:step>
+        <!-- flow2: zip all files in one mitab archive -->
+        <batch:step id="zip.allPublicationMitab" parent="zip.allPublicationTab27Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+        </batch:step>
     </batch:job>
 
     <!-- Job which will export interactions by species in mitab publication files -->
@@ -532,11 +517,24 @@
 
             <!-- flow2: export interactions per publication -->
             <batch:flow>
-                <!-- Export interactions per publication in MITAB 2.7 -->
-                <batch:step  id="export.publicationMitab" parent="mitab27.publicationStep">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                <batch:split id="mitab.export2" task-executor="asyncTaskExecutor" >
+                    <!-- flow1: export all individual species files -->
+                    <batch:flow>
+                        <!-- Export interactions per publication in MITAB 2.7 -->
+                        <batch:step  id="export.publicationMitab" parent="mitab27.publicationStep">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:fail on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
+                    <!-- export species -->
+                    <batch:flow>
+                        <batch:step id="p.create.SpeciesClassification" parent="species.classificationStep">
+                            <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:fail on="FAILED"/>
+                        </batch:step>
+                    </batch:flow>
                     <batch:fail on="FAILED"/>
-                </batch:step>
+                </batch:split>
 
                 <!-- split 2 : zip, export species, export datasets -->
                 <batch:split id="psimitab.split4" task-executor="asyncTaskExecutor">
@@ -555,11 +553,6 @@
 
                     <batch:flow>
                         <!-- export species -->
-                        <batch:step id="p.create.SpeciesClassification" parent="species.classificationStep">
-                            <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:fail on="FAILED"/>
-                            <batch:next on="*" to="p.create.species"/>
-                        </batch:step>
                         <batch:step id="p.create.species" parent="mitab27.speciesStep">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
                             <batch:fail on="FAILED"/>
