@@ -641,6 +641,8 @@
                     <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
+            <batch:fail on="FAILED"/>
+            <batch:next on="*" to="xml.split"/>
         </batch:split>
 
         <!-- split 2 : zip, export species, export datasets -->

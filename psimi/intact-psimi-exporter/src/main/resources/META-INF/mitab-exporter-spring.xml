@@ -534,6 +534,7 @@
                         </batch:step>
                     </batch:flow>
                     <batch:fail on="FAILED"/>
+                    <batch:next on="*" to="psimitab.split4"/>
                 </batch:split>
 
                 <!-- split 2 : zip, export species, export datasets -->
@@ -581,6 +582,7 @@
                     <batch:fail on="FAILED"/>
                 </batch:split>
             </batch:flow>
+            <batch:fail on="FAILED"/>
         </batch:split>
     </batch:job>
 </beans>
