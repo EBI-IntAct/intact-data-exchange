@@ -228,12 +228,21 @@
     <bean id="interactionMixImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactInteractionMixDbImporter" lazy-init="true"/>
 
     <!-- Basic Step configuration -->
+    <bean id="mailStepListener" class="uk.ac.ebi.intact.dataexchange.dbimporter.listener.MailNotifierStepExecutionListener" scope="prototype" lazy-init="true">
+        <property name="mailSender">
+            <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+                <property name="host" value="${intact.notification.email.smtpHost}"/>
+            </bean>
+        </property>
+        <property name="senderAddress" value="${intact.notification.email.sender}"/>
+    </bean>
 
     <!-- Enricher Steps -->
     <batch:step id="interactionEvidenceEnricherStep" parent="basicBatchStep">
         <batch:tasklet transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="interactionEvidenceReader"
@@ -252,6 +261,7 @@
         <batch:tasklet transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="modelledInteractionReader"
@@ -270,6 +280,7 @@
         <batch:tasklet transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="complexReader"
@@ -288,6 +299,7 @@
         <batch:tasklet transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="interactionReader"
