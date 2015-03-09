@@ -638,7 +638,7 @@
             <batch:flow>
                 <batch:step id="p.create.SpeciesClassification" parent="species.classificationStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
+                    <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
             <batch:fail on="FAILED"/>
