@@ -102,6 +102,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactComplexOrderedBySpeciesReader"
@@ -120,6 +121,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactComplexOrderedBySpeciesReader"
@@ -138,6 +140,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactComplexOrderedBySpeciesReader"
@@ -157,6 +160,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="complexSpeciesArchive25Reader"
@@ -174,6 +178,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="complexSpeciesArchive30Reader"
@@ -191,6 +196,7 @@
         <batch:tasklet start-limit="100" ref="compressorComplexesXml25Tasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
@@ -199,6 +205,7 @@
         <batch:tasklet start-limit="100" ref="compressorComplexesXml30Tasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
@@ -213,43 +220,27 @@
         <!-- Export  complex in XML -->
         <batch:step  id="exportComplexXml" parent="xml.complexStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
-            <batch:end on="FAILED"/>
+            <batch:fail on="FAILED"/>
+            <batch:next on="*" to="zip.complexXml25"/>
         </batch:step>
-
-        <!-- zip xml-->
-        <batch:split id="xml.zip" task-executor="asyncTaskExecutor" >
-            <!-- flow1: zip all individual xml25 files -->
-            <batch:flow>
-                <batch:step id="zip.complexXml25" parent="zip.singleComplexXml25Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-            <!-- flow2: zip all individual xml30 files -->
-            <batch:flow>
-                <batch:step  id="zip.complexXml30" parent="zip.singleComplexXml30Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-
-            <!-- flow3: zip all files in one xml25 archive -->
-            <batch:flow>
-                <batch:step id="zip.allcomplexXml25" parent="zip.allComplexesXml25Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-
-            <!-- flow4: zip all files in one xml30 archive -->
-            <batch:flow>
-                <batch:step id="zip.allcomplexXml30" parent="zip.allComplexesXml30Step">
-                    <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
-                </batch:step>
-            </batch:flow>
-
-            <batch:end on="FAILED"/>
-        </batch:split>
+        <batch:step id="zip.complexXml25" parent="zip.singleComplexXml25Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+            <batch:next on="*" to="zip.complexXml30"/>
+        </batch:step>
+        <batch:step  id="zip.complexXml30" parent="zip.singleComplexXml30Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+            <batch:next on="*" to="zip.allcomplexXml25"/>
+        </batch:step>
+        <batch:step id="zip.allcomplexXml25" parent="zip.allComplexesXml25Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+            <batch:next on="*" to="zip.allcomplexXml30"/>
+        </batch:step>
+        <batch:step id="zip.allcomplexXml30" parent="zip.allComplexesXml30Step">
+            <batch:tasklet task-executor="syncTaskExecutor"/>
+            <batch:fail on="FAILED"/>
+        </batch:step>
     </batch:job>
 </beans>

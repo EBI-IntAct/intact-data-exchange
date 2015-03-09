@@ -120,7 +120,7 @@
         </property>
         <property name="jpaVendorAdapter">
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-                <property name="databasePlatform" value="${db.platform}"/>
+                <property name="databasePlatform" value="${db.dialect}"/>
                 <property name="showSql" value="false"/>
                 <property name="generateDdl" value="false"/>
             </bean>
@@ -180,6 +180,15 @@
         <property name="compression" value="zip"/>
     </bean>
 
+    <bean id="mailStepListener" class="uk.ac.ebi.intact.dataexchange.psimi.exporter.listener.MailNotifierStepExecutionListener" scope="prototype" lazy-init="true">
+        <property name="mailSender">
+            <bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+                <property name="host" value="${intact.notification.email.smtpHost}"/>
+            </bean>
+        </property>
+        <property name="senderAddress" value="${intact.notification.email.sender}"/>
+    </bean>
+
     <!-- readers -->
     <!-- simple publication reader ordered by created date. It excludes the IntAct paper -->
     <bean id="intactPublicationReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true" scope="prototype">
@@ -225,6 +234,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactPublicationOrderedBySpeciesReader"
