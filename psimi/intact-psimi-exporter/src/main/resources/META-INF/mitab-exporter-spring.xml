@@ -216,6 +216,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactPositiveInteractionEvidenceReader"
@@ -233,6 +234,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactNegativeInteractionEvidenceReader"
@@ -250,6 +252,7 @@
         <batch:tasklet start-limit="100" ref="compressGlobalMitabTasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
@@ -259,6 +262,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactPublicationReader"
@@ -278,6 +282,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="publicationMitabArchiveReader"
@@ -295,6 +300,7 @@
         <batch:tasklet start-limit="100" ref="compressorTab27Tasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
@@ -304,6 +310,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="speciesClassificationMitabReader"
@@ -325,6 +332,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="speciesMitabArchiveReader"
@@ -343,6 +351,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactPublicationOrderedByDatasetReader"
@@ -360,6 +369,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactDatasetArchiveMitabReader"

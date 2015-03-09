@@ -102,6 +102,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactComplexOrderedBySpeciesReader"
@@ -120,6 +121,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactComplexOrderedBySpeciesReader"
@@ -138,6 +140,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="intactComplexOrderedBySpeciesReader"
@@ -157,6 +160,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="complexSpeciesArchive25Reader"
@@ -174,6 +178,7 @@
         <batch:tasklet start-limit="100" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
 
             <batch:chunk reader="complexSpeciesArchive30Reader"
@@ -191,6 +196,7 @@
         <batch:tasklet start-limit="100" ref="compressorComplexesXml25Tasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
@@ -199,6 +205,7 @@
         <batch:tasklet start-limit="100" ref="compressorComplexesXml30Tasklet" transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener" />
+                <batch:listener ref="mailStepListener"/>
             </batch:listeners>
         </batch:tasklet>
     </batch:step>
