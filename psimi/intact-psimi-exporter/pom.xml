@@ -18,6 +18,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
       <db.hbm2ddl>none</db.hbm2ddl>
+
+      <intact.notification.email.sender>${email.sender}</intact.notification.email.sender>
+      <intact.notification.email.smtpHost>${email.smtpHost}</intact.notification.email.smtpHost>
   </properties>
 
     <build>
