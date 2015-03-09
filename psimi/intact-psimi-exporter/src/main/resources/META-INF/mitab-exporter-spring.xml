@@ -387,7 +387,7 @@
             <batch:flow>
                 <batch:step id="exportPositiveMitab" parent="mitab27.positiveInteractionStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
+                    <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
 
@@ -395,11 +395,11 @@
             <batch:flow>
                 <batch:step  id="exportNegativeMitab" parent="mitab27.negativeInteractionStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
+                    <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
 
-            <batch:end on="FAILED"/>
+            <batch:fail on="FAILED"/>
             <batch:next on="*" to="zip.globalMitab"/>
         </batch:split>
 
@@ -419,7 +419,7 @@
         <!-- Export interactions per publication in MITAB 2.7 -->
         <batch:step  id="exportPublicationMitab" parent="mitab27.publicationStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
-            <batch:end on="FAILED"/>
+            <batch:fail on="FAILED"/>
         </batch:step>
 
         <!-- zip mitab-->
@@ -428,7 +428,7 @@
             <batch:flow>
                 <batch:step id="zip.publicationMitab" parent="zip.singlePublicationMitabStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
+                    <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
 
@@ -436,11 +436,11 @@
             <batch:flow>
                 <batch:step id="zip.allPublicationMitab" parent="zip.allPublicationTab27Step">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
+                    <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
 
-            <batch:end on="FAILED"/>
+            <batch:fail on="FAILED"/>
         </batch:split>
     </batch:job>
 
@@ -452,17 +452,17 @@
 
         <batch:step id="p.createSpeciesClassification" parent="species.classificationStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
-            <batch:end on="FAILED"/>
+            <batch:fail on="FAILED"/>
             <batch:next on="*" to="p.createSpecies"/>
         </batch:step>
         <batch:step id="p.createSpecies" parent="mitab27.speciesStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
-            <batch:end on="FAILED"/>
+            <batch:fail on="FAILED"/>
             <batch:next on="*" to="zip.species"/>
         </batch:step>
         <batch:step id="zip.species" parent="zip.singleSpeciesMitabStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
-            <batch:end on="FAILED"/>
+            <batch:fail on="FAILED"/>
         </batch:step>
     </batch:job>
 
@@ -474,13 +474,13 @@
 
         <batch:step id="p.createDatasets" parent="mitab.datasetStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
-            <batch:end on="FAILED"/>
+            <batch:fail on="FAILED"/>
             <batch:next on="*" to="p.zipDatasetsMitab"/>
         </batch:step>
 
         <batch:step id="p.zipDatasetsMitab" parent="zip.datasetMitabStep">
             <batch:tasklet task-executor="syncTaskExecutor"/>
-            <batch:end on="FAILED"/>
+            <batch:fail on="FAILED"/>
         </batch:step>
     </batch:job>
 
@@ -501,7 +501,7 @@
                     <batch:flow>
                         <batch:step id="export.positiveMitab" parent="mitab27.positiveInteractionStep">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:end on="FAILED"/>
+                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
 
@@ -509,18 +509,18 @@
                     <batch:flow>
                         <batch:step  id="export.negativeMitab" parent="mitab27.negativeInteractionStep">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:end on="FAILED"/>
+                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
 
-                    <batch:end on="FAILED"/>
+                    <batch:fail on="FAILED"/>
                     <batch:next on="*" to="zip.global.mitab"/>
                 </batch:split>
 
                 <!-- zip global mitab-->
                 <batch:step id="zip.global.mitab" parent="zip.globalMitabStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
+                    <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
 
@@ -529,7 +529,7 @@
                 <!-- Export interactions per publication in MITAB 2.7 -->
                 <batch:step  id="export.publicationMitab" parent="mitab27.publicationStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:end on="FAILED"/>
+                    <batch:fail on="FAILED"/>
                 </batch:step>
 
                 <!-- split 2 : zip, export species, export datasets -->
@@ -538,12 +538,12 @@
                         <!-- zip mitab-->
                         <batch:step id="zip.publication.Mitab" parent="zip.singlePublicationMitabStep">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:end on="FAILED"/>
+                            <batch:fail on="FAILED"/>
                             <batch:next on="*" to="zip.allPublication.Mitab"/>
                         </batch:step>
                         <batch:step id="zip.allPublication.Mitab" parent="zip.allPublicationTab27Step">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:end on="FAILED"/>
+                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
 
@@ -551,17 +551,17 @@
                         <!-- export species -->
                         <batch:step id="p.create.SpeciesClassification" parent="species.classificationStep">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:end on="FAILED"/>
+                            <batch:fail on="FAILED"/>
                             <batch:next on="*" to="p.create.species"/>
                         </batch:step>
                         <batch:step id="p.create.species" parent="mitab27.speciesStep">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:end on="FAILED"/>
+                            <batch:fail on="FAILED"/>
                             <batch:next on="*" to="zip.speciesMitab"/>
                         </batch:step>
                         <batch:step id="zip.speciesMitab" parent="zip.singleSpeciesMitabStep">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:end on="FAILED"/>
+                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
 
@@ -569,17 +569,17 @@
                         <!-- export datasets -->
                         <batch:step id="p.create.datasets" parent="mitab.datasetStep">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:end on="FAILED"/>
+                            <batch:fail on="FAILED"/>
                             <batch:next on="*" to="p.zip.datasetsMitab"/>
                         </batch:step>
 
                         <batch:step id="p.zip.datasetsMitab" parent="zip.datasetMitabStep">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:end on="FAILED"/>
+                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
 
-                    <batch:end on="FAILED"/>
+                    <batch:fail on="FAILED"/>
                 </batch:split>
             </batch:flow>
         </batch:split>
