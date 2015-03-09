@@ -641,7 +641,6 @@
                     <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
-            <batch:fail on="FAILED"/>
         </batch:split>
 
         <!-- split 2 : zip, export species, export datasets -->
