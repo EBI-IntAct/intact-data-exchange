@@ -417,10 +417,16 @@
         </batch:listeners>
 
         <!-- Export interactions per publication in MITAB 2.7 -->
-        <batch:step  id="exportPublicationMitab" parent="mitab27.publicationStep">
-            <batch:tasklet task-executor="syncTaskExecutor"/>
+        <batch:split id="mitab.export" task-executor="asyncTaskExecutor" >
+            <!-- flow1: export all individual species files -->
+            <batch:flow>
+                <batch:step  id="exportPublicationMitab" parent="mitab27.publicationStep">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:fail on="FAILED"/>
+                </batch:step>
+            </batch:flow>
             <batch:fail on="FAILED"/>
-        </batch:step>
+        </batch:split>
 
         <!-- zip mitab-->
         <batch:split id="psimitab.zip" task-executor="asyncTaskExecutor" >
