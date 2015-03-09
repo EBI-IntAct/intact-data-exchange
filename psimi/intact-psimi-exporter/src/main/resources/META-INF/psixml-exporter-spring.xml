@@ -713,24 +713,17 @@
                 <batch:step id="p.create.datasets" parent="xml.datasetStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
                     <batch:fail on="FAILED"/>
+                    <batch:next on="*" to="p.zip.datasetsXml25"/>
                 </batch:step>
-                <batch:split id="dataset.split" task-executor="asyncTaskExecutor">
-                    <!-- zip xml-->
-                    <batch:flow>
-                        <batch:step id="p.zip.datasetsXml25" parent="zip.datasetXml25Step">
-                            <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:fail on="FAILED"/>
-                        </batch:step>
-                    </batch:flow>
-                    <batch:flow>
-                        <batch:step id="p.zip.datasetsXml30" parent="zip.datasetXml30Step">
-                            <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:fail on="FAILED"/>
-                        </batch:step>
-                    </batch:flow>
-
+                <batch:step id="p.zip.datasetsXml25" parent="zip.datasetXml25Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
                     <batch:fail on="FAILED"/>
-                </batch:split>
+                    <batch:next on="*" to="p.zip.datasetsXml30"/>
+                </batch:step>
+                <batch:step id="p.zip.datasetsXml30" parent="zip.datasetXml30Step">
+                    <batch:tasklet task-executor="syncTaskExecutor"/>
+                    <batch:fail on="FAILED"/>
+                </batch:step>
             </batch:flow>
 
             <batch:fail on="FAILED"/>
