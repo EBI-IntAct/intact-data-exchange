@@ -408,9 +408,6 @@
                     <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
-
-            <batch:fail on="FAILED"/>
-            <batch:next on="*" to="zip.globalMitab"/>
         </batch:split>
 
         <!-- zip mitab-->
@@ -493,7 +490,7 @@
         </batch:listeners>
 
         <!-- split 1 : export positive and negative interactions in parallel of publication export -->
-        <batch:split id="psimitab.split" task-executor="asyncTaskExecutor">
+        <batch:split id="psimitab.split" task-executor="asyncTaskExecutor" next="zip.global.mitab">
             <!-- flow1 : export positive and negative in big file interactions -->
             <batch:flow>
                 <!-- split 2 : export positive and negative interactions in parallel -->
@@ -513,9 +510,6 @@
                             <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
-
-                    <batch:fail on="FAILED"/>
-                    <batch:next on="*" to="zip.global.mitab"/>
                 </batch:split>
 
                 <!-- zip global mitab-->
@@ -527,7 +521,7 @@
 
             <!-- flow2: export interactions per publication -->
             <batch:flow>
-                <batch:split id="mitab.export2" task-executor="asyncTaskExecutor" >
+                <batch:split id="mitab.export2" task-executor="asyncTaskExecutor" next="psimitab.split4">
                     <!-- flow1: export all individual species files -->
                     <batch:flow>
                         <!-- Export interactions per publication in MITAB 2.7 -->
@@ -543,8 +537,6 @@
                             <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
-                    <batch:fail on="FAILED"/>
-                    <batch:next on="*" to="psimitab.split4"/>
                 </batch:split>
 
                 <!-- split 2 : zip, export species, export datasets -->
@@ -588,11 +580,8 @@
                             <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
-
-                    <batch:fail on="FAILED"/>
                 </batch:split>
             </batch:flow>
-            <batch:fail on="FAILED"/>
         </batch:split>
     </batch:job>
 </beans>
