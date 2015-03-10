@@ -642,7 +642,7 @@
         </batch:listeners>
 
         <!-- Export interactions per publication/species in XML -->
-        <batch:split id="xml.export2" task-executor="asyncTaskExecutor" >
+        <batch:split id="xml.export2" task-executor="asyncTaskExecutor" next="xml.split">
             <!-- flow1: export all individual species files -->
             <batch:flow>
                 <batch:step  id="export.publicationXml" parent="xml.publicationStep">
@@ -657,8 +657,6 @@
                     <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
-            <batch:fail on="FAILED"/>
-            <batch:next on="*" to="xml.split"/>
         </batch:split>
 
         <!-- split 2 : zip, export species, export datasets -->
@@ -688,10 +686,9 @@
                     <batch:flow>
                         <batch:step id="zip.allPublication.xml30" parent="zip.allPublicationXml30Step">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
+                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
-
-                    <batch:fail on="FAILED"/>
                 </batch:split>
             </batch:flow>
 
@@ -720,8 +717,6 @@
                             <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
-
-                    <batch:fail on="FAILED"/>
                 </batch:split>
             </batch:flow>
 
@@ -742,8 +737,6 @@
                     <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
-
-            <batch:fail on="FAILED"/>
         </batch:split>
     </batch:job>
 </beans>
