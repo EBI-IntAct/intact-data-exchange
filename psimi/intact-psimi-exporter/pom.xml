@@ -20,6 +20,7 @@
       <db.hbm2ddl>none</db.hbm2ddl>
       <intact.notification.email.sender>${email.sender}</intact.notification.email.sender>
       <intact.notification.email.smtpHost>${email.smtpHost}</intact.notification.email.smtpHost>
+      <intact.notification.email.recipients>${email.recipients}</intact.notification.email.recipients>
   </properties>
 
     <profiles>

@@ -32,6 +32,7 @@ public class MailNotifierStepExecutionListener implements StepExecutionListener 
 
     private MailSender mailSender;
     private String senderAddress;
+    private String recipients;
 
     public MailNotifierStepExecutionListener() {
 
@@ -42,7 +43,7 @@ public class MailNotifierStepExecutionListener implements StepExecutionListener 
         SimpleMailMessage message = newSimpleMessage();
         message.setSubject("[IntAct_export] Started step: "+stepExecution.getStepName()+"");
         message.setText(stepExecution.getSummary()+"\n"+stepExecution.getJobExecution());
-        message.setTo(stepExecution.getJobParameters().getString("email.recipient"));
+        message.setTo(recipients);
 
         try{
             mailSender.send(message);
@@ -58,7 +59,7 @@ public class MailNotifierStepExecutionListener implements StepExecutionListener 
         message.setSubject("[IntAct_export] Finished step: "+stepExecution.getStepName()+" Exit status: "+stepExecution.getExitStatus().getExitCode());
         message.setText(stepExecution.toString()+"\n"+stepExecution.getExecutionContext());
         message.setText(stepExecution.toString()+"\n"+stepExecution.getSummary()+"\n"+stepExecution.getJobExecution());
-        message.setTo(stepExecution.getJobParameters().getString("email.recipient"));
+        message.setTo(recipients);
 
         try{
             mailSender.send(message);
@@ -82,5 +83,9 @@ public class MailNotifierStepExecutionListener implements StepExecutionListener 
 
     public void setSenderAddress(String senderAddress) {
         this.senderAddress = senderAddress;
+    }
+
+    public void setRecipients(String recipients) {
+        this.recipients = recipients;
     }
 }
