@@ -187,6 +187,7 @@
             </bean>
         </property>
         <property name="senderAddress" value="${intact.notification.email.sender}"/>
+        <property name="recipients" value="${intact.notification.email.recipients}"/>
     </bean>
 
     <!-- readers -->
