@@ -647,14 +647,12 @@
             <batch:flow>
                 <batch:step  id="export.publicationXml" parent="xml.publicationStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
             <!-- export species -->
             <batch:flow>
                 <batch:step id="p.create.SpeciesClassification" parent="species.classificationStep">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
         </batch:split>
@@ -668,25 +666,21 @@
                     <batch:flow>
                         <batch:step id="zip.publication.xml25" parent="zip.singlePublicationXml25Step">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
                     <batch:flow>
                         <batch:step id="zip.publication.xml30" parent="zip.singlePublicationXml25Step">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
                     <batch:flow>
                         <batch:step id="zip.allPublication.xml25" parent="zip.allPublicationXml25Step">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
                     <batch:flow>
                         <batch:step id="zip.allPublication.xml30" parent="zip.allPublicationXml30Step">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
                 </batch:split>
@@ -703,7 +697,6 @@
                         </batch:step>
                         <batch:step id="zip.speciesXml25" parent="zip.singleSpeciesXml25Step">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
                     <batch:flow>
@@ -714,7 +707,6 @@
                         </batch:step>
                         <batch:step id="zip.speciesXml30" parent="zip.singleSpeciesXml30Step">
                             <batch:tasklet task-executor="syncTaskExecutor"/>
-                            <batch:fail on="FAILED"/>
                         </batch:step>
                     </batch:flow>
                 </batch:split>
@@ -734,7 +726,6 @@
                 </batch:step>
                 <batch:step id="p.zip.datasetsXml30" parent="zip.datasetXml30Step">
                     <batch:tasklet task-executor="syncTaskExecutor"/>
-                    <batch:fail on="FAILED"/>
                 </batch:step>
             </batch:flow>
         </batch:split>
