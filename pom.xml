@@ -41,15 +41,15 @@
         <module>intact-cvutils</module>
         <module>psimi</module>
         <module>intact-enricher</module>
-        <module>uniprot-export</module>
-        <module>pdbe</module>
+        <module>intact-uniprot-export</module>
+        <module>intact-pdbe-import</module>
         <module>intact-tasks</module>
-        <module>imex</module>
+        <module>imex-id-update</module>
         <module>intact-mi-cluster-score</module>
-    <module>structured-abstract</module>
-    <module>intact-db-importer</module>
-    <module>cttv-exporter</module>
-  </modules>
+        <module>structured-abstract</module>
+        <module>intact-db-importer</module>
+        <module>cttv-exporter</module>
+    </modules>
 
     <build>
         <plugins>
