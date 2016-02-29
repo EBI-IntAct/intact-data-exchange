@@ -103,20 +103,17 @@ public class GOLineConverter1Test extends UniprotExportBase{
 
             // isoform isoform first
             if (("P28548-1".equalsIgnoreCase(par.getFirstProtein()) && "P28548-2".equalsIgnoreCase(par.getSecondProtein())) || ("P28548-2".equalsIgnoreCase(par.getFirstProtein()) && "P28548-1".equalsIgnoreCase(par.getSecondProtein())) ){
-
                 Assert.assertEquals(2, par.getPubmedIds().size());
-                Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("14704431", pubIterator.next());
-                Assert.assertEquals("15199141", pubIterator.next());
+                Assert.assertTrue(par.getPubmedIds().contains("14704431"));
+                Assert.assertTrue(par.getPubmedIds().contains("15199141"));
             }
             // feature chain
             else if ("P28548".equals(par.getFirstProtein()) && "Q21361".equals(par.getSecondProtein())){
                 Assert.assertEquals(4, par.getPubmedIds().size());
-                Iterator<String> pubIterator = par.getPubmedIds().iterator();
-                Assert.assertEquals("15199141", pubIterator.next());
-                Assert.assertEquals("15115758", pubIterator.next());
-                Assert.assertEquals("18212739", pubIterator.next());
-                Assert.assertEquals("14704431", pubIterator.next());
+                Assert.assertTrue(par.getPubmedIds().contains("15199141"));
+                Assert.assertTrue(par.getPubmedIds().contains("15115758"));
+                Assert.assertTrue(par.getPubmedIds().contains("18212739"));
+                Assert.assertTrue(par.getPubmedIds().contains("14704431"));
             }
             // master protein and trans variant
             else if ("P28548".equals(par.getFirstProtein()) && "P12347-4".equals(par.getSecondProtein())){
