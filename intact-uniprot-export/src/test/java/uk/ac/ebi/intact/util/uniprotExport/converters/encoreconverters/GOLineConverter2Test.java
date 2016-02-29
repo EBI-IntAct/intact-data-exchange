@@ -119,8 +119,8 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
                 Assert.assertEquals(2, par.getComponentXrefs().size());
                 Iterator<String> compIterator = par.getComponentXrefs().iterator();
-                Assert.assertEquals("GO:00xxxxxxxxx1", compIterator.next());
-                Assert.assertEquals("GO:00xxxxxxxxx2", compIterator.next());
+                Assert.assertTrue(par.getComponentXrefs().contains("GO:00xxxxxxxxx1"));
+                Assert.assertTrue(par.getComponentXrefs().contains("GO:00xxxxxxxxx2"));
             }
             // master protein and trans variant
             else if ("P28548".equals(par.getFirstProtein())){
