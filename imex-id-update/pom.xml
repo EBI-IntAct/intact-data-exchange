@@ -2,11 +2,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>uk.ac.ebi.intact.dataexchange.imex</groupId>
-        <artifactId>imex</artifactId>
+        <groupId>uk.ac.ebi.intact.dataexchange</groupId>
+        <artifactId>intact-dataexchange-master</artifactId>
         <version>3.0.1-SNAPSHOT</version>
     </parent>
 
+    <groupId>uk.ac.ebi.intact.dataexchange.imex</groupId>
     <artifactId>imex-id-update</artifactId>
     <packaging>jar</packaging>
     <version>3.0.1-SNAPSHOT</version>
