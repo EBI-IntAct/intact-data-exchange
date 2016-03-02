@@ -168,6 +168,7 @@ public class UniprotExportProcessor {
      * @param DRFile : name of the DR file
      * @param CCFile: name of the CC file
      * @param GOFile : name of the GO file
+     * @param referenceFile: name of the reference file
      * @throws UniprotExportException
      */
     public void runUniprotExport(String DRFile, String CCFile, String GOFile, String silverCCFile, String referenceFile) throws UniprotExportException {
@@ -332,6 +333,7 @@ public class UniprotExportProcessor {
      * @param results : the results of clustering and filtering for uniprot export
      * @param DRFile : the file containing DR lines
      * @param CCFile : the file containing CC lines
+     * @param referenceFile: the file containing Reference lines               
      * @throws IOException
      */
     public void exportDRAndCCAndReferenceLines(MiClusterScoreResults results, String DRFile, String CCFile, String silverCCFile, String referenceFile) throws IOException {
@@ -427,6 +429,7 @@ public class UniprotExportProcessor {
      * @param results
      * @param drWriter
      * @param ccWriter
+     * @param referenceLineWriter 
      * @param parentAc
      * @param interactions
      * @param negativeInteractions
