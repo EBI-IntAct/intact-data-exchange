@@ -3,31 +3,32 @@ package uk.ac.ebi.intact.util.uniprotExport;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter1;
 import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.ReferenceLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.ReferenceLineConverter1;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter1;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter1;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
-import uk.ac.ebi.intact.util.uniprotExport.iterator.UniprotEntryIterator;
 import uk.ac.ebi.intact.util.uniprotExport.iterator.UniprotEntry;
+import uk.ac.ebi.intact.util.uniprotExport.iterator.UniprotEntryIterator;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.referencelineparameters.ReferenceParameters;
 import uk.ac.ebi.intact.util.uniprotExport.results.ExportedClusteredInteractions;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.IntactCluster;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedProteins;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
-import uk.ac.ebi.intact.util.uniprotExport.writers.CCWriterFactory;
-import uk.ac.ebi.intact.util.uniprotExport.writers.DRWriterFactory;
-import uk.ac.ebi.intact.util.uniprotExport.writers.GOWriterFactory;
-import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
+import uk.ac.ebi.intact.util.uniprotExport.writers.*;
 import uk.ac.ebi.intact.util.uniprotExport.writers.cclinewriters.CCLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriter;
+import uk.ac.ebi.intact.util.uniprotExport.writers.referencewriters.ReferenceLineWriter;
 
 import java.io.IOException;
 import java.util.*;
@@ -67,6 +68,11 @@ public class UniprotExportProcessor {
      * The converter of an interactor into DR line
      */
     private DRLineConverter drConverter;
+    
+    /**
+     * The converter of an interactor into reference line
+     */
+    private ReferenceLineConverter referenceLineConverter;
 
     /**
      * The filter of binary interactions
@@ -82,6 +88,11 @@ public class UniprotExportProcessor {
      * Factory to create DRWriters
      */
     private DRWriterFactory drWriterFactory;
+
+    /**
+     * Factory to create ReferenceWriter
+     */
+    private ReferenceWriterFactory referenceWriterFactory;
 
     /**
      * Factory to create GOWriters
@@ -110,12 +121,15 @@ public class UniprotExportProcessor {
         silverCcConverter = ccConverter;
 
         drConverter = new DRLineConverter1();
+        
+        referenceLineConverter = new ReferenceLineConverter1();
 
         this.filter = filter;
 
         this.ccWriterFactory = new CCWriterFactory();
         this.drWriterFactory = new DRWriterFactory();
         this.goWriterFactory = new GOWriterFactory();
+        this.referenceWriterFactory = new ReferenceWriterFactory();
 
         positiveInteractionsToExport = new HashSet<EncoreInteraction>();
         negativeInteractionsToExport = new HashSet<EncoreInteraction>();
@@ -128,17 +142,19 @@ public class UniprotExportProcessor {
      *
      * @param filter : the filter to use for uniprot export
      */
-    public UniprotExportProcessor(InteractionFilter filter, GoLineConverter goConverter, CCLineConverter ccConverter, CCLineConverter silverCcConverter, DRLineConverter drConverter){
+    public UniprotExportProcessor(InteractionFilter filter, GoLineConverter goConverter, CCLineConverter ccConverter, CCLineConverter silverCcConverter, DRLineConverter drConverter, ReferenceLineConverter referenceLineConverter){
 
         this.goConverter = goConverter != null ? goConverter : new GoLineConverter1();
         this.drConverter = drConverter != null ? drConverter : new DRLineConverter1();
         this.ccConverter = ccConverter != null ? ccConverter : new CCLineConverter1();
         this.silverCcConverter = silverCcConverter != null ? silverCcConverter : this.ccConverter;
+        this.referenceLineConverter = referenceLineConverter != null ? referenceLineConverter : new ReferenceLineConverter1();
 
         this.filter = filter;
         this.ccWriterFactory = new CCWriterFactory();
         this.drWriterFactory = new DRWriterFactory();
         this.goWriterFactory = new GOWriterFactory();
+        this.referenceWriterFactory = new ReferenceWriterFactory();
 
         positiveInteractionsToExport = new HashSet<EncoreInteraction>();
         negativeInteractionsToExport = new HashSet<EncoreInteraction>();
@@ -154,7 +170,7 @@ public class UniprotExportProcessor {
      * @param GOFile : name of the GO file
      * @throws UniprotExportException
      */
-    public void runUniprotExport(String DRFile, String CCFile, String GOFile, String silverCCFile) throws UniprotExportException {
+    public void runUniprotExport(String DRFile, String CCFile, String GOFile, String silverCCFile, String referenceFile) throws UniprotExportException {
 
         logger.info("Export binary interactions from IntAct");
         MiClusterScoreResults results = filter.exportInteractions();
@@ -164,7 +180,7 @@ public class UniprotExportProcessor {
             exportGOLines(results, GOFile);
 
             logger.info("Write DR and CC lines");
-            exportDRAndCCLines(results, DRFile, CCFile, silverCCFile);
+            exportDRAndCCAndReferenceLines(results, DRFile, CCFile, silverCCFile, referenceFile);
 
             ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
             ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
@@ -318,11 +334,13 @@ public class UniprotExportProcessor {
      * @param CCFile : the file containing CC lines
      * @throws IOException
      */
-    public void exportDRAndCCLines(MiClusterScoreResults results, String DRFile, String CCFile, String silverCCFile) throws IOException {
+    public void exportDRAndCCAndReferenceLines(MiClusterScoreResults results, String DRFile, String CCFile, String silverCCFile, String referenceFile) throws IOException {
         MiClusterContext clusterContext = results.getExportContext();
 
         // the Dr writer
         DRLineWriter drWriter = drWriterFactory.createDRLineWriterFor(this.drConverter, DRFile);
+        
+        ReferenceLineWriter referenceLineWriter = referenceWriterFactory.createReferenceLineWriterFor(this.referenceLineConverter, referenceFile);
 
         // two CC line writers which will be initialized depending on the version (1 = old CC line format, 2 = new CC line format)
         CCLineWriter ccWriter = ccWriterFactory.createCCLineWriterFor(this.ccConverter, CCFile);
@@ -385,9 +403,9 @@ public class UniprotExportProcessor {
                         // collect number of exported interactions for this interactor
                         collectExportedAndExcludedInteractions(positiveClusteredInteractions, negativeInteractionsToExport, negativeInteractionsToExclude, neg, Collections.EMPTY_LIST);
                     }
-
+                    
                     // write CC lines if the number of interactions is superior to 0
-                    flushDRAndCCLinesFor(results, drWriter, ccWriter, ccWriterForSilver, uniprotEntry.getMasterUniprot(), positiveInteractionsToExport, positiveInteractionsToExclude, negativeInteractionsToExport, negativeInteractionsToExclude);
+                    flushDRAndCCAndReferenceLinesFor(results, drWriter, ccWriter, ccWriterForSilver, referenceLineWriter, uniprotEntry.getMasterUniprot(), positiveInteractionsToExport, positiveInteractionsToExclude, negativeInteractionsToExport, negativeInteractionsToExclude);
                 }
             }
 
@@ -414,9 +432,10 @@ public class UniprotExportProcessor {
      * @param negativeInteractions
      * @throws IOException
      */
-    private void flushDRAndCCLinesFor(MiClusterScoreResults results, DRLineWriter drWriter, CCLineWriter ccWriter, CCLineWriter silverCcWriter, String parentAc, Set<EncoreInteraction> interactions, Set<EncoreInteraction> excludedInteractions, Set<EncoreInteraction> negativeInteractions, Set<EncoreInteraction> excludedNegativeInteractions) throws IOException {
+    private void flushDRAndCCAndReferenceLinesFor(MiClusterScoreResults results, DRLineWriter drWriter, CCLineWriter ccWriter, CCLineWriter silverCcWriter, ReferenceLineWriter referenceLineWriter, String parentAc, Set<EncoreInteraction> interactions, Set<EncoreInteraction> excludedInteractions, Set<EncoreInteraction> negativeInteractions, Set<EncoreInteraction> excludedNegativeInteractions) throws IOException {
         encoreInteractionsForDRLine.clear();
-
+        
+        boolean isDRQualified = false;
         int numberInteractions = interactions.size();
         int numberNegativeInteractions = negativeInteractions.size();
         int numberExcludedInteractions = excludedInteractions.size();
@@ -457,13 +476,27 @@ public class UniprotExportProcessor {
 
                 if (parameter != null){
                     drWriter.writeDRLine(parameter);
+                    //Because we want to use all the ac's in the reference file, we just take them from here. 
+                    isDRQualified = true;
                 }
             }
             else{
                 logger.error("No DRWriter is compatible with the current drline converter, the dr lines will not be written");
             }
         }
-
+        if (isDRQualified) {
+            logger.info("Write Reference lines for " + parentAc);
+            ReferenceParameters referenceParameters = this.referenceLineConverter.convertInteractorIntoReferenceLine(parentAc);
+            if (referenceParameters != null) {
+                if(referenceLineWriter != null) {
+                    referenceLineWriter.writeReferenceLine(referenceParameters);
+                } else {
+                    logger.error("No ReferenceWriter is compatible with the current referenceLineConverter, the reference line will not be written");
+                }
+            } else {
+                logger.error("No Reference Parameters to parse");
+            }
+        }
         encoreInteractionsForDRLine.clear();
     }
 
@@ -593,6 +626,14 @@ public class UniprotExportProcessor {
 
     public DRLineConverter getDrConverter() {
         return drConverter;
+    }
+
+    public ReferenceLineConverter getReferenceLineConverter() {
+        return referenceLineConverter;
+    }
+
+    public void setReferenceLineConverter(ReferenceLineConverter referenceLineConverter) {
+        this.referenceLineConverter = referenceLineConverter;
     }
 
     public void setDrConverter(DRLineConverter drConverter) {
