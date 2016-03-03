@@ -22,6 +22,7 @@
         <ccfile>/ebi/sp/pro6/intact/local/data/released/current/various/uniprotcomments.dat:1</ccfile>
         <silverccfile>/ebi/sp/pro6/intact/local/data/released/current/various/silver_nexprot.txt:1</silverccfile>
         <gofile>/ebi/sp/pro6/intact/local/data/released/current/various/gene_association.goa_intact.gz:1</gofile>
+        <refFile>/ebi/sp/pro6/intact/local/data/released/current/various/references.txt</refFile>
         <binaryOnly>false</binaryOnly>
         <highConfidence>true</highConfidence>
         <proteinOnly>true</proteinOnly>
@@ -79,6 +80,8 @@
                                 <argument>${gofile}</argument>
                                 <!-- The name of the silver CC file-->
                                 <argument>${silverccfile}</argument>
+                                <!-- The name of the silver reference file-->
+                                <argument>${refFile}</argument>
                                 <argument>${binaryOnly}</argument>
                                 <argument>${highConfidence}</argument>
                                 <argument>${proteinOnly}</argument>
