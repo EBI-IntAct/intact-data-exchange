@@ -830,5 +830,28 @@ public class QueryBuilder {
 
         return interactions;
     }
+    
+    public List<String> getReferenceLineInformation(String uniprotAc){
+        DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
+
+        TransactionStatus transactionStatus = dataContext.beginTransaction();
+
+        String queryString = "select distinct intX.primaryId, insti.shortLabel, pub.shortLabel, pub.ac " +
+                "from Publication pub, Experiment exp, Component comp, InteractorXref intX, Institution insti, InteractionImpl intImpl " +
+                "where pub.ac = exp.publication.ac " +
+                "and exp member of intImpl.experiments " +
+                "and comp.interactorAc = intX.parentAc " +
+                "and pub.owner.ac = insti.ac " +
+                "and intX.primaryId = :uniprotAc";
+
+        Query query = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().createQuery(queryString);
+        query.setParameter("uniprotAc", uniprotAc);
+
+        List<String> resultList = query.getResultList();
+
+        dataContext.commitTransaction(transactionStatus);
+
+        return resultList;
+    }
 
 }
