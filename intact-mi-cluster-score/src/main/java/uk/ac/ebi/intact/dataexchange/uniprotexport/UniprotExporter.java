@@ -7,6 +7,7 @@ import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportProcessor;
 import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter;
+import uk.ac.ebi.intact.util.uniprotExport.converters.ReferenceLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
@@ -75,12 +76,14 @@ public class UniprotExporter {
         String goFile = args[4];
         int version_goFile;
         String silverCcFile = args[5];
+        int version_refFile;
+        String referenceFile = args[6];
         int version_silverCcFile;
-        boolean excludeSpokeExpanded = Boolean.parseBoolean(args[6]);
-        boolean excludeLowConfidence = Boolean.parseBoolean(args[7]);
-        boolean excludeNonProtein = Boolean.parseBoolean(args[8]);
-        boolean excludeNegative = Boolean.parseBoolean(args[9]);
-        boolean excludeInferred = Boolean.parseBoolean(args[10]);
+        boolean excludeSpokeExpanded = Boolean.parseBoolean(args[7]);
+        boolean excludeLowConfidence = Boolean.parseBoolean(args[8]);
+        boolean excludeNonProtein = Boolean.parseBoolean(args[9]);
+        boolean excludeNegative = Boolean.parseBoolean(args[10]);
+        boolean excludeInferred = Boolean.parseBoolean(args[11]);
 
         IntactContext.initContext(new String[]{"/META-INF/jpa.spring.xml", "/META-INF/uniprotExport.spring.xml"});
 
@@ -147,6 +150,16 @@ public class UniprotExporter {
             version_silverCcFile = 1;
         }
 
+        if (referenceFile.contains(":")){
+            int index = args[6].indexOf(":");
+            referenceFile = args[6].substring(0, index);
+
+            version_refFile =  Integer.parseInt(args[6].substring(index + 1));
+        }
+        else{
+            version_refFile = 1;
+        }
+
         final InteractionSource source = InteractionFilterFactory.convertIntoInteractionSourceName(sourceType);
 
         if (source.equals(InteractionSource.none) || (mitabFile == null && source.equals(InteractionSource.mitab)) || (mitabFile != null && !source.equals(InteractionSource.mitab))){
@@ -169,6 +182,9 @@ public class UniprotExporter {
         System.out.println( "Version of the GO writer = " + version_goFile );
         System.out.println( "Silver CC file = " + silverCcFile );
         System.out.println( "Version of the silver CC writer = " + version_silverCcFile );
+        System.out.println( "Reference file = " + referenceFile);
+        System.out.println( "Version of the reference file writer = " + version_refFile );
+
 
         System.out.println("Filter spoke expanded interactions : " + excludeSpokeExpanded );
         System.out.println("Filter low confidence interactions : " + excludeLowConfidence);
@@ -188,15 +204,16 @@ public class UniprotExporter {
         GoLineConverter<? extends GOParameters> goConverter = GOConverterFactory.createGOConverter(version_goFile);
         CCLineConverter ccConverter = CCConverterFactory.createCCConverter(version_ccFile);
         CCLineConverter silverCcConverter = ccConverter;
+        ReferenceLineConverter referenceLineConverter = ReferenceConverterFactory.createReferenceLineConverter(version_refFile);
 
         if (version_ccFile != version_silverCcFile){
             silverCcConverter = CCConverterFactory.createCCConverter(version_silverCcFile);
         }
 
-        UniprotExportProcessor processor = new UniprotExportProcessor(filter, goConverter, ccConverter, silverCcConverter, drConverter);
+        UniprotExportProcessor processor = new UniprotExportProcessor(filter, goConverter, ccConverter, silverCcConverter, drConverter, referenceLineConverter);
 
         try {
-            processor.runUniprotExport(drFile, ccFile, goFile, silverCcFile);
+            processor.runUniprotExport(drFile, ccFile, goFile, silverCcFile, referenceFile);
 
         } catch (UniprotExportException e) {
             e.printStackTrace();
