@@ -44,7 +44,7 @@ public class UniprotExportProcessorTest extends UniprotExportBase{
         //results.getPositiveClusteredInteractions().getInteractionsToExport().add(3);
         //results.getNegativeClusteredInteractions().getInteractionsToExport().add(2);
 
-        processor.exportDRAndCCLines(results, "drFile", "ccFile", "ccFileSilver");
+        processor.exportDRAndCCAndReferenceLines(results, "drFile", "ccFile", "ccFileSilver", "refFile");
 
         //processor.runUniprotExport("drFile", "ccFile", "goFile");
 
