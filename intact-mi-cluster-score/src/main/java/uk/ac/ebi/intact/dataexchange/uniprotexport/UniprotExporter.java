@@ -47,7 +47,7 @@ public class UniprotExporter {
     public static void main( String[] args ) throws IOException {
 
         // Six possible arguments
-        if( args.length != 11 ) {
+        if( args.length != 12 ) {
             System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <silverCCFile> <goFile> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly> <excludeInferred>" );
             System.err.println( "Usage: <rule> is the type of rule we want to use to export the interaction to uniprot. " +
                     "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
