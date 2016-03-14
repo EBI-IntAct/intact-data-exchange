@@ -13,6 +13,7 @@
     <context:property-placeholder location="classpath*:jami-batch-complex.properties"/>
 
     <import resource="classpath*:/META-INF/psimi-batch-spring.xml"/>
+    <import resource="classpath*:"/>
 
     <tx:annotation-driven proxy-target-class="true"/>
 
