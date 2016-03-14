@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
@@ -26,8 +27,8 @@
         <module>intact-solr</module>
         <module>intact-solr-home</module>
         <module>intact-calimocho-converters</module>
-    <module>intact-jami-mitab</module>
-  </modules>
+        <module>intact-jami-mitab</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -47,9 +48,9 @@
 
     <repositories>
         <repository>
-              <id>intact.nexus</id>
-              <name>IntAct Nexus</name>
-              <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
+            <id>intact.nexus</id>
+            <name>IntAct Nexus</name>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
         </repository>
     </repositories>
 
