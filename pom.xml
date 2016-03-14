@@ -12,7 +12,7 @@
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
@@ -34,7 +34,7 @@
         <connection>scm:git:https://bitbucket.org/intact-ebi/intact-data-exchange-master.git</connection>
         <developerConnection>scm:git:https://bitbucket.org/intact-ebi/intact-data-exchange-master.git</developerConnection>
         <url>https://bitbucket.org/intact-ebi/intact-data-exchange-master</url>
-        <tag>HEAD</tag>
+        <tag>intact-dataexchange-master-3.0.1</tag>
     </scm>
 
     <modules>
