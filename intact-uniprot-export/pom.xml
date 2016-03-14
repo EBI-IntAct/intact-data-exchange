@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.2-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -11,7 +11,7 @@
     <groupId>uk.ac.ebi.intact.dataexchange.uniprotexport</groupId>
     <artifactId>intact-uniprot-export</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.2-SNAPSHOT</version>
+    <version>3.0.1-SNAPSHOT</version>
 
     <name>IntAct Data Exchange :: Uniprot Export :: CC/DR Line Export</name>
     <description>IntAct CC/DR line export for UniProt</description>
@@ -20,8 +20,7 @@
         <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/uniprot-export/intact-uniprot-export</connection>
         <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/uniprot-export/intact-uniprot-export</developerConnection>
         <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/uniprot-export/intact-uniprot-export</url>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <build>
         <resources>

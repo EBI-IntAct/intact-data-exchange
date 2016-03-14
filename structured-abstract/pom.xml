@@ -4,12 +4,12 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.2-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>structured-abstract</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
+    <version>3.0.1-SNAPSHOT</version>
 
     <name>IntAct structured abstract</name>
 
@@ -21,8 +21,7 @@
         <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/structured-abstract</connection>
         <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/structured-abstract</developerConnection>
         <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/structured-abstract</url>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <dependencies>
         <!-- IntAct dependencies -->
