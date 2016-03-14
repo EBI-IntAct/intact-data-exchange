@@ -2,12 +2,12 @@
   <parent>
     <artifactId>psimitab-master</artifactId>
     <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-    <version>3.0.1</version>
+    <version>3.0.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>intact-solr-home</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.2-SNAPSHOT</version>
 
   <name>IntAct Data Exchange :: PSI MI :: TAB :: Lucene SOLR Home Template</name>
 
@@ -15,7 +15,7 @@
         <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psimitab/intact-solr-home</connection>
         <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psimitab/intact-solr-home</developerConnection>
         <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/psimi/psimitab/intact-solr-home</url>
-      <tag>intact-dataexchange-master-3.0.1</tag>
+      <tag>HEAD</tag>
   </scm>
 
      <build>
