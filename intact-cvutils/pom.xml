@@ -3,13 +3,13 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.1</version>
+        <version>3.0.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-cvutils</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2-SNAPSHOT</version>
 
     <name>IntAct Data Exchange :: CV Utils</name>
 
@@ -17,7 +17,7 @@
         <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/intact-cvutils</connection>
         <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/intact-cvutils</developerConnection>
         <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/intact-cvutils</url>
-      <tag>intact-dataexchange-master-3.0.1</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <build>

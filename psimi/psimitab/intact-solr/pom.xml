@@ -6,13 +6,13 @@
     <parent>
         <artifactId>psimitab-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-        <version>3.0.1</version>
+        <version>3.0.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-solr-core</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2-SNAPSHOT</version>
 
     <name>IntAct Data Exchange :: PSI MI :: TAB :: Lucene SOLR integration</name>
 
@@ -20,7 +20,7 @@
         <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psimitab/intact-solr/</connection>
         <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psimitab/intact-solr/</developerConnection>
         <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/psimi/psimitab/intact-solr/</url>
-      <tag>intact-dataexchange-master-3.0.1</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <properties>

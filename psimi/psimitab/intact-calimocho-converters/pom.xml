@@ -4,11 +4,11 @@
     <parent>
         <artifactId>psimitab-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-        <version>3.0.1</version>
+        <version>3.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>intact-calimocho-converters</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2-SNAPSHOT</version>
     <name>intact-calimocho-converters</name>
 
     <dependencies>

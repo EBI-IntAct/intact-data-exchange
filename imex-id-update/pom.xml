@@ -4,13 +4,13 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.1</version>
+        <version>3.0.2-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.ac.ebi.intact.dataexchange.imex</groupId>
     <artifactId>imex-id-update</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.1</version>
+    <version>3.0.2-SNAPSHOT</version>
 
     <name>IntAct Data Exchange :: IMEx :: IMEx Id update</name>
 
@@ -18,7 +18,7 @@
         <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/imex/imex-id-update</connection>
         <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/imex/imex-id-update</developerConnection>
         <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/imex/imex-id-update</url>
-      <tag>intact-dataexchange-master-3.0.1</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <dependencies>
@@ -26,13 +26,13 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.13</version>
+            <version>1.2.14-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-imex-updater</artifactId>
-            <version>1.1.3</version>
+            <version>1.1.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
