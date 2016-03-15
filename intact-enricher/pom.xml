@@ -4,13 +4,13 @@
     <parent>
         <artifactId>intact-dataexchange-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-enricher</artifactId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1</version>
 
     <name>IntAct Data Exchange :: Enricher</name>
 
@@ -19,39 +19,39 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.14-SNAPSHOT</version>
+            <version>1.2.13</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>1.1.4-SNAPSHOT</version>
+            <version>1.1.4</version>
         </dependency>
 
         <!-- JAMI bridges -->
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-obo</artifactId>
-            <version>1.1.2-SNAPSHOT</version>
+            <version>1.1.3</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-ols</artifactId>
-            <version>1.1.3-SNAPSHOT</version>
+            <version>1.1.3</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-picr</artifactId>
-            <version>1.1.3-SNAPSHOT</version>
+            <version>1.1.3</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-europubmedcentral</artifactId>
-            <version>1.1.3-SNAPSHOT</version>
+            <version>1.1.3</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-uniprot-taxonomy</artifactId>
-            <version>1.1.3-SNAPSHOT</version>
+            <version>1.1.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.axis</groupId>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-uniprot</artifactId>
-            <version>1.1.3-SNAPSHOT</version>
+            <version>1.1.4-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-chebi</artifactId>
-            <version>1.1.3-SNAPSHOT</version>
+            <version>1.1.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.sun.xml.bind</groupId>

@@ -3,14 +3,14 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>intact-psixml</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-psixml-exchange</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1</version>
 
     <name>IntAct Data Exchange :: PSI MI :: XML :: Exchange</name>
     <description>Imports PSIXML files to the database or creates PSIXML from the intact database</description>
@@ -20,7 +20,8 @@
         <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psixml/intact-psixml-exchange</connection>
         <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psixml/intact-psixml-exchange</developerConnection>
         <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/psimi/psixml/intact-psixml-exchange</url>
-    </scm>
+      <tag>intact-dataexchange-master-3.0.1</tag>
+  </scm>
 
     <build>
         <resources>

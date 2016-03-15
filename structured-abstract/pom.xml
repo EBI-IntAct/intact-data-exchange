@@ -4,12 +4,12 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.1</version>
     </parent>
 
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>structured-abstract</artifactId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1</version>
 
     <name>IntAct structured abstract</name>
 
@@ -21,14 +21,15 @@
         <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/structured-abstract</connection>
         <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/structured-abstract</developerConnection>
         <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/structured-abstract</url>
-    </scm>
+      <tag>intact-dataexchange-master-3.0.1</tag>
+  </scm>
 
     <dependencies>
         <!-- IntAct dependencies -->
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.14-SNAPSHOT</version>
+            <version>1.2.13</version>
         </dependency>
     </dependencies>
 
