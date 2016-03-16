@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -9,7 +10,6 @@
         <version>3.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
     <artifactId>intact-psixml-dbimporter</artifactId>
     <version>3.0.1-SNAPSHOT</version>
 
@@ -44,7 +44,7 @@
                                 <argument>-classpath</argument>
                                 <!-- automatically creates the classpath using all project dependencies,
                                      also adding the project build directory -->
-                                <classpath />
+                                <classpath/>
                                 <argument>uk.ac.ebi.intact.dataexchange.psimi.xml.dbimporter.DbImporter</argument>
                                 <argument>${file}</argument>
                                 <argument>${user}</argument>
@@ -77,8 +77,9 @@
                                 <argument>-classpath</argument>
                                 <!-- automatically creates the classpath using all project dependencies,
                                      also adding the project build directory -->
-                                <classpath />
-                                <argument>uk.ac.ebi.intact.dataexchange.psimi.xml.dbimporter.ChemblComplexXmlConverter</argument>
+                                <classpath/>
+                                <argument>uk.ac.ebi.intact.dataexchange.psimi.xml.dbimporter.ChemblComplexXmlConverter
+                                </argument>
                                 <!-- the chembl tabular file listing components of a comples-->
                                 <argument>${input_components}</argument>
                                 <!-- the chembl tabular file listing the complexes-->
@@ -116,8 +117,9 @@
                                 <argument>-classpath</argument>
                                 <!-- automatically creates the classpath using all project dependencies,
                                      also adding the project build directory -->
-                                <classpath />
-                                <argument>uk.ac.ebi.intact.dataexchange.psimi.xml.dbimporter.PDBComplexXmlConverter</argument>
+                                <classpath/>
+                                <argument>uk.ac.ebi.intact.dataexchange.psimi.xml.dbimporter.PDBComplexXmlConverter
+                                </argument>
                                 <!-- the PDB incomplete XML file-->
                                 <argument>${input_file}</argument>
                                 <!-- the output XML file-->
@@ -179,18 +181,6 @@
             <artifactId>spring-core</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>uk.ac.ebi.uniprot.kraken</groupId>-->
-            <!--<artifactId>uniprotjapi</artifactId>-->
-            <!--<version>2015.02</version>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.springframework</groupId>-->
-                    <!--<artifactId>spring-context</artifactId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>

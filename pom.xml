@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>uk.ac.ebi.intact.maven</groupId>
@@ -25,14 +26,15 @@
     </properties>
 
     <!--<scm>-->
-        <!--<connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</connection>-->
-        <!--<developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</developerConnection>-->
-        <!--<url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk</url>-->
+    <!--<connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</connection>-->
+    <!--<developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</developerConnection>-->
+    <!--<url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk</url>-->
     <!--</scm>-->
 
     <scm>
         <connection>scm:git:https://bitbucket.org/intact-ebi/intact-data-exchange-master.git</connection>
-        <developerConnection>scm:git:https://bitbucket.org/intact-ebi/intact-data-exchange-master.git</developerConnection>
+        <developerConnection>scm:git:https://bitbucket.org/intact-ebi/intact-data-exchange-master.git
+        </developerConnection>
         <url>https://bitbucket.org/intact-ebi/intact-data-exchange-master</url>
         <tag>HEAD</tag>
     </scm>
@@ -91,10 +93,10 @@
                 <version>1.2.17</version>
                 <optional>true</optional>
                 <exclusions>
-                   <exclusion>
-                      <groupId>javax.jms</groupId>
-                      <artifactId>jms</artifactId>
-                   </exclusion>
+                    <exclusion>
+                        <groupId>javax.jms</groupId>
+                        <artifactId>jms</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
