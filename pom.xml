@@ -25,12 +25,6 @@
         <commons.version>2.1.10</commons.version>
     </properties>
 
-    <!--<scm>-->
-    <!--<connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</connection>-->
-    <!--<developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk</developerConnection>-->
-    <!--<url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk</url>-->
-    <!--</scm>-->
-
     <scm>
         <connection>scm:git:https://bitbucket.org/intact-ebi/intact-data-exchange-master.git</connection>
         <developerConnection>scm:git:https://bitbucket.org/intact-ebi/intact-data-exchange-master.git
@@ -155,12 +149,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
