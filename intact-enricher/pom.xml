@@ -92,25 +92,6 @@
             </exclusions>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>uk.ac.ebi.uniprot.kraken</groupId>-->
-            <!--<artifactId>uniprotjapi</artifactId>-->
-            <!--<version>2015.02</version>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.springframework</groupId>-->
-                    <!--<artifactId>spring-context</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.springframework</groupId>-->
-                    <!--<artifactId>spring-beans</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.springframework</groupId>-->
-                    <!--<artifactId>spring-core</artifactId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>japi</artifactId>
@@ -118,14 +99,4 @@
         </dependency>
 
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>intact.nexus</id>
-            <name>IntAct Nexus</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
-        </repository>
-    </repositories>
-
-
 </project>

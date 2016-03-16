@@ -132,31 +132,4 @@
             <version>4.11</version>
         </dependency>
     </dependencies>
-
-    <distributionManagement>
-        <repository>
-            <id>ebi-repo</id>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
-        </repository>
-
-        <snapshotRepository>
-            <id>ebi-repo-snapshots</id>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
-        </snapshotRepository>
-
-        <site>
-            <id>intact-site</id>
-            <name>Intact site</name>
-            <url>${site.remote.basedir}/${artifactId}</url>
-        </site>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>intact.nexus</id>
-            <name>IntAct Nexus</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
-        </repository>
-    </repositories>
-
 </project>

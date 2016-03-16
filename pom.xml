@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.maven</groupId>
         <artifactId>intact-hibernate-master</artifactId>
-        <version>43</version>
+        <version>44</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -166,21 +166,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-              <id>intact.nexus</id>
-              <name>IntAct Nexus</name>
-              <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <site>
-            <id>intact-site</id>
-            <name>Intact site</name>
-            <url>${site.remote.basedir}/dataexchange</url>
-        </site>
-    </distributionManagement>
-
 </project>

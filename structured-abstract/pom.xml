@@ -31,12 +31,4 @@
             <version>1.2.14-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>intact.nexus</id>
-            <name>IntAct Nexus</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
-        </repository>
-    </repositories>
 </project>
