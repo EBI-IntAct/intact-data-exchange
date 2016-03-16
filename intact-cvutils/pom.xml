@@ -13,12 +13,6 @@
 
     <name>IntAct Data Exchange :: CV Utils</name>
 
-    <scm>
-        <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/intact-cvutils</connection>
-        <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/intact-cvutils</developerConnection>
-        <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/intact-cvutils</url>
-    </scm>
-
     <build>
         <plugins>
             <plugin>

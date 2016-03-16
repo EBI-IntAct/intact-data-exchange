@@ -17,12 +17,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <scm>
-        <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/structured-abstract</connection>
-        <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/structured-abstract</developerConnection>
-        <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/structured-abstract</url>
-    </scm>
-
     <dependencies>
         <!-- IntAct dependencies -->
         <dependency>

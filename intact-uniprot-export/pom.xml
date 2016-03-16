@@ -56,7 +56,6 @@
         </dependency>
 
         <!-- MI score cluster dependency-->
-
         <dependency>
             <groupId>uk.ac.ebi.enfin.mi.cluster.score</groupId>
             <artifactId>miClusterScore</artifactId>

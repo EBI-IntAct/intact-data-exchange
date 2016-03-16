@@ -16,12 +16,6 @@
     <description>Imports PSIXML files to the database or creates PSIXML from the intact database</description>
     <url>http://www.ebi.ac.uk/~intact/devsite/intact-psixml-exchange</url>
 
-    <scm>
-        <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psixml/intact-psixml-exchange</connection>
-        <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/psimi/psixml/intact-psixml-exchange</developerConnection>
-        <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/psimi/psixml/intact-psixml-exchange</url>
-    </scm>
-
     <build>
         <resources>
             <resource>

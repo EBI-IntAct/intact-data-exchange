@@ -14,12 +14,6 @@
 
     <name>IntAct Data Exchange :: IMEx :: IMEx Id update</name>
 
-    <scm>
-        <connection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/imex/imex-id-update</connection>
-        <developerConnection>scm:svn:https://intact.googlecode.com/svn/repo/data-exchange/trunk/imex/imex-id-update</developerConnection>
-        <url>http://code.google.com/p/intact/source/browse/repo/data-exchange/trunk/imex/imex-id-update</url>
-    </scm>
-
     <dependencies>
 
         <dependency>
