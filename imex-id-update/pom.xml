@@ -5,13 +5,13 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.2-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.ac.ebi.intact.dataexchange.imex</groupId>
     <artifactId>imex-id-update</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.2-SNAPSHOT</version>
 
     <name>IntAct Data Exchange :: IMEx :: IMEx Id update</name>
 

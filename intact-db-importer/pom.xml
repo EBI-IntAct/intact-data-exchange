@@ -6,12 +6,12 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.2-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-db-importer</artifactId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.2-SNAPSHOT</version>
     <name>IntAct Data Exchange :: PSI MI :: file :: Db import</name>
     <description>Imports files to the intact database</description>
 
