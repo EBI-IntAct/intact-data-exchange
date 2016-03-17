@@ -6,11 +6,11 @@
     <parent>
         <artifactId>intact-psixml</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-        <version>3.0.2</version>
+        <version>3.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>intact-psixml-dbimporter</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3-SNAPSHOT</version>
 
     <name>IntAct Data Exchange :: PSI MI :: XML :: DB Importer</name>
 
