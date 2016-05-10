@@ -62,18 +62,34 @@
                     <artifactId>ehcache</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>uk.ac.ebi.intact.bridges</groupId>
-                    <artifactId>intact-citexplore</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>uk.ac.ebi.intact.bridges</groupId>
-                    <artifactId>intact-uniprot</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>uk.ac.ebi.uniprot.kraken</groupId>
                     <artifactId>uniprotjapi</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>uk.ac.ebi.pride</groupId>
+                    <artifactId>ols-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>uk.ac.ebi.ols</groupId>
+                    <artifactId>ols-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>uk.ac.ebi.intact.bridges</groupId>
+                    <artifactId>intact-taxonomy</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.intact.bridges</groupId>
+            <artifactId>intact-taxonomy</artifactId>
+            <version>${bridges.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.pride.utilities</groupId>
+            <artifactId>ols-client</artifactId>
+            <version>2.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -109,6 +125,5 @@
             <artifactId>japi</artifactId>
             <version>RELEASE</version>
         </dependency>
-
     </dependencies>
 </project>
