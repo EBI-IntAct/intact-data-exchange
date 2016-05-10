@@ -16806,7 +16806,7 @@
                                                 refTypeAc="MI:0356"/>
                                 </xref>
                             </interactorType>
-                            <organism ncbiTaxId="5085">
+                            <organism ncbiTaxId="746128">
                                 <names>
                                     <shortLabel>Aspergillus fumigatus</shortLabel>
                                     <fullName>Aspergillus fumigatus</fullName>
@@ -16922,7 +16922,7 @@
                                                 refTypeAc="MI:0356"/>
                                 </xref>
                             </interactorType>
-                            <organism ncbiTaxId="5085">
+                            <organism ncbiTaxId="746128">
                                 <names>
                                     <shortLabel>Aspergillus fumigatus</shortLabel>
                                     <fullName>Aspergillus fumigatus</fullName>
