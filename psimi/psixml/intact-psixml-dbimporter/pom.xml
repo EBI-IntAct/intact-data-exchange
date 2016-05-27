@@ -16,7 +16,7 @@
 
     <properties>
         <db.hbm2ddl>none</db.hbm2ddl>
-        <spring.version>3.1.2.RELEASE</spring.version>
+        <spring.version>3.2.9.RELEASE</spring.version>
     </properties>
 
     <profiles>
@@ -184,7 +184,7 @@
         <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>japi</artifactId>
-            <version>1.0.4</version>
+            <version>RELEASE</version>
         </dependency>
 
         <!-- Oracle -->
