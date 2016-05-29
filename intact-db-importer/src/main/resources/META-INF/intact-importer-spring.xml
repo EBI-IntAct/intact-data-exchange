@@ -333,7 +333,7 @@
             <batch:listener ref="basicJobLoggerListener"/>
         </batch:listeners>
 
-        <batch:step id="modelledEvidenceStep" parent="modelledEvidenceStep"/>
+        <batch:step id="modelledEvidenceStep" parent="modelledInteractionEnricherStep"/>
     </batch:job>
     <batch:job id="complexImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
 
