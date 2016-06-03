@@ -106,13 +106,4 @@
         </dependency>
 
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>nexus</id>
-            <name>IntAct Nexus</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public/</url>
-        </repository>
-    </repositories>
-
 </project>

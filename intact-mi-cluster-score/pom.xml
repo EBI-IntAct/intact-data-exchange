@@ -29,7 +29,7 @@
         <excludeInferred>true</excludeInferred>
         <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
         <db.hbm2ddl>none</db.hbm2ddl>
-        <spring.version>3.1.2.RELEASE</spring.version>
+        <spring.version>3.2.9.RELEASE</spring.version>
     </properties>
 
     <build>
