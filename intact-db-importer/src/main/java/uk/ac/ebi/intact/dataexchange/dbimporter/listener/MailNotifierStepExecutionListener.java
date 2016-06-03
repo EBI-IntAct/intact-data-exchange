@@ -44,12 +44,12 @@ public class MailNotifierStepExecutionListener implements StepExecutionListener 
         message.setText(stepExecution.getSummary()+"\n"+stepExecution.getJobExecution());
         message.setTo(stepExecution.getJobParameters().getString("email.recipient"));
 
-        try{
-            mailSender.send(message);
-        }
-        catch (MailException e){
-            log.error("Impossible to send e-mail", e);
-        }
+//        try{
+//            mailSender.send(message);
+//        }
+//        catch (MailException e){
+//            log.error("Impossible to send e-mail", e);
+//        }
     }
 
     public ExitStatus afterStep(StepExecution stepExecution) {
@@ -60,12 +60,12 @@ public class MailNotifierStepExecutionListener implements StepExecutionListener 
         message.setText(stepExecution.toString()+"\n"+stepExecution.getSummary()+"\n"+stepExecution.getJobExecution());
         message.setTo(stepExecution.getJobParameters().getString("email.recipient"));
 
-        try{
-            mailSender.send(message);
-        }
-        catch (MailException e){
-            log.error("Impossible to send e-mail", e);
-        }
+//        try{
+//            mailSender.send(message);
+//        }
+//        catch (MailException e){
+//            log.error("Impossible to send e-mail", e);
+//        }
 
         return stepExecution.getExitStatus();
     }
