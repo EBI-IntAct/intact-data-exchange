@@ -19,11 +19,6 @@
     <url>http://www.ebi.ac.uk/~intact/devsite/dataexchange</url>
 
     <properties>
-        <core.version>2.6.11-SNAPSHOT</core.version>
-        <bridges.version>2.1.19-SNAPSHOT</bridges.version>
-        <psi.jami.version>3.0.0-SNAPSHOT</psi.jami.version>
-        <intact.jami.version>1.2.14-SNAPSHOT</intact.jami.version>
-        <pride.ols.client>2.3-SNAPSHOT</pride.ols.client>
         <commons.version>2.1.10</commons.version>
         <spring.version>3.2.9.RELEASE</spring.version>
     </properties>
@@ -56,12 +51,12 @@
             <dependency>
                 <groupId>uk.ac.ebi.intact.core</groupId>
                 <artifactId>intact-core</artifactId>
-                <version>${core.version}</version>
+                <version>2.6.11-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>uk.ac.ebi.intact.core</groupId>
                 <artifactId>intact-annotations</artifactId>
-                <version>${core.version}</version>
+                <version>2.6.11-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>uk.ac.ebi.intact.commons</groupId>

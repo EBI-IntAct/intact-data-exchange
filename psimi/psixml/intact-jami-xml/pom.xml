@@ -23,20 +23,20 @@
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>${psi.jami.version}</version>
+            <version>3.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-xml</artifactId>
-            <version>${psi.jami.version}</version>
+            <version>3.0.0-SNAPSHOT</version>
         </dependency>
 
         <!-- intact jami -->
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>${intact.jami.version}</version>
+            <version>1.2.15-SNAPSHOT</version>
         </dependency>
 
         <dependency>
