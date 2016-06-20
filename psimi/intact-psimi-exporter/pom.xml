@@ -167,7 +167,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.16-SNAPSHOT</version>
+            <version>${intact.jami.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
@@ -182,31 +182,31 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange</groupId>
             <artifactId>structured-abstract</artifactId>
-            <version>${pom.version}</version>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <!-- JAMI file dependencies -->
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>${psi.jami.version}</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-html</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>${psi.jami.version}</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-interactionviewer-json</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <!-- JAMI batch dependencies -->
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-batch</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>${psi.jami.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -237,13 +237,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>3.2.9.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>3.2.9.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -21,14 +21,14 @@
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <!-- intact jami -->
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.16-SNAPSHOT</version>
+            <version>${intact.jami.version}</version>
         </dependency>
 
         <dependency>

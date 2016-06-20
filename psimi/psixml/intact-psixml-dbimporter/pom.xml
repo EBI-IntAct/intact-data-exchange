@@ -16,7 +16,6 @@
 
     <properties>
         <db.hbm2ddl>none</db.hbm2ddl>
-        <spring.version>3.2.9.RELEASE</spring.version>
     </properties>
 
     <profiles>

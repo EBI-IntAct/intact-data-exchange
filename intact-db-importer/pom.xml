@@ -16,7 +16,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
         <db.hbm2ddl>none</db.hbm2ddl>
-
         <intact.notification.email.sender>${email.sender}</intact.notification.email.sender>
         <intact.notification.email.smtpHost>${email.smtpHost}</intact.notification.email.smtpHost>
     </properties>
@@ -99,7 +98,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.16-SNAPSHOT</version>
+            <version>${intact.jami.version}</version>
         </dependency>
 
         <!-- JAMI enricher dependencies-->
@@ -113,14 +112,14 @@
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <!-- JAMI batch dependencies -->
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-batch</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <dependency>
@@ -139,13 +138,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>3.2.9.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>3.2.9.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
