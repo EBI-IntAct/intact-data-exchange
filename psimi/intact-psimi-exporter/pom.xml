@@ -182,7 +182,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange</groupId>
             <artifactId>structured-abstract</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>${pom.version}</version>
         </dependency>
 
         <!-- JAMI file dependencies -->
