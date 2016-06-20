@@ -99,7 +99,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.14-SNAPSHOT</version>
+            <version>1.2.16-SNAPSHOT</version>
         </dependency>
 
         <!-- JAMI enricher dependencies-->
@@ -113,14 +113,14 @@
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>3.0.1-SNAPSHOT</version>
         </dependency>
 
         <!-- JAMI batch dependencies -->
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-batch</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>3.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
