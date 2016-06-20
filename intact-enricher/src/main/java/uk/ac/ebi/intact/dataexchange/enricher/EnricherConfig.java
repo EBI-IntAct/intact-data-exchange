@@ -31,7 +31,8 @@ public class EnricherConfig {
     private boolean updateGenes = true;
     private boolean updateExperiments = true;
     private boolean updateInteractionShortLabels = true;
-    private String oboUrl = "http://psidev.cvs.sourceforge.net/viewvc/psidev/psi/mi/rel25/data/psi-mi25.obo?revision=1.97";
+    //TODO: Just temporary... OLS!!!!!!
+    private String oboUrl = "https://raw.githubusercontent.com/MICommunity/psidev/master/psi/mi/rel25/data/psi-mi25.obo";
     private boolean updateCvTerms = true;
     private boolean updateCellTypesAndTissues = false;
     private boolean updateCvInXrefsAliasesAnnotations = true;
