@@ -9,8 +9,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-cvutils</artifactId>
-    <version>3.0.3-SNAPSHOT</version>
-
     <name>IntAct Data Exchange :: CV Utils</name>
 
     <build>
@@ -26,19 +24,12 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>uk.ac.ebi.intact.core</groupId>
-            <artifactId>intact-core</artifactId>
-            <version>${core.version}</version>
-        </dependency>
-
         <!--To be removed when Dataexchange 2.0.1 is released -->
         <dependency>
             <groupId>uk.ac.ebi</groupId>
             <artifactId>ols</artifactId>
             <version>1.18</version>
         </dependency>
-
         <!-- other third party -->
         <dependency>
             <groupId>net.sf.opencsv</groupId>

@@ -10,36 +10,31 @@
     <groupId>uk.ac.ebi.intact.dataexchange.imex</groupId>
     <artifactId>imex-id-update</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.3-SNAPSHOT</version>
-
     <name>IntAct Data Exchange :: IMEx :: IMEx Id update</name>
 
     <dependencies>
-
+        <!--intact jami-->
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.15-SNAPSHOT</version>
+            <version>${intact.jami.verson}</version>
         </dependency>
-
+        <!--psi jami-->
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-imex-updater</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>${psi.jami.verson}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
         </dependency>
-
     </dependencies>
 </project>

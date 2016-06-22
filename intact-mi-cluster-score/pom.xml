@@ -8,10 +8,7 @@
     </parent>
 
     <artifactId>intact-mi-cluster-score</artifactId>
-    <version>3.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
-
-
     <name>IntAct Data Exchange :: Intact MI cluster score</name>
     <description>IntAct CC/DR line export for UniProt using the Mi cluster score</description>
 
@@ -348,12 +345,6 @@
                     <artifactId>commons-io</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>uk.ac.ebi.intact.core</groupId>
-            <artifactId>intact-core</artifactId>
-            <version>${core.version}</version>
         </dependency>
 
         <!-- PostgreSQL -->

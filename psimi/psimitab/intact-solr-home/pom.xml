@@ -8,8 +8,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-solr-home</artifactId>
-    <version>3.0.3-SNAPSHOT</version>
-
     <name>IntAct Data Exchange :: PSI MI :: TAB :: Lucene SOLR Home Template</name>
 
     <build>

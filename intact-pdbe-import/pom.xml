@@ -11,8 +11,6 @@
 
     <groupId>uk.ac.ebi.intact.dataexchange.pdbe</groupId>
     <artifactId>intact-pdbe-import</artifactId>
-    <version>3.0.3-SNAPSHOT</version>
-
     <name>IntAct Data Exchange :: PDBe :: Import</name>
 
     <dependencies>

@@ -9,8 +9,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>intact-psimitab-converters</artifactId>
-    <version>3.0.3-SNAPSHOT</version>
-
     <name>IntAct Data Exchange :: PSI MI :: TAB :: IntAct PSI-MI TAB Converters</name>
 
     <dependencies>
@@ -29,12 +27,6 @@
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>uk.ac.ebi.intact.core</groupId>
-            <artifactId>intact-core</artifactId>
-            <version>${core.version}</version>
         </dependency>
 
         <!-- Third party -->

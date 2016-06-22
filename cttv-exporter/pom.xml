@@ -9,7 +9,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cttv-exporter</artifactId>
-    <version>3.0.3-SNAPSHOT</version>
 
     <profiles>
         <profile>
@@ -98,17 +97,18 @@
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>${psi.jami.verson}</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-batch</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>${psi.jami.verson}</version>
         </dependency>
+        <!--intact jami-->
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.15-SNAPSHOT</version>
+            <version>${intact.jami.verson}</version>
         </dependency>
         <!--CTTV-->
         <dependency>

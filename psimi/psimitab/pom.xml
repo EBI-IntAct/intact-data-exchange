@@ -11,8 +11,6 @@
 
     <artifactId>psimitab-master</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.3-SNAPSHOT</version>
-
     <name>IntAct Data Exchange :: PSI MI :: TAB</name>
     <description>PSI MI TAB Master POM</description>
 
