@@ -19,11 +19,11 @@
     <url>http://www.ebi.ac.uk/~intact/devsite/dataexchange</url>
 
     <properties>
-        <core.version>2.6.11</core.version>
-        <bridges.version>2.1.19</bridges.version>
+        <core.version>2.6.12-SNAPSHOT</core.version>
+        <bridges.version>2.1.20-SNAPSHOT</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.jami.verson>1.2.15</intact.jami.verson>
-        <psi.jami.verson>3.0.0</psi.jami.verson>
+        <intact.jami.verson>1.2.16-SNAPSHOT</intact.jami.verson>
+        <psi.jami.verson>3.0.1-SNAPSHOT</psi.jami.verson>
         <spring.version>3.2.9.RELEASE</spring.version>
     </properties>
 
