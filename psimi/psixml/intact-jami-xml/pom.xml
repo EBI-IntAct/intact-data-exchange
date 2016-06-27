@@ -20,13 +20,13 @@
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>${psi.jami.verson}</version>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-xml</artifactId>
-            <version>${psi.jami.verson}</version>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <!-- intact jami -->
