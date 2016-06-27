@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.3</version>
+        <version>3.0.4</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -97,12 +97,12 @@
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>${psi.jami.verson}</version>
+            <version>${psi.jami.version}</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-batch</artifactId>
-            <version>${psi.jami.verson}</version>
+            <version>${psi.jami.version}</version>
         </dependency>
         <!--intact jami-->
         <dependency>

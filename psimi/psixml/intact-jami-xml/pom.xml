@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>intact-psixml</artifactId>
-        <version>3.0.3</version>
+        <version>3.0.4</version>
     </parent>
 
     <artifactId>intact-jami-xml</artifactId>
@@ -20,13 +20,13 @@
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-commons</artifactId>
-            <version>${psi.jami.verson}</version>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-xml</artifactId>
-            <version>${psi.jami.verson}</version>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <!-- intact jami -->

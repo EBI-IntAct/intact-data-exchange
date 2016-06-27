@@ -12,7 +12,7 @@
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.3</version>
+    <version>3.0.4</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
@@ -22,17 +22,17 @@
         <core.version>2.6.11</core.version>
         <bridges.version>2.1.19</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.jami.verson>1.2.15</intact.jami.verson>
-        <psi.jami.verson>3.0.0</psi.jami.verson>
+        <intact.jami.verson>1.2.16</intact.jami.verson>
+        <psi.jami.version>3.0.1</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
+        <ols.client.version>2.4</ols.client.version>
     </properties>
 
     <scm>
-        <connection>scm:git:https://bitbucket.org/intact-ebi/intact-data-exchange-master.git</connection>
-        <developerConnection>scm:git:https://bitbucket.org/intact-ebi/intact-data-exchange-master.git
-        </developerConnection>
-        <url>https://bitbucket.org/intact-ebi/intact-data-exchange-master</url>
-        <tag>intact-dataexchange-master-3.0.3</tag>
+        <connection>scm:git:https://github.com/EBI-IntAct/intact-data-exchange.git</connection>
+        <developerConnection>scm:git:https://github.com/EBI-IntAct/intact-data-exchange.git</developerConnection>
+        <url>https://github.com/EBI-IntAct/intact-data-exchange</url>
+        <tag>HEAD</tag>
     </scm>
 
     <modules>
@@ -48,6 +48,28 @@
         <module>intact-db-importer</module>
         <module>cttv-exporter</module>
     </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>external.atlassian.jgitflow</groupId>
+                <artifactId>jgitflow-maven-plugin</artifactId>
+                <version>1.0-m5.1</version>
+                <configuration>
+                    <flowInitContext>
+                        <masterBranchName>master</masterBranchName>
+                        <developBranchName>develop</developBranchName>
+                        <featureBranchPrefix>feature-</featureBranchPrefix>
+                        <releaseBranchPrefix>release-</releaseBranchPrefix>
+                        <hotfixBranchPrefix>hotfix-</hotfixBranchPrefix>
+                        <versionTagPrefix>${project.artifactId}-</versionTagPrefix>
+                    </flowInitContext>
+                    <!-- see goals wiki page for configuration options -->
+                    <allowUntracked>true</allowUntracked>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencyManagement>
         <dependencies>
