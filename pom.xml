@@ -49,6 +49,28 @@
         <module>cttv-exporter</module>
     </modules>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>external.atlassian.jgitflow</groupId>
+                <artifactId>jgitflow-maven-plugin</artifactId>
+                <version>1.0-m5.1</version>
+                <configuration>
+                    <flowInitContext>
+                        <masterBranchName>master</masterBranchName>
+                        <developBranchName>develop</developBranchName>
+                        <featureBranchPrefix>feature-</featureBranchPrefix>
+                        <releaseBranchPrefix>release-</releaseBranchPrefix>
+                        <hotfixBranchPrefix>hotfix-</hotfixBranchPrefix>
+                        <versionTagPrefix>${project.artifactId}-</versionTagPrefix>
+                    </flowInitContext>
+                    <!-- see goals wiki page for configuration options -->
+                    <allowUntracked>true</allowUntracked>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencyManagement>
         <dependencies>
             <!-- IntAct dependencies -->
