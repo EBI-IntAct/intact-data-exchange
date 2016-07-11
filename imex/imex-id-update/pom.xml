@@ -9,7 +9,7 @@
 
     <artifactId>imex-id-update</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.10</version>
+    <version>2.1.10.1</version>
 
     <name>IntAct Data Exchange :: IMEx :: IMEx Id update</name>
 

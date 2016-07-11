@@ -416,7 +416,7 @@ public class IntactImexAssignerImpl extends ImexCentralUpdater implements Intact
                     }
 
                     // if it is a true PPI positive interaction, we can assign an IMEx id
-                    if (involvesOnlyProteins(interaction) && !InteractionUtils.isNegative(interaction)){
+                    if (!InteractionUtils.isNegative(interaction)){
                         String interactionImexId = null;
                         boolean hasConflictingImexId = false;
 
