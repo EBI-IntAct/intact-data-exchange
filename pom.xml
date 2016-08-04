@@ -47,6 +47,7 @@
         <module>structured-abstract</module>
         <module>intact-db-importer</module>
         <module>cttv-exporter</module>
+        <module>intact-mutation-export</module>
     </modules>
 
     <build>
