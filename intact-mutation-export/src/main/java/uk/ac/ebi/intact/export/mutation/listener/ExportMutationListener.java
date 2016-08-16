@@ -20,11 +20,12 @@ public class ExportMutationListener extends AbstractShortlabelGeneratorListener 
 
 
     public void onUnmodifiedMutationShortlabel(UnmodifiedMutationShortlabelEvent event) {
-        IntactFeatureEvidence featureEvidence = event.getFeatureEvidence();
-        MutationExportLine line = FeatureToExportLine.convertFeatureToMutationExportLine(featureEvidence);
-        if(line != null){
-            WriterHelper.mutationList.add(line);
-            System.out.println(WriterHelper.mutationList.size());
-        }
+        WriterHelper.featureEvidenceSet.add(event.getFeatureEvidence());
+        System.out.println(WriterHelper.featureEvidenceSet.size());
+//        MutationExportLine line = FeatureToExportLine.convertFeatureToMutationExportLine(featureEvidence);
+//        if(line != null){
+//            WriterHelper.mutationList.add(line);
+//            System.out.println(WriterHelper.mutationList.size());
+//        }
     }
 }
