@@ -17,7 +17,7 @@ fi
 
 DATABASE=$1
 FOLDER=$2
-LOG=$4
+LOG=$3
 
 rm -rf target
 mkdir target
@@ -25,4 +25,4 @@ mkdir target
 # Make sure we are using institution intact by default.
 INTACT_OPTS="-Duk.ac.ebi.intact.INSTITUTION_LABEL=intact -Duk.ac.ebi.intact.AC_PREFIX=EBI"
 
-mvn clean -U -X install -Pmutation-export,${DATABASE},oracle -Dfolder=${FOLDER} -Ddb=oracle -Dmaven.test.skip -Dmaven.repo.local=repository
+mvn clean install -Pmutation-export,${DATABASE},oracle -Dfolder=${FOLDER} -Dmaven.test.skip
