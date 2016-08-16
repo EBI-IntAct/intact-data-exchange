@@ -44,7 +44,6 @@ public class MutationExportProcessor {
         updateByACs(intactFeatureEvidences);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
     public void updateByACs(Set<IntactFeatureEvidence> intactFeatureEvidences) {
         for (IntactFeatureEvidence intactFeatureEvidence : intactFeatureEvidences) {
             log.info("Generate shortlabel for: " + intactFeatureEvidence.getAc());
