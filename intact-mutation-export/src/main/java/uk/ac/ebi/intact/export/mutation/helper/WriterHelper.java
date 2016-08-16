@@ -1,50 +1,45 @@
 package uk.ac.ebi.intact.export.mutation.helper;
 
 import psidev.psi.mi.jami.model.FeatureEvidence;
+import uk.ac.ebi.intact.export.mutation.MutationExportConfig;
+import uk.ac.ebi.intact.export.mutation.MutationExportContext;
 import uk.ac.ebi.intact.export.mutation.helper.model.ExportRange;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
-import uk.ac.ebi.intact.export.mutation.writer.ExportWriter;
-import uk.ac.ebi.intact.export.mutation.writer.FileExportHandler;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
  */
 public class WriterHelper {
 
-    public static Set<FeatureEvidence> featureEvidenceSet = new HashSet<>();
-    public static List<MutationExportLine> mutationList = new ArrayList<>();
+    private static MutationExportConfig config = MutationExportContext.getInstance().getConfig();
 
-    public static void exportMutations(FileExportHandler fileExportHandler) {
-        ExportWriter exportWriter = fileExportHandler.getExportWriter();
+
+    public void exportMutations(FeatureEvidence featureEvidence) {
+        MutationExportLine line = FeatureToExportLine.convertFeatureToMutationExportLine(featureEvidence);
         try {
-            exportWriter.writeHeaderIfNecessary("Feature AC", "Feature short label", "Feature range(s)", "Original sequence", "Resulting sequence", "Feature type", "Feature annotation", "Affected protein AC", "Affected protein symbol", "Affected protein organism", "Interaction participants", "PubMedID", "Figure legend", "Interaction AC");
-            exportWriter.flush();
+            config.getFileExportHandler().getExportWriter().writeHeaderIfNecessary("Feature AC", "Feature short label", "Feature range(s)", "Original sequence", "Resulting sequence", "Feature type", "Feature annotation", "Affected protein AC", "Affected protein symbol", "Affected protein organism", "Interaction participants", "PubMedID", "Figure legend", "Interaction AC");
+            config.getFileExportHandler().getExportWriter().flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (MutationExportLine line : mutationList) {
 
 
-            try {
-                if (line != null) {
-                    for (ExportRange exportRange : line.getExportRange()) {
-                        exportWriter.writeColumnValues(line.getFeatureAc(), line.getFeatureShortlabel(),
-                                exportRange.getRange(), exportRange.getOriginalSequence(), exportRange.getResultingSequence(), line.getFeatureType(), line.getAnnotations(),
-                                line.getAffectedProteinAc(), line.getAffectedProteinSymbol(), line.getAffectedProteinOrganism(),
-                                line.getParticipants(), line.getPubmedId(), line.getFigureLegend(), line.getInteractionAc());
-                    }
+        try {
+            if (line != null) {
+                for (ExportRange exportRange : line.getExportRange()) {
+                    config.getFileExportHandler().getExportWriter().writeColumnValues(line.getFeatureAc(), line.getFeatureShortlabel(),
+                            exportRange.getRange(), exportRange.getOriginalSequence(), exportRange.getResultingSequence(), line.getFeatureType(), line.getAnnotations(),
+                            line.getAffectedProteinAc(), line.getAffectedProteinSymbol(), line.getAffectedProteinOrganism(),
+                            line.getParticipants(), line.getPubmedId(), line.getFigureLegend(), line.getInteractionAc());
                 }
-                exportWriter.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+            config.getFileExportHandler().getExportWriter().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
-
 }
+
+

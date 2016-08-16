@@ -32,6 +32,8 @@ public class MutationExportProcessor {
         initListener();
     }
 
+    public static Set<FeatureEvidence> featureEvidences = new HashSet<>();
+
     private void initListener() {
         log.info("Initialise event listeners...");
         config.getShortlabelGenerator().addListener(new ExportMutationListener());
@@ -49,7 +51,10 @@ public class MutationExportProcessor {
             log.info("Generate shortlabel for: " + intactFeatureEvidence.getAc());
             config.getShortlabelGenerator().generateNewShortLabel(intactFeatureEvidence);
         }
-        WriterHelper.exportMutations(config.getFileExportHandler());
+        WriterHelper writerHelper = new WriterHelper();
+        for(FeatureEvidence intactFeatureEvidence : featureEvidences) {
+            writerHelper.exportMutations(intactFeatureEvidence);
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
