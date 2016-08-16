@@ -16,7 +16,6 @@ public class MutationExport {
     private static final Log log = LogFactory.getLog(MutationExport.class);
 
     public static void main(String[] args) {
-
         if (args.length != 1) {
             System.err.println("Usage: MutationExport <folder>");
             System.exit(1);

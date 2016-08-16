@@ -4,15 +4,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import psidev.psi.mi.jami.model.FeatureEvidence;
 import uk.ac.ebi.intact.export.mutation.MutationExportConfig;
 import uk.ac.ebi.intact.export.mutation.MutationExportContext;
+import uk.ac.ebi.intact.export.mutation.helper.WriterHelper;
 import uk.ac.ebi.intact.export.mutation.listener.ExportMutationListener;
 import uk.ac.ebi.intact.jami.model.extension.IntactFeatureEvidence;
 import uk.ac.ebi.intact.tools.feature.shortlabel.generator.utils.OntologyServiceHelper;
 
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
@@ -22,14 +28,13 @@ public class MutationExportProcessor {
 
     private MutationExportConfig config = MutationExportContext.getInstance().getConfig();
 
-
     private void init() {
         initListener();
     }
 
     private void initListener() {
         log.info("Initialise event listeners...");
-        config.getShortlabelGenerator().addListener(new ExportMutationListener(config.getFileExportHandler()));
+        config.getShortlabelGenerator().addListener(new ExportMutationListener());
     }
 
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
@@ -45,6 +50,7 @@ public class MutationExportProcessor {
             log.info("Generate shortlabel for: " + intactFeatureEvidence.getAc());
             config.getShortlabelGenerator().generateNewShortLabel(intactFeatureEvidence);
         }
+        WriterHelper.exportMutations(config.getFileExportHandler());
     }
 
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
