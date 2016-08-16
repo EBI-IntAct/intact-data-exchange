@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.export.mutation.helper;
 
+import psidev.psi.mi.jami.model.FeatureEvidence;
 import uk.ac.ebi.intact.export.mutation.helper.model.ExportRange;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
 import uk.ac.ebi.intact.export.mutation.writer.ExportWriter;
@@ -7,13 +8,16 @@ import uk.ac.ebi.intact.export.mutation.writer.FileExportHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
  */
 public class WriterHelper {
 
+    public static Set<FeatureEvidence> featureEvidenceSet = new HashSet<>();
     public static List<MutationExportLine> mutationList = new ArrayList<>();
 
     public static void exportMutations(FileExportHandler fileExportHandler) {
