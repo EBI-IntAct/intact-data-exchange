@@ -57,7 +57,7 @@ public class FeatureToExportLine {
         if (xref == null) {
             return "";
         } else {
-            return xref.getDatabase().getShortName() + ":" + xref.getId();
+            return xref.getId();
         }
     }
 
