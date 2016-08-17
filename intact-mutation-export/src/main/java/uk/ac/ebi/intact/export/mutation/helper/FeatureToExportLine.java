@@ -33,7 +33,7 @@ public class FeatureToExportLine {
         line.setAffectedProteinSymbol(featureToExportLine.extractProteinSymbol(intactInteractor.getShortName(), intactInteractor.getAliases()));
         line.setAffectedProteinFullName(intactInteractor.getFullName());
         line.setAffectedProteinOrganism(featureToExportLine.extractInteractorOrganism(intactInteractor.getOrganism()));
-        line.setParticipants(featureToExportLine.extractParticipants(interactionEvidence, intactParticipantEvidence));
+        line.setParticipants(featureToExportLine.extractParticipants(interactionEvidence));
         line.setPubmedId(publication.getPubmedId());
         line.setFigureLegend(featureToExportLine.extractFigureLegend(interactionEvidence.getAnnotations()));
         for (Range range : featureEvidence.getRanges()) {
@@ -48,7 +48,7 @@ public class FeatureToExportLine {
         if (annotation == null) {
             return "";
         } else {
-            return annotation.getValue();
+            return annotation.getValue().replaceAll("\t", " ").replaceAll("\n", " ");
         }
     }
 
@@ -96,13 +96,11 @@ public class FeatureToExportLine {
         }
     }
 
-    private String extractParticipants(InteractionEvidence interactionEvidence, ParticipantEvidence excludeAc) {
+    private String extractParticipants(InteractionEvidence interactionEvidence) {
         Collection<String> participants = new ArrayList<>();
-        interactionEvidence.getParticipants().stream().filter(p -> !Objects.equals(((IntactParticipantEvidence) p).getAc(), ((IntactParticipantEvidence) excludeAc).getAc())).forEach(p -> {
-            participants.add(extractIdentityAc(p.getInteractor().getIdentifiers()) +
-                    "(" + extractFeatureType(p.getInteractor().getInteractorType()) +
-                    ", " + extractInteractorOrganism(p.getInteractor().getOrganism()) + ")");
-        });
+        interactionEvidence.getParticipants().forEach(p -> participants.add(extractIdentityAc(p.getInteractor().getIdentifiers()) +
+                "(" + extractFeatureType(p.getInteractor().getInteractorType()) +
+                ", " + extractInteractorOrganism(p.getInteractor().getOrganism()) + ")"));
         if (participants.isEmpty()) {
             return "";
         } else {
@@ -136,7 +134,7 @@ public class FeatureToExportLine {
         if (annotationsFiltered == null) {
             return "";
         } else {
-            return StringUtils.join(annotations, ",");
+            return StringUtils.join(annotations, ",").replaceAll("\t", " ").replaceAll("\n", " ");
         }
     }
 
