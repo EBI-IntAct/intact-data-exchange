@@ -54,13 +54,6 @@ public class MutationExportProcessor {
             config.getShortlabelGenerator().generateNewShortLabel(featureEvidence);
             featureEvidenceIterator.remove();
         }
-        Iterator featureEvidenceIterator1 = featureEvidences.iterator();
-        while (featureEvidenceIterator1.hasNext()){
-            WriterHelper writerHelper = new WriterHelper();
-            FeatureEvidence featureEvidence = (FeatureEvidence) featureEvidenceIterator1.next();
-            writerHelper.exportMutations(featureEvidence);
-            featureEvidenceIterator1.remove();
-        }
     }
 
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
