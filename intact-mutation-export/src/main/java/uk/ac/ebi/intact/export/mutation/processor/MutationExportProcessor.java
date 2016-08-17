@@ -37,7 +37,7 @@ public class MutationExportProcessor {
 
     private void initListener() {
         log.info("Initialise event listeners...");
-        config.getShortlabelGenerator().addListener(new ExportMutationListener());
+        config.getShortlabelGenerator().addListener(new ExportMutationListener(config.getFileExportHandler()));
     }
 
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
@@ -47,7 +47,7 @@ public class MutationExportProcessor {
         updateByACs(intactFeatureEvidences);
     }
 
-    public void updateByACs(Set<IntactFeatureEvidence> intactFeatureEvidences) {
+    private void updateByACs(Set<IntactFeatureEvidence> intactFeatureEvidences) {
         Iterator featureEvidenceIterator = intactFeatureEvidences.iterator();
         while (featureEvidenceIterator.hasNext()) {
             IntactFeatureEvidence featureEvidence = (IntactFeatureEvidence)featureEvidenceIterator.next();
