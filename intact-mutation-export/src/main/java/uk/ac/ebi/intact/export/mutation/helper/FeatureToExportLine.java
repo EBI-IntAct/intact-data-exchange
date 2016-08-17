@@ -1,12 +1,17 @@
 package uk.ac.ebi.intact.export.mutation.helper;
 
+import org.apache.commons.lang.StringUtils;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.export.mutation.helper.model.ExportRange;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
 import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.excludeAc.uk).
@@ -21,7 +26,7 @@ public class FeatureToExportLine {
         InteractionEvidence interactionEvidence = intactParticipantEvidence.getInteraction();
         Experiment experiment = interactionEvidence.getExperiment();
         Publication publication = experiment.getPublication();
-        if(publication.getReleasedDate()==null){
+        if (publication.getReleasedDate() == null) {
             return null;
         }
         line.setFeatureAc(featureToExportLine.extractAc(featureEvidence.getIdentifiers(), "intact"));
@@ -43,49 +48,45 @@ public class FeatureToExportLine {
     }
 
     private String extractFigureLegend(Collection<Annotation> annotations) {
-        for (Annotation annotation : annotations) {
-            if (annotation.getTopic().getShortName().equals("figure legend")) {
-                return annotation.getValue();
-            }
+        Annotation annotation = annotations.stream().filter(a -> a.getTopic().getShortName().equals("figure legend")).findFirst().orElse(null);
+        if (annotation == null) {
+            return "";
+        } else {
+            return annotation.getValue();
         }
-        return "";
     }
 
     private String extractAc(Collection<Xref> identifiers, String database) {
-        for (Xref xref : identifiers) {
-            if (xref.getQualifier().getShortName().equals("identity") && xref.getDatabase().getShortName().equals(database)) {
-                return xref.getId();
-            }
+        Xref xref = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals(database)).findFirst().orElse(null);
+        if (xref == null) {
+            return "";
+        } else {
+            return xref.getId();
         }
-        return "";
     }
 
     private String buildProteinAc(Collection<Xref> dbXrefs) {
-        for (Xref xref : dbXrefs) {
-            if (xref.getQualifier().getShortName().equals("identity")) {
-                return xref.getDatabase().getShortName() + ":" + xref.getId();
-            }
+        Xref xref = dbXrefs.stream().filter(i -> i.getQualifier().getShortName().equals("identity")).findFirst().orElse(null);
+        if(xref == null){
+            return "";
+        } else {
+            return xref.getDatabase().getShortName() + ":" + xref.getId();
+
         }
-        return "";
     }
 
     private String extractParticipants(InteractionEvidence interactionEvidence, ParticipantEvidence excludeAc) {
-        String participants = "";
-        for (ParticipantEvidence participantEvidence : interactionEvidence.getParticipants()) {
-            if (Objects.equals(((IntactParticipantEvidence)participantEvidence).getAc(), ((IntactParticipantEvidence)excludeAc).getAc())) {
-                continue;
-            }
-            if(participantEvidence.getInteractor().getOrganism() == null){
-                System.out.println();
-            }
-            participants += buildProteinAc(participantEvidence.getInteractor().getIdentifiers()) +
-                    "(" + extractFeatureType(participantEvidence.getInteractor().getInteractorType()) +
-                    ", " + extractInteractorOrganism(participantEvidence.getInteractor().getOrganism()) + ");";
+        Collection<String> participants = new ArrayList<>();
+        interactionEvidence.getParticipants().stream().filter(p -> !Objects.equals(((IntactParticipantEvidence) p).getAc(), ((IntactParticipantEvidence) excludeAc).getAc())).forEach(p -> {
+            participants.add(buildProteinAc(p.getInteractor().getIdentifiers()) +
+                    "(" + extractFeatureType(p.getInteractor().getInteractorType()) +
+                    ", " + extractInteractorOrganism(p.getInteractor().getOrganism()) + ")");
+        });
+        if (participants.isEmpty()) {
+            return "";
+        } else {
+            return StringUtils.join(participants, ";");
         }
-        if (!participants.isEmpty()) {
-            participants = participants.substring(0, participants.length() - 1);
-        }
-        return participants;
     }
 
     private ExportRange buildRange(Range range) {
@@ -97,12 +98,12 @@ public class FeatureToExportLine {
     }
 
     private String extractProteinSymbol(String shortName, Collection<Alias> aliases) {
-        for (Alias alias : aliases) {
-            if (alias.getType().getShortName().equals("gene name")) {
-                return alias.getName();
-            }
+        Alias alias = aliases.stream().filter(a -> a.getType().getShortName().equals("gene name")).findFirst().orElse(null);
+        if(alias == null){
+            return shortName;
+        } else {
+            return alias.getName();
         }
-        return shortName;
     }
 
     private String extractInteractorOrganism(Organism organism) {
@@ -110,20 +111,12 @@ public class FeatureToExportLine {
     }
 
     private String extractAnnotations(Collection<Annotation> annotations) {
-        String annotationString = "";
-        for (Annotation annotation : annotations) {
-            if (annotation.getTopic().getShortName().equals("remark-internal")) {
-                continue;
-            }
-            if (annotation.getTopic().getShortName().equals("no-mutation-update")) {
-                continue;
-            }
-            annotationString += annotation.getValue() + ", ";
+        Annotation annotationsFiltered = annotations.stream().filter(a -> !a.getTopic().getShortName().equals("remark-internal") && !a.getTopic().getShortName().equals("no-mutation-update")).findAny().orElse(null);
+        if(annotationsFiltered == null){
+            return "";
+        } else {
+            return StringUtils.join(annotations, ",");
         }
-        if (!annotationString.isEmpty()) {
-            annotationString = annotationString.substring(0, annotationString.length() - 1);
-        }
-        return annotationString;
     }
 
     private String extractFeatureType(CvTerm type) {

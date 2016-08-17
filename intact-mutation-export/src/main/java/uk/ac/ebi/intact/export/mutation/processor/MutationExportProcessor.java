@@ -61,13 +61,9 @@ public class MutationExportProcessor {
         List<String> mutationTerms = OntologyServiceHelper.getOntologyServiceHelper().getAssociatedMITerms("MI:0118", 10);
         log.info("Retrieved all child terms of MI:0118 (mutation).");
         Set<IntactFeatureEvidence> featureEvidences = new HashSet<>();
-        for (String term : mutationTerms) {
-            //MI:0429(necessary binding region) should not be taken into account
-            if (term.equals("MI:0429")) {
-                continue;
-            }
+        mutationTerms.stream().filter(term -> !term.equals("MI:0429")).forEach(term -> {
             featureEvidences.addAll(config.getMutationExportDao().getFeatureEvidenceByType(term));
-        }
+        });
         log.info("Retrieved all features of type mutation. Excluded MI:0429(necessary binding region)");
         return featureEvidences;
     }
