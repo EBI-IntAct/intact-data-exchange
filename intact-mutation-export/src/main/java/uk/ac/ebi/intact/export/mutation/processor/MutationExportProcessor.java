@@ -14,6 +14,7 @@ import uk.ac.ebi.intact.tools.feature.shortlabel.generator.utils.OntologyService
 
 import java.io.Writer;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -47,13 +48,18 @@ public class MutationExportProcessor {
     }
 
     public void updateByACs(Set<IntactFeatureEvidence> intactFeatureEvidences) {
-        for (IntactFeatureEvidence intactFeatureEvidence : intactFeatureEvidences) {
-            log.info("Generate shortlabel for: " + intactFeatureEvidence.getAc());
-            config.getShortlabelGenerator().generateNewShortLabel(intactFeatureEvidence);
+        Iterator featureEvidenceIterator = intactFeatureEvidences.iterator();
+        while (featureEvidenceIterator.hasNext()) {
+            IntactFeatureEvidence featureEvidence = (IntactFeatureEvidence)featureEvidenceIterator.next();
+            config.getShortlabelGenerator().generateNewShortLabel(featureEvidence);
+            featureEvidenceIterator.remove();
         }
-        WriterHelper writerHelper = new WriterHelper();
-        for(FeatureEvidence intactFeatureEvidence : featureEvidences) {
-            writerHelper.exportMutations(intactFeatureEvidence);
+        Iterator featureEvidenceIterator1 = featureEvidences.iterator();
+        while (featureEvidenceIterator1.hasNext()){
+            WriterHelper writerHelper = new WriterHelper();
+            FeatureEvidence featureEvidence = (FeatureEvidence) featureEvidenceIterator1.next();
+            writerHelper.exportMutations(featureEvidence);
+            featureEvidenceIterator1.remove();
         }
     }
 

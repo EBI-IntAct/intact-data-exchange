@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 public class FeatureToExportLine {
 
-    public static MutationExportLine convertFeatureToMutationExportLine(FeatureEvidence featureEvidence) {
+    public MutationExportLine convertFeatureToMutationExportLine(FeatureEvidence featureEvidence) {
         FeatureToExportLine featureToExportLine = new FeatureToExportLine();
         MutationExportLine line = new MutationExportLine();
         ParticipantEvidence intactParticipantEvidence = (ParticipantEvidence) featureEvidence.getParticipant();
@@ -22,7 +22,6 @@ public class FeatureToExportLine {
         Experiment experiment = interactionEvidence.getExperiment();
         Publication publication = experiment.getPublication();
         if(publication.getReleasedDate()==null){
-            System.out.println("");
             return null;
         }
         line.setFeatureAc(featureToExportLine.extractAc(featureEvidence.getIdentifiers(), "intact"));
@@ -31,9 +30,6 @@ public class FeatureToExportLine {
         line.setAnnotations(featureToExportLine.extractAnnotations(featureEvidence.getAnnotations()));
         line.setAffectedProteinAc("uniprotkb:" + featureToExportLine.extractAc(intactInteractor.getIdentifiers(), "uniprotkb"));
         line.setAffectedProteinSymbol(featureToExportLine.extractProteinSymbol(intactInteractor.getShortName(), intactInteractor.getAliases()));
-        if(intactInteractor.getOrganism() == null){
-            System.out.println();
-        }
         line.setAffectedProteinOrganism(featureToExportLine.extractInteractorOrganism(intactInteractor.getOrganism()));
 
         line.setParticipants(featureToExportLine.extractParticipants(interactionEvidence, intactParticipantEvidence));
@@ -44,7 +40,6 @@ public class FeatureToExportLine {
         }
         line.setInteractionAc(featureToExportLine.extractAc(interactionEvidence.getIdentifiers(), "intact"));
         return line;
-
     }
 
     private String extractFigureLegend(Collection<Annotation> annotations) {
@@ -134,6 +129,4 @@ public class FeatureToExportLine {
     private String extractFeatureType(CvTerm type) {
         return type.getShortName() + "(" + type.getMIIdentifier() + ")";
     }
-
-
 }

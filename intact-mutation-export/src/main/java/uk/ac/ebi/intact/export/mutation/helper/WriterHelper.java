@@ -15,9 +15,9 @@ public class WriterHelper {
 
     private static MutationExportConfig config = MutationExportContext.getInstance().getConfig();
 
-
     public void exportMutations(FeatureEvidence featureEvidence) {
-        MutationExportLine line = FeatureToExportLine.convertFeatureToMutationExportLine(featureEvidence);
+        FeatureToExportLine featureToExportLine = new FeatureToExportLine();
+        MutationExportLine line = featureToExportLine.convertFeatureToMutationExportLine(featureEvidence);
         try {
             config.getFileExportHandler().getExportWriter().writeHeaderIfNecessary("Feature AC", "Feature short label", "Feature range(s)", "Original sequence", "Resulting sequence", "Feature type", "Feature annotation", "Affected protein AC", "Affected protein symbol", "Affected protein organism", "Interaction participants", "PubMedID", "Figure legend", "Interaction AC");
             config.getFileExportHandler().getExportWriter().flush();
