@@ -36,6 +36,8 @@ public class FeatureToExportLine {
         line.setParticipants(featureToExportLine.extractParticipants(interactionEvidence));
         line.setPubmedId(publication.getPubmedId());
         line.setFigureLegend(featureToExportLine.extractFigureLegend(interactionEvidence.getAnnotations()));
+        if(line.getAffectedProteinAc() == null || line.getAffectedProteinAc().isEmpty())
+            System.err.println(line.getFeatureAc() + " " + line.getFeatureShortlabel());
         for (Range range : featureEvidence.getRanges()) {
             line.getExportRange().add(featureToExportLine.buildRange(range));
         }
@@ -65,10 +67,10 @@ public class FeatureToExportLine {
     private String extractUniPortAc(Collection<Xref> identifiers) {
         Collection<Xref> xrefs;
         xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals("uniprotkb")).collect(Collectors.toList());
-        if (xrefs == null) {
+        if (xrefs == null || xrefs.isEmpty()) {
             xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("multiple parent")).collect(Collectors.toList());
         }
-        if (xrefs == null) {
+        if (xrefs == null || xrefs.isEmpty()) {
             xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals("intact")).collect(Collectors.toList());
         }
         if (xrefs == null) {
