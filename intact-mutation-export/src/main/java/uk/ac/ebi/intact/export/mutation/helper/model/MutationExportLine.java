@@ -15,6 +15,7 @@ public class MutationExportLine {
     private String annotations;
     private String affectedProteinAc;
     private String affectedProteinSymbol;
+    private String affectedProteinFullName;
     private String affectedProteinOrganism;
     private String participants;
     private String pubmedId;
@@ -75,6 +76,14 @@ public class MutationExportLine {
 
     public void setAffectedProteinSymbol(String affectedProteinSymbol) {
         this.affectedProteinSymbol = affectedProteinSymbol;
+    }
+
+    public String getAffectedProteinFullName() {
+        return affectedProteinFullName;
+    }
+
+    public void setAffectedProteinFullName(String affectedProteinFullName) {
+        this.affectedProteinFullName = affectedProteinFullName;
     }
 
     public String getAffectedProteinOrganism() {

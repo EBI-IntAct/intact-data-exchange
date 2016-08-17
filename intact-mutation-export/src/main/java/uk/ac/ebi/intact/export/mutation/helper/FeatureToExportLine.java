@@ -6,12 +6,8 @@ import uk.ac.ebi.intact.export.mutation.helper.model.ExportRange;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
 import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.excludeAc.uk).
@@ -29,21 +25,21 @@ public class FeatureToExportLine {
         if (publication.getReleasedDate() == null) {
             return null;
         }
-        line.setFeatureAc(featureToExportLine.extractAc(featureEvidence.getIdentifiers(), "intact"));
+        line.setFeatureAc(featureToExportLine.extractIntactAc(featureEvidence.getIdentifiers()));
         line.setFeatureShortlabel(featureEvidence.getShortName());
         line.setFeatureType(featureToExportLine.extractFeatureType(featureEvidence.getType()));
         line.setAnnotations(featureToExportLine.extractAnnotations(featureEvidence.getAnnotations()));
-        line.setAffectedProteinAc("uniprotkb:" + featureToExportLine.extractAc(intactInteractor.getIdentifiers(), "uniprotkb"));
+        line.setAffectedProteinAc(featureToExportLine.extractUniPortAc(intactInteractor.getIdentifiers()));
         line.setAffectedProteinSymbol(featureToExportLine.extractProteinSymbol(intactInteractor.getShortName(), intactInteractor.getAliases()));
+        line.setAffectedProteinFullName(intactInteractor.getFullName());
         line.setAffectedProteinOrganism(featureToExportLine.extractInteractorOrganism(intactInteractor.getOrganism()));
-
         line.setParticipants(featureToExportLine.extractParticipants(interactionEvidence, intactParticipantEvidence));
         line.setPubmedId(publication.getPubmedId());
         line.setFigureLegend(featureToExportLine.extractFigureLegend(interactionEvidence.getAnnotations()));
         for (Range range : featureEvidence.getRanges()) {
             line.getExportRange().add(featureToExportLine.buildRange(range));
         }
-        line.setInteractionAc(featureToExportLine.extractAc(interactionEvidence.getIdentifiers(), "intact"));
+        line.setInteractionAc(featureToExportLine.extractIntactAc(interactionEvidence.getIdentifiers()));
         return line;
     }
 
@@ -56,29 +52,54 @@ public class FeatureToExportLine {
         }
     }
 
-    private String extractAc(Collection<Xref> identifiers, String database) {
-        Xref xref = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals(database)).findFirst().orElse(null);
+    private String extractIntactAc(Collection<Xref> identifiers) {
+        Xref xref = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals("intact")).findFirst().orElse(null);
         if (xref == null) {
             return "";
         } else {
-            return xref.getId();
+            return xref.getDatabase().getShortName() + ":" + xref.getId();
         }
     }
 
-    private String buildProteinAc(Collection<Xref> dbXrefs) {
+
+    private String extractUniPortAc(Collection<Xref> identifiers) {
+        Collection<Xref> xrefs;
+        xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals("uniprotkb")).collect(Collectors.toList());
+        if (xrefs == null) {
+            xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("multiple parent")).collect(Collectors.toList());
+        }
+        if (xrefs == null) {
+            xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals("intact")).collect(Collectors.toList());
+        }
+        if (xrefs == null) {
+            return "";
+        } else if (xrefs.size() == 1) {
+            Xref xref = xrefs.iterator().next();
+            return xref.getDatabase().getShortName() + ":" + xref.getId();
+        } else {
+            Iterator<Xref> xrefIterator = xrefs.iterator();
+            List<String> strings = new ArrayList<>();
+            while (xrefIterator.hasNext()) {
+                Xref xref = xrefIterator.next();
+                strings.add(xref.getDatabase().getShortName() + ":" + xref.getId());
+            }
+            return StringUtils.join(strings, ";");
+        }
+    }
+
+    private String extractIdentityAc(Collection<Xref> dbXrefs) {
         Xref xref = dbXrefs.stream().filter(i -> i.getQualifier().getShortName().equals("identity")).findFirst().orElse(null);
-        if(xref == null){
+        if (xref == null) {
             return "";
         } else {
             return xref.getDatabase().getShortName() + ":" + xref.getId();
-
         }
     }
 
     private String extractParticipants(InteractionEvidence interactionEvidence, ParticipantEvidence excludeAc) {
         Collection<String> participants = new ArrayList<>();
         interactionEvidence.getParticipants().stream().filter(p -> !Objects.equals(((IntactParticipantEvidence) p).getAc(), ((IntactParticipantEvidence) excludeAc).getAc())).forEach(p -> {
-            participants.add(buildProteinAc(p.getInteractor().getIdentifiers()) +
+            participants.add(extractIdentityAc(p.getInteractor().getIdentifiers()) +
                     "(" + extractFeatureType(p.getInteractor().getInteractorType()) +
                     ", " + extractInteractorOrganism(p.getInteractor().getOrganism()) + ")");
         });
@@ -99,7 +120,7 @@ public class FeatureToExportLine {
 
     private String extractProteinSymbol(String shortName, Collection<Alias> aliases) {
         Alias alias = aliases.stream().filter(a -> a.getType().getShortName().equals("gene name")).findFirst().orElse(null);
-        if(alias == null){
+        if (alias == null) {
             return shortName;
         } else {
             return alias.getName();
@@ -112,7 +133,7 @@ public class FeatureToExportLine {
 
     private String extractAnnotations(Collection<Annotation> annotations) {
         Annotation annotationsFiltered = annotations.stream().filter(a -> !a.getTopic().getShortName().equals("remark-internal") && !a.getTopic().getShortName().equals("no-mutation-update")).findAny().orElse(null);
-        if(annotationsFiltered == null){
+        if (annotationsFiltered == null) {
             return "";
         } else {
             return StringUtils.join(annotations, ",");
