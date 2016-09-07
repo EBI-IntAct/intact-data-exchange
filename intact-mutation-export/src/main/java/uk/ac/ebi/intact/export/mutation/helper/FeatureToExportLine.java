@@ -79,10 +79,8 @@ public class FeatureToExportLine {
             Xref xref = xrefs.iterator().next();
             return xref.getDatabase().getShortName() + ":" + xref.getId();
         } else {
-            Iterator<Xref> xrefIterator = xrefs.iterator();
             List<String> strings = new ArrayList<>();
-            while (xrefIterator.hasNext()) {
-                Xref xref = xrefIterator.next();
+            for (Xref xref : xrefs) {
                 strings.add(xref.getDatabase().getShortName() + ":" + xref.getId());
             }
             return StringUtils.join(strings, ";");

@@ -48,11 +48,8 @@ public class MutationExportProcessor {
     }
 
     private void updateByACs(Set<IntactFeatureEvidence> intactFeatureEvidences) {
-        Iterator featureEvidenceIterator = intactFeatureEvidences.iterator();
-        while (featureEvidenceIterator.hasNext()) {
-            IntactFeatureEvidence featureEvidence = (IntactFeatureEvidence)featureEvidenceIterator.next();
-            config.getShortlabelGenerator().generateNewShortLabel(featureEvidence);
-            featureEvidenceIterator.remove();
+        for (IntactFeatureEvidence featureEvidenceIterator : intactFeatureEvidences) {
+            config.getShortlabelGenerator().generateNewShortLabel(featureEvidenceIterator);
         }
     }
 
