@@ -4,9 +4,11 @@ import org.apache.commons.lang.StringUtils;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.export.mutation.helper.model.ExportRange;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
-import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -36,7 +38,7 @@ public class FeatureToExportLine {
         line.setParticipants(featureToExportLine.extractParticipants(interactionEvidence));
         line.setPubmedId(publication.getPubmedId());
         line.setFigureLegend(featureToExportLine.extractFigureLegend(interactionEvidence.getAnnotations()));
-        if(line.getAffectedProteinAc() == null || line.getAffectedProteinAc().isEmpty())
+        if (line.getAffectedProteinAc() == null || line.getAffectedProteinAc().isEmpty())
             System.err.println(line.getFeatureAc() + " " + line.getFeatureShortlabel());
         for (Range range : featureEvidence.getRanges()) {
             line.getExportRange().add(featureToExportLine.buildRange(range));
@@ -66,25 +68,29 @@ public class FeatureToExportLine {
 
     private String extractUniPortAc(Collection<Xref> identifiers) {
         Collection<Xref> xrefs;
+        Xref intactIdentity = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals("intact")).collect(Collectors.toList()).get(0);
+
         xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals("uniprotkb")).collect(Collectors.toList());
-        if (xrefs == null || xrefs.isEmpty()) {
-            xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("multiple parent")).collect(Collectors.toList());
-        }
-        if (xrefs == null || xrefs.isEmpty()) {
-            xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("identity") && i.getDatabase().getShortName().equals("intact")).collect(Collectors.toList());
-        }
-        if (xrefs == null) {
-            return "";
-        } else if (xrefs.size() == 1) {
+
+        if(xrefs.size() == 1){
             Xref xref = xrefs.iterator().next();
             return xref.getDatabase().getShortName() + ":" + xref.getId();
-        } else {
-            List<String> strings = new ArrayList<>();
-            for (Xref xref : xrefs) {
-                strings.add(xref.getDatabase().getShortName() + ":" + xref.getId());
-            }
-            return StringUtils.join(strings, ";");
         }
+
+        if (xrefs.isEmpty()) {
+            xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("multiple parent")).collect(Collectors.toList());
+            List<String> strings = xrefs.stream().map(Xref::getId).collect(Collectors.toList());
+            return intactIdentity.getDatabase().getShortName() + ":" + intactIdentity.getId() + "(fusion of uniprotkb:" + StringUtils.join(strings, ";") + ")";
+        }
+        if (xrefs.isEmpty()) {
+            xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("see also")).collect(Collectors.toList());
+            List<String> strings = xrefs.stream().map(Xref::getId).collect(Collectors.toList());
+            return intactIdentity.getDatabase().getShortName() + ":" + intactIdentity.getId() + "(see uniprotkb:" + StringUtils.join(strings, ";") + ")";
+        }
+        if (xrefs.isEmpty()) {
+            return intactIdentity.getDatabase().getShortName() + ":" + intactIdentity.getId();
+        }
+        return "";
     }
 
     private String extractIdentityAc(Collection<Xref> dbXrefs) {
@@ -130,8 +136,9 @@ public class FeatureToExportLine {
     }
 
     private String extractAnnotations(Collection<Annotation> annotations) {
-        Annotation annotationsFiltered = annotations.stream().filter(a -> !a.getTopic().getShortName().equals("remark-internal") && !a.getTopic().getShortName().equals("no-mutation-update")).findAny().orElse(null);
-        if (annotationsFiltered == null) {
+        List<Annotation> annotationsFiltered = annotations.stream().filter(annotation -> !annotation.getTopic().getShortName().equals("remark-internal") && !annotation.getTopic().getShortName().equals("no-mutation-update")).collect(Collectors.toList());
+        //        Annotation annotationsFiltered = annotations.stream().filter(a -> !a.getTopic().getShortName().equals("remark-internal") && !a.getTopic().getShortName().equals("no-mutation-update")).findAny().orElse(null);
+        if (annotationsFiltered.isEmpty()) {
             return "";
         } else {
             return StringUtils.join(annotations, ",").replaceAll("\t", " ").replaceAll("\n", " ");
