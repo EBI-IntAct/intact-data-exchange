@@ -42,7 +42,7 @@
         <module>intact-uniprot-export</module>
         <module>intact-pdbe-import</module>
         <module>intact-tasks</module>
-        <module>imex-id-update</module>
+        <!--<module>imex-id-update</module>-->
         <module>intact-mi-cluster-score</module>
         <module>structured-abstract</module>
         <module>intact-db-importer</module>
