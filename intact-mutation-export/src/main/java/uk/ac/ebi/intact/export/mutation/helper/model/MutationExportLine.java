@@ -83,7 +83,10 @@ public class MutationExportLine {
     }
 
     public void setAffectedProteinFullName(String affectedProteinFullName) {
-        this.affectedProteinFullName = affectedProteinFullName;
+        if(affectedProteinFullName != null){
+            this.affectedProteinFullName = affectedProteinFullName;
+        }
+        this.affectedProteinFullName = "";
     }
 
     public String getAffectedProteinOrganism() {
