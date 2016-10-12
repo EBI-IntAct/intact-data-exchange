@@ -2,6 +2,8 @@ package uk.ac.ebi.intact.export.mutation.helper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.export.mutation.helper.model.ExportRange;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
 import uk.ac.ebi.intact.export.mutation.processor.MutationExportProcessor;
@@ -23,6 +25,7 @@ public class Consumer implements Runnable {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
     public void run() {
         try {
             fileExportHandler.getExportWriter().writeHeaderIfNecessary("Feature AC", "Feature short label", "Feature range(s)", "Original sequence", "Resulting sequence", "Feature type", "Feature annotation", "Affected protein AC", "Affected protein symbol", "Affected protein full name", "Affected protein organism", "Interaction participants", "PubMedID", "Figure legend", "Interaction AC");

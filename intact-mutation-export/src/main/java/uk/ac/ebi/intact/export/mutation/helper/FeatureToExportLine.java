@@ -1,6 +1,8 @@
 package uk.ac.ebi.intact.export.mutation.helper;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.export.mutation.helper.model.ExportRange;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
@@ -28,6 +30,7 @@ public class FeatureToExportLine {
 //    private final String MI_REMARKINTERNAL = "";
 //    private final String MI_NOMUTATIONUPDATE = "";
 
+    @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
     public MutationExportLine convertFeatureToMutationExportLine(FeatureEvidence featureEvidence) {
         FeatureToExportLine featureToExportLine = new FeatureToExportLine();
         MutationExportLine line = new MutationExportLine();
