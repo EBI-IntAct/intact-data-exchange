@@ -17,11 +17,11 @@ public class MutationExport {
     private static final Log log = LogFactory.getLog(MutationExport.class);
 
     public static void main(String[] args) {
-//        if (args.length != 1) {
-//            System.err.println("Usage: MutationExport <folder>");
-//            System.exit(1);
-//        }
-        final String filename = "/Users/maximiliankoch";
+        if (args.length != 1) {
+            System.err.println("Usage: MutationExport <folder>");
+            System.exit(1);
+        }
+        final String filename = args[0];
 
         MutationExportConfig config = MutationExportContext.getInstance().getConfig();
         config.setMutationExportDao(new MutationExportDaoImpl());
