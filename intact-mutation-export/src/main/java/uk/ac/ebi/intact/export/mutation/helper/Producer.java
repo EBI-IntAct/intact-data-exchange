@@ -19,8 +19,8 @@ public class Producer implements Runnable {
     @Override
     public void run() {
         try {
-            while (MutationExportProcessor.readyToCheckMutations.peek() != null) {
-                while(10 > MutationExportProcessor.checkedMutations.remainingCapacity()){
+            while (true) {
+                while(MutationExportProcessor.checkedMutations.remainingCapacity() < 10){
                     System.out.println("Sleeep");
                     Thread.sleep(10000);
                 }

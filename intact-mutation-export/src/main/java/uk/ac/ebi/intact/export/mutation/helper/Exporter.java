@@ -24,7 +24,7 @@ public class Exporter implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        while (MutationExportProcessor.readyToCheckMutations.peek() != null && MutationExportProcessor.checkedMutations.peek() != null && MutationExportProcessor.exportMutations.peek() != null){
+        while (true){
             MutationExportLine line = null;
             try {
                 line = MutationExportProcessor.exportMutations.take();
@@ -45,6 +45,5 @@ public class Exporter implements Runnable {
                 e.printStackTrace();
             }
         }
-        System.exit(0);
     }
 }
