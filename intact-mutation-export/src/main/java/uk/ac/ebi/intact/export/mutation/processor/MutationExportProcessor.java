@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import psidev.psi.mi.jami.model.FeatureEvidence;
 import uk.ac.ebi.intact.export.mutation.MutationExportConfig;
 import uk.ac.ebi.intact.export.mutation.MutationExportContext;
 import uk.ac.ebi.intact.export.mutation.helper.Consumer;
@@ -22,7 +23,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class MutationExportProcessor {
     private static final Log log = LogFactory.getLog(MutationExportProcessor.class);
-    public static BlockingQueue<String> readyToCheckMutations = new LinkedBlockingDeque<>(10);
+    public static BlockingQueue<IntactFeatureEvidence> readyToCheckMutations = new LinkedBlockingDeque<>(10);
     public static BlockingQueue<IntactFeatureEvidence> checkedMutations = new LinkedBlockingDeque<>(20);
     private static Thread PRODUCER;
     private static Thread CONSUMER;
@@ -49,8 +50,7 @@ public class MutationExportProcessor {
         MutationExportProcessor.CONSUMER.start();
         for (String ac : acs) {
             try {
-
-                readyToCheckMutations.put(ac);
+                readyToCheckMutations.put(config.getMutationExportDao().getFeature(ac));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

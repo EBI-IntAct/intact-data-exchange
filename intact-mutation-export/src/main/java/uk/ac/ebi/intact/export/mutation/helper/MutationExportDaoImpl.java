@@ -3,6 +3,7 @@ package uk.ac.ebi.intact.export.mutation.helper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.FeatureEvidence;
 import psidev.psi.mi.jami.model.ParticipantEvidence;
 import uk.ac.ebi.intact.export.mutation.MutationExportConfig;
 import uk.ac.ebi.intact.export.mutation.MutationExportContext;
@@ -26,6 +27,11 @@ public class MutationExportDaoImpl implements MutationExportDao {
             acs.add(feature.getAc());
         }
         return acs;
+    }
+
+    @Override
+    public IntactFeatureEvidence getFeature(String ac) {
+        return config.getIntactDao().getFeatureEvidenceDao().getByAc(ac);
     }
 
     @Override
