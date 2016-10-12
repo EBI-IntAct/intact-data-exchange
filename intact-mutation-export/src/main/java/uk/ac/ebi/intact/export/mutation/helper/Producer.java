@@ -18,7 +18,10 @@ public class Producer implements Runnable {
     public void run() {
         try {
             while (true) {
-                String ac = MutationExportProcessor.intactFeatureEvidencesQueue.take();
+                while(MutationExportProcessor.checkedMutations.size() >= 10){
+                    Thread.sleep(10000);
+                }
+                String ac = MutationExportProcessor.readyToCheckMutations.take();
                 log.info("Generate shortlabel of " + ac);
                 config.getShortlabelGenerator().generateNewShortLabel(ac);
             }

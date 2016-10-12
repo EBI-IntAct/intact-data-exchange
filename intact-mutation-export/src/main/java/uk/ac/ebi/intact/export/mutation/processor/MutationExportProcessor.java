@@ -13,9 +13,7 @@ import uk.ac.ebi.intact.jami.model.extension.IntactFeatureEvidence;
 import uk.ac.ebi.intact.tools.feature.shortlabel.generator.utils.OntologyServiceHelper;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -24,8 +22,8 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class MutationExportProcessor {
     private static final Log log = LogFactory.getLog(MutationExportProcessor.class);
-    public static BlockingQueue<String> intactFeatureEvidencesQueue = new LinkedBlockingDeque<>(5);
-    public static BlockingQueue<IntactFeatureEvidence> exportMutationQueue = new LinkedBlockingDeque<>(10);
+    public static BlockingQueue<String> readyToCheckMutations = new LinkedBlockingDeque<>(10);
+    public static BlockingQueue<IntactFeatureEvidence> checkedMutations = new LinkedBlockingDeque<>(20);
     private static Thread PRODUCER;
     private static Thread CONSUMER;
     private MutationExportConfig config = MutationExportContext.getInstance().getConfig();
@@ -51,7 +49,8 @@ public class MutationExportProcessor {
         MutationExportProcessor.CONSUMER.start();
         for (String ac : acs) {
             try {
-                intactFeatureEvidencesQueue.put(ac);
+
+                readyToCheckMutations.put(ac);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

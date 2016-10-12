@@ -38,7 +38,7 @@ public class Consumer implements Runnable {
 
             IntactFeatureEvidence intactFeatureEvidence = null;
             try {
-                intactFeatureEvidence = MutationExportProcessor.exportMutationQueue.take();
+                intactFeatureEvidence = MutationExportProcessor.checkedMutations.take();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -60,7 +60,7 @@ public class Consumer implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if(!MutationExportProcessor.producerIsAlive() && MutationExportProcessor.intactFeatureEvidencesQueue.isEmpty() && MutationExportProcessor.exportMutationQueue.isEmpty()){
+            if(!MutationExportProcessor.producerIsAlive() && MutationExportProcessor.readyToCheckMutations.isEmpty() && MutationExportProcessor.checkedMutations.isEmpty()){
                 System.exit(0);
             }
         }
