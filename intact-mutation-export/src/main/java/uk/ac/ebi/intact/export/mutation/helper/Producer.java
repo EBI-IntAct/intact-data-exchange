@@ -19,8 +19,9 @@ public class Producer implements Runnable {
     @Override
     public void run() {
         try {
-            while (true) {
-                while(MutationExportProcessor.checkedMutations.size() >= 10){
+            while (MutationExportProcessor.readyToCheckMutations.peek() != null) {
+                while(10 > MutationExportProcessor.checkedMutations.remainingCapacity()){
+                    System.out.println("Sleeep");
                     Thread.sleep(10000);
                 }
                 IntactFeatureEvidence ac = MutationExportProcessor.readyToCheckMutations.take();

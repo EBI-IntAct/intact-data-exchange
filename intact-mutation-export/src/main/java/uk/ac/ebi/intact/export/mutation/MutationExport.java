@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.export.mutation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.ebi.intact.export.mutation.helper.Exporter;
 import uk.ac.ebi.intact.export.mutation.helper.MutationExportDaoImpl;
 import uk.ac.ebi.intact.export.mutation.helper.Consumer;
 import uk.ac.ebi.intact.export.mutation.processor.MutationExportProcessor;
@@ -29,8 +30,8 @@ public class MutationExport {
         try {
             MutationExportProcessor mutationExportProcessor = new MutationExportProcessor();
             config.setFileExportHandler(new FileExportHandler(new File(filename)));
-            Consumer consumer = new Consumer(config.getFileExportHandler());
-            config.setConsumer(consumer);
+            Exporter exporter = new Exporter(config.getFileExportHandler());
+            config.setExporter(exporter);
             log.info("Starting the mutation export");
             mutationExportProcessor.exportAll();
         } catch (IOException e) {

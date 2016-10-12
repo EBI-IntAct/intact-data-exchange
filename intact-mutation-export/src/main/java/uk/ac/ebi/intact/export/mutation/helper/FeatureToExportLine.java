@@ -87,13 +87,17 @@ public class FeatureToExportLine {
 
         if (xrefs.isEmpty()) {
             xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals(MI_MULTIPLEPARENT)).collect(Collectors.toList());
-            List<String> strings = xrefs.stream().map(Xref::getId).collect(Collectors.toList());
-            return intactIdentity.getDatabase().getShortName() + COLON + intactIdentity.getId() + "(fusion of uniprotkb:" + StringUtils.join(strings, ";") + ")";
+            if (!xrefs.isEmpty()) {
+                List<String> strings = xrefs.stream().map(Xref::getId).collect(Collectors.toList());
+                return intactIdentity.getDatabase().getShortName() + COLON + intactIdentity.getId() + "(fusion of uniprotkb:" + StringUtils.join(strings, ";") + ")";
+            }
         }
         if (xrefs.isEmpty()) {
             xrefs = identifiers.stream().filter(i -> i.getQualifier().getShortName().equals("see also")).collect(Collectors.toList());
-            List<String> strings = xrefs.stream().map(Xref::getId).collect(Collectors.toList());
-            return intactIdentity.getDatabase().getShortName() + COLON + intactIdentity.getId() + "(see uniprotkb:" + StringUtils.join(strings, ";") + ")";
+            if (!xrefs.isEmpty()) {
+                List<String> strings = xrefs.stream().map(Xref::getId).collect(Collectors.toList());
+                return intactIdentity.getDatabase().getShortName() + COLON + intactIdentity.getId() + "(see uniprotkb:" + StringUtils.join(strings, ";") + ")";
+            }
         }
         if (xrefs.isEmpty()) {
             return intactIdentity.getDatabase().getShortName() + COLON + intactIdentity.getId();
@@ -153,6 +157,6 @@ public class FeatureToExportLine {
     }
 
     private String extractFeatureType(CvTerm type) {
-        return type.getShortName() + "(" + type.getShortName() + ")";
+        return type.getShortName() + "(" + type.getMIIdentifier() + ")";
     }
 }
