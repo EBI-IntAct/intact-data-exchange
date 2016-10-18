@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.export.mutation.helper.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
@@ -83,7 +84,10 @@ public class MutationExportLine {
     }
 
     public void setAffectedProteinFullName(String affectedProteinFullName) {
-        this.affectedProteinFullName = affectedProteinFullName;
+        if(!Objects.equals(affectedProteinFullName, "null")){
+            this.affectedProteinFullName = affectedProteinFullName;
+        }
+        this.affectedProteinFullName = "";
     }
 
     public String getAffectedProteinOrganism() {

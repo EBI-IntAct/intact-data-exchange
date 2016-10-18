@@ -3,12 +3,14 @@ package uk.ac.ebi.intact.export.mutation.helper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.FeatureEvidence;
 import psidev.psi.mi.jami.model.ParticipantEvidence;
 import uk.ac.ebi.intact.export.mutation.MutationExportConfig;
 import uk.ac.ebi.intact.export.mutation.MutationExportContext;
 import uk.ac.ebi.intact.jami.model.extension.IntactFeatureEvidence;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
@@ -19,8 +21,17 @@ public class MutationExportDaoImpl implements MutationExportDao {
     private MutationExportConfig config = MutationExportContext.getInstance().getConfig();
 
     @Override
-    public Collection<IntactFeatureEvidence> getFeatureEvidenceByType(String term) {
-        return config.getIntactDao().getFeatureEvidenceDao().getByFeatureType(null, term);
+    public List<String> getFeatureEvidenceByType(String term) {
+        List <String> acs = new ArrayList<>();
+        for(IntactFeatureEvidence feature : config.getIntactDao().getFeatureEvidenceDao().getByFeatureType(null, term)){
+            acs.add(feature.getAc());
+        }
+        return acs;
+    }
+
+    @Override
+    public IntactFeatureEvidence getFeature(String ac) {
+        return config.getIntactDao().getFeatureEvidenceDao().getByAc(ac);
     }
 
     @Override

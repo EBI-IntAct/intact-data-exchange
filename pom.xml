@@ -23,7 +23,7 @@
         <bridges.version>2.1.20-SNAPSHOT</bridges.version>
         <commons.version>2.1.10</commons.version>
         <intact.jami.verson>1.2.17-SNAPSHOT</intact.jami.verson>
-        <psi.jami.version>3.0.2-SNAPSHOT</psi.jami.version>
+        <psi.jami.version>3.0.4-SNAPSHOT</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
         <ols.client.version>2.5-SNAPSHOT</ols.client.version>
     </properties>
@@ -42,7 +42,7 @@
         <module>intact-uniprot-export</module>
         <module>intact-pdbe-import</module>
         <module>intact-tasks</module>
-        <module>imex-id-update</module>
+        <!--<module>imex-id-update</module>-->
         <module>intact-mi-cluster-score</module>
         <module>structured-abstract</module>
         <module>intact-db-importer</module>
