@@ -58,6 +58,10 @@
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-io</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>uk.ac.ebi.enfin.mi.score</groupId>
+                    <artifactId>miscore</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
