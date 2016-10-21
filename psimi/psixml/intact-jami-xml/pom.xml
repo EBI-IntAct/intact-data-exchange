@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>intact-psixml</artifactId>
-        <version>3.0.8-SNAPSHOT</version>
+        <version>3.0.8</version>
     </parent>
 
     <artifactId>intact-jami-xml</artifactId>
