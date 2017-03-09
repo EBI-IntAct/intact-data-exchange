@@ -28,9 +28,12 @@ import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.full.FullInteractionEnricher;
 import psidev.psi.mi.jami.enricher.impl.full.FullInteractionEvidenceEnricher;
 import psidev.psi.mi.jami.model.*;
+import psidev.psi.mi.jami.utils.XrefUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.utils.IntactUtils;
+
+import java.util.Collection;
 
 /**
  * IntAct enricher for interaction evidence
@@ -124,6 +127,17 @@ public class InteractionEvidenceEnricher extends FullInteractionEvidenceEnricher
 
         processConfidences(interactionToEnrich, null);
         processParameters(interactionToEnrich, null);
+
+        // DIP Hack ----------
+        // We substitute the identifier for imex source MI:0973 to the IntAct internal one IA:0850 to avoid create a new CvTerm in the DB
+        if(interactionToEnrich.getXrefs() != null && !interactionToEnrich.getXrefs().isEmpty()){
+            Collection<Xref> dipXrefIds = XrefUtils.collectAllXrefsHavingDatabaseQualifierAndId(interactionToEnrich.getXrefs(),"MI:0488" ,"psi-mi", "MI:0465","MI:0973", "imex-source");
+            if(dipXrefIds != null && !dipXrefIds.isEmpty()){
+                Xref dipIdXref = dipXrefIds.iterator().next(); //We retrieve the first one, hopefully we don't have more than one.
+                dipIdXref.getQualifier().setMIIdentifier(null);
+                dipIdXref.getQualifier().setShortName("imex source");
+            }
+        }
     }
 
     @Override

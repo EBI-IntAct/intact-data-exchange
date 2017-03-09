@@ -30,8 +30,12 @@ import psidev.psi.mi.jami.enricher.impl.full.FullProteinEnricher;
 import psidev.psi.mi.jami.enricher.listener.ProteinEnricherListener;
 import psidev.psi.mi.jami.enricher.util.EnricherUtils;
 import psidev.psi.mi.jami.model.*;
+import psidev.psi.mi.jami.utils.AnnotationUtils;
+import psidev.psi.mi.jami.utils.XrefUtils;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
+
+import java.util.Collection;
 
 /**
  * This class enriches ie adds additional information to the protein
@@ -129,7 +133,8 @@ public class ProteinEnricher extends FullProteinEnricher {
     @Override
     protected void processIdentifiers(Protein objectToEnrich, Protein objectSource) throws EnricherException {
         if (objectSource != null){
-            EnricherUtils.mergeXrefs(objectToEnrich, objectToEnrich.getIdentifiers(), objectSource.getIdentifiers(), true, true,
+            //DIP Hack -----------------
+            EnricherUtils.mergeXrefs(objectToEnrich, objectToEnrich.getIdentifiers(), objectSource.getIdentifiers(), false, true,
                     getListener(), getListener());
         }
 
@@ -189,6 +194,19 @@ public class ProteinEnricher extends FullProteinEnricher {
                 ((ProteinEnricherListener)getListener()).onSequenceUpdate(proteinToEnrich, oldSeq);
             }
         }
+
+        /**************** DIP Hack *******************/
+        //Temporary hack for DIP to allow to keep the protein sequence reported in the DIP files !!!!!!
+        if(proteinToEnrich.getIdentifiers() != null && !proteinToEnrich.getIdentifiers().isEmpty()){
+            Collection<Xref> dipXrefIds = XrefUtils.collectAllXrefsHavingDatabaseAndQualifier(proteinToEnrich.getIdentifiers()
+                    , "MI:0486" ,"uniprotkb", Xref.IDENTITY_MI, Xref.IDENTITY);
+            if(dipXrefIds != null && !dipXrefIds.isEmpty()){
+                Xref dipIdXref = XrefUtils.collectFirstIdentifierWithDatabase(dipXrefIds,"MI:0486" ,"uniprotkb" );
+                Annotation dipExpId= AnnotationUtils.createAnnotation(Annotation.COMMENT, Annotation.COMMENT_MI, "DIP protein "+ dipIdXref.getId() + " original sequence version: " + dipIdXref.getVersion());
+                proteinToEnrich.getAnnotations().add(dipExpId);
+            }
+        }
+        /**************** DIP Hack *******************/
     }
 
     protected String replaceLabelInvalidChars(String label) {

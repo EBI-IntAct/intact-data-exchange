@@ -155,6 +155,21 @@ public class ExperimentEnricher extends FullExperimentEnricher {
                     objectToEnrich.getAnnotations().add(pubJournal);
                 }
             }
+            /**************** DIP Hack *******************/
+            //Temporary hack for DIP to allow to have the experiments separated !!!!!!
+            if(objectToEnrich.getXrefs() != null && !objectToEnrich.getXrefs().isEmpty()){
+                // We copy the DIP experiment identifier to split the experiments when
+                // the have the same experimental conditions. It is not the case for IntAct but it is needed for DIP.
+                // It is related with references to cell lines that weren't annotated in the past
+                Collection<Xref> dipXrefIds = XrefUtils.collectAllXrefsHavingDatabaseAndQualifier(objectToEnrich.getXrefs(), "MI:0465" ,"dip", Xref.IDENTITY_MI, Xref.IDENTITY);
+                if(dipXrefIds != null && !dipXrefIds.isEmpty()){
+                    Xref dipIdXref = XrefUtils.collectFirstIdentifierWithDatabase(dipXrefIds,"MI:0465" ,"dip" );
+                    Annotation dipExpId= AnnotationUtils.createAnnotation(Annotation.COMMENT, Annotation.COMMENT_MI, "DIP original experiment: " + dipIdXref.getId());
+                    objectToEnrich.getAnnotations().add(dipExpId);
+                }
+            }
+            /**************** DIP Hack *******************/
+
         }
 
         if (enricherContext.getConfig().isUpdateCvTerms() && getCvTermEnricher() != null){
