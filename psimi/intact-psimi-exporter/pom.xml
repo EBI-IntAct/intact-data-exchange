@@ -166,7 +166,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>${intact.jami.verson}</version>
+            <version>${intact.jami.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
@@ -206,12 +206,6 @@
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-batch</artifactId>
             <version>${psi.jami.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- compress -->

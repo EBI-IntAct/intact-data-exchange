@@ -22,10 +22,12 @@
         <core.version>2.6.11</core.version>
         <bridges.version>2.1.19</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.jami.verson>1.2.16</intact.jami.verson>
-        <psi.jami.version>3.0.3</psi.jami.version>
-        <spring.version>3.2.9.RELEASE</spring.version>
+        <intact.jami.version>1.2.18-SNAPSHOT</intact.jami.version>
+        <psi.jami.version>3.0.6-SNAPSHOT</psi.jami.version>
+        <!--OLS client is included in psi-jami ols module too,
+         check compatibility issues-->
         <ols.client.version>2.4</ols.client.version>
+        <spring.version>3.2.9.RELEASE</spring.version>
     </properties>
 
     <scm>
