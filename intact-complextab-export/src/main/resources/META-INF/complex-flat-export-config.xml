@@ -42,7 +42,7 @@
     <!-- for autowired annotations to work propertly -->
     <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
 
-    <bean name="generator" class="uk.ac.ebi.intact.export.complex.flat.ComplexFlatExportConfig">
+    <bean name="generator" class="uk.ac.ebi.intact.export.complex.tab.ComplexFlatExportConfig">
         <property name="intactDao" ref="intactDao"/>
     </bean>
 

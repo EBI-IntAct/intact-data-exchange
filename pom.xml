@@ -22,8 +22,9 @@
         <core.version>2.6.11</core.version>
         <bridges.version>2.1.19</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.jami.verson>1.2.16</intact.jami.verson>
-        <psi.jami.version>3.0.3</psi.jami.version>
+        <intact.jami.verson>1.2.18</intact.jami.verson>
+        <!--The version needs to be the same than in intact-jami to avoid problems-->
+        <psi.jami.version>3.0.7</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
         <ols.client.version>2.4</ols.client.version>
     </properties>
@@ -42,13 +43,13 @@
         <module>intact-uniprot-export</module>
         <module>intact-pdbe-import</module>
         <module>intact-tasks</module>
-        <!--<module>imex-id-update</module>-->
+        <module>imex-id-update</module>
         <module>intact-mi-cluster-score</module>
         <module>structured-abstract</module>
         <module>intact-db-importer</module>
         <module>cttv-exporter</module>
-<!--        <module>intact-mutation-export</module>
-        <module>intact-complextab-export</module>-->
+        <module>intact-mutation-export</module>
+        <module>intact-complextab-export</module>
     </modules>
 
     <build>
@@ -72,6 +73,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>disable-java8-doclint</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <additionalparam>-Xdoclint:none</additionalparam>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>
