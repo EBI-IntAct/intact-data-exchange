@@ -1,14 +1,14 @@
-package uk.ac.ebi.intact.export.complex.flat.processor;
+package uk.ac.ebi.intact.export.complex.tab.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.intact.export.complex.flat.ComplexFlatExportConfig;
-import uk.ac.ebi.intact.export.complex.flat.ComplexFlatExportContext;
-import uk.ac.ebi.intact.export.complex.flat.exception.ComplexExportException;
-import uk.ac.ebi.intact.export.complex.flat.helper.RowFactory;
-import uk.ac.ebi.intact.export.complex.flat.writer.ExportWriter;
+import uk.ac.ebi.intact.export.complex.tab.ComplexFlatExportConfig;
+import uk.ac.ebi.intact.export.complex.tab.ComplexFlatExportContext;
+import uk.ac.ebi.intact.export.complex.tab.exception.ComplexExportException;
+import uk.ac.ebi.intact.export.complex.tab.helper.RowFactory;
+import uk.ac.ebi.intact.export.complex.tab.writer.ExportWriter;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 
 import java.io.IOException;

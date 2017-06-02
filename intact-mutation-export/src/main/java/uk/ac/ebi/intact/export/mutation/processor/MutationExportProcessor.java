@@ -12,7 +12,6 @@ import uk.ac.ebi.intact.export.mutation.helper.Producer;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
 import uk.ac.ebi.intact.export.mutation.listener.ExportMutationListener;
 import uk.ac.ebi.intact.jami.model.extension.IntactFeatureEvidence;
-import uk.ac.ebi.intact.tools.feature.shortlabel.generator.utils.OntologyServiceHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +28,19 @@ public class MutationExportProcessor {
     public static BlockingQueue<MutationExportLine> exportMutations = new LinkedBlockingDeque<>(20);
     private static Thread PRODUCER;
     private static Thread EXPORTER;
+
+    private final static String MUTATION_MI_ID = "MI:0118";
+    private final static String MUTATION_ENABLING_INTERACTION_MI_ID = "MI:2227";
+    private final static String MUTATION_DECREASING_MI_ID = "MI:0119";
+    private final static String MUTATION_DECREASING_RATE_MI_ID = "MI:1130";
+    private final static String MUTATION_DECREASING_STRENGTH_MI_ID = "MI:1133";
+    private final static String MUTATION_DISRUPTING_MI_ID = "MI:0573";
+    private final static String MUTATION_DISRUPTING_RATE_MI_ID = "MI:1129";
+    private final static String MUTATION_DISRUPTING_STRENGTH_MI_ID = "MI:1128";
+    private final static String MUTATION_INCREASING_MI_ID = "MI:0382";
+    private final static String MUTATION_INCREASING_RATE_MI_ID = "MI:1131";
+    private final static String MUTATION_INCREASING_STRENGTH_MI_ID = "MI:1132";
+    private final static String MUTATION_WITH_NO_EFFECT_MI_ID = "MI:2226";
 
     private MutationExportConfig config = MutationExportContext.getInstance().getConfig();
 
@@ -106,10 +118,23 @@ public class MutationExportProcessor {
 
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
     private List<String> getAllMutationFeatures() {
-        List<String> mutationTerms = OntologyServiceHelper.getOntologyServiceHelper().getAssociatedMITerms("MI:0118", 10);
+        List<String> mutationTerms = new ArrayList<String>();
+        mutationTerms.add(MUTATION_MI_ID);
+        mutationTerms.add(MUTATION_ENABLING_INTERACTION_MI_ID);
+        mutationTerms.add(MUTATION_DECREASING_MI_ID);
+        mutationTerms.add(MUTATION_DECREASING_RATE_MI_ID);
+        mutationTerms.add(MUTATION_DECREASING_STRENGTH_MI_ID);
+        mutationTerms.add(MUTATION_DISRUPTING_MI_ID);
+        mutationTerms.add(MUTATION_DISRUPTING_RATE_MI_ID);
+        mutationTerms.add(MUTATION_DISRUPTING_STRENGTH_MI_ID);
+        mutationTerms.add(MUTATION_INCREASING_MI_ID);
+        mutationTerms.add(MUTATION_INCREASING_RATE_MI_ID);
+        mutationTerms.add(MUTATION_INCREASING_STRENGTH_MI_ID);
+        mutationTerms.add(MUTATION_WITH_NO_EFFECT_MI_ID);
+
         log.info("Retrieved all child terms of MI:0118 (mutation).");
         List<String> acs = new ArrayList<>();
-        mutationTerms.stream().filter(term -> !term.equals("MI:0429")).forEach(term -> {
+        mutationTerms.forEach(term -> {
             acs.addAll(config.getMutationExportDao().getFeatureEvidenceByType(term));
         });
         log.info("Retrieved all features of type mutation. Excluded MI:0429(necessary binding region)");

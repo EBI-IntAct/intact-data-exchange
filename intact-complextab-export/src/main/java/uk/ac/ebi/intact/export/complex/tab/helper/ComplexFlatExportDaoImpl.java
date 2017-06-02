@@ -1,7 +1,7 @@
-package uk.ac.ebi.intact.export.complex.flat.helper;
+package uk.ac.ebi.intact.export.complex.tab.helper;
 
-import uk.ac.ebi.intact.export.complex.flat.ComplexFlatExportConfig;
-import uk.ac.ebi.intact.export.complex.flat.ComplexFlatExportContext;
+import uk.ac.ebi.intact.export.complex.tab.ComplexFlatExportConfig;
+import uk.ac.ebi.intact.export.complex.tab.ComplexFlatExportContext;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 
 import java.util.List;
