@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>intact-psixml</artifactId>
-        <version>3.0.10.1</version>
+        <version>3.0.11-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
