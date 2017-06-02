@@ -71,8 +71,8 @@
     <dependencies>
         <dependency>
             <groupId>uk.ac.ebi.intact.tools</groupId>
-            <artifactId>feature-shortabel-genrator</artifactId>
-            <version>1.0.5-SNAPSHOT</version>
+            <artifactId>feature-shortlabel-generator</artifactId>
+            <version>1.0.8</version>
         </dependency>
 
         <dependency>
