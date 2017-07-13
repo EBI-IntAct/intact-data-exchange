@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.6-SNAPSHOT</version>
+        <version>3.0.11-SNAPSHOT</version>
     </parent>
 
 
     <artifactId>intact-complextab-export</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <properties>
-        <spring.version>3.2.9.RELEASE</spring.version>
-    </properties>
+    <name>IntAct Data Exchange :: Complex :: ComplexTab</name>
 
     <build>
         <plugins>
@@ -62,7 +57,7 @@
 
                                 <argument>-classpath</argument>
                                 <classpath />
-                                <argument>uk.ac.ebi.intact.export.complex.flat.ComplexFlatExport</argument>
+                                <argument>uk.ac.ebi.intact.export.complex.tab.ComplexFlatExport</argument>
                                 <argument>${folder}</argument>
                             </arguments>
                         </configuration>
@@ -73,37 +68,11 @@
     </profiles>
 
     <dependencies>
-        <dependency>
-            <groupId>uk.ac.ebi.intact.bridges</groupId>
-            <artifactId>intact-ols-light</artifactId>
-            <version>2.1.12</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j13</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>psidev.psi.mi.jami</groupId>
-            <artifactId>jami-core</artifactId>
-            <version>1.2.4</version>
-        </dependency>
-
         <!-- JAMI -->
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.13</version>
-        </dependency>
-
-        <!-- Test -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
+            <version>${intact.jami.version}</version>
         </dependency>
 
         <dependency>

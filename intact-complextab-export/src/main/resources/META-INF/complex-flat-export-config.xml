@@ -42,7 +42,7 @@
     <!-- for autowired annotations to work propertly -->
     <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
 
-    <bean name="generator" class="uk.ac.ebi.intact.export.complex.flat.ComplexFlatExportConfig">
+    <bean name="generator" class="uk.ac.ebi.intact.export.complex.tab.ComplexFlatExportConfig">
         <property name="intactDao" ref="intactDao"/>
     </bean>
 
@@ -79,10 +79,10 @@
     </bean>
     <!-- Intact core basic datasource -->
     <bean id="jamiCoreDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${db.driver}"/>
-        <property name="url" value="${db.url}"/>
-        <property name="username" value="${db.user}"/>
-        <property name="password" value="${db.password}"/>
+        <property name="driverClassName" value="${jami.db.driver}"/>
+        <property name="url" value="${jami.db.url}"/>
+        <property name="username" value="${jami.db.user}"/>
+        <property name="password" value="${jami.db.password}"/>
     </bean>
 
     <bean id="intactJamiConfiguration" class="uk.ac.ebi.intact.jami.context.IntactConfiguration" scope="prototype">

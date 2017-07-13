@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.export.complex.flat.helper;
+package uk.ac.ebi.intact.export.complex.tab.helper;
 
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 

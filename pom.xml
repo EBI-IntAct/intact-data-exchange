@@ -12,7 +12,7 @@
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.10-SNAPSHOT</version>
+    <version>3.0.11-SNAPSHOT</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
@@ -22,12 +22,13 @@
         <core.version>2.6.11</core.version>
         <bridges.version>2.1.19</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.jami.version>1.2.18-SNAPSHOT</intact.jami.version>
-        <psi.jami.version>3.0.6-SNAPSHOT</psi.jami.version>
-        <!--OLS client is included in psi-jami ols module too,
-         check compatibility issues-->
-        <ols.client.version>2.4</ols.client.version>
+        <intact.jami.version>1.2.18</intact.jami.version>
+        <!--The version needs to be the same than in intact-jami to avoid problems-->
+        <psi.jami.version>3.0.7</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
+        <!--OLS client is included in psi-jami ols module too,
+        check compatibility issues-->
+        <ols.client.version>2.4</ols.client.version>
     </properties>
 
     <scm>
@@ -44,17 +45,25 @@
         <module>intact-uniprot-export</module>
         <module>intact-pdbe-import</module>
         <module>intact-tasks</module>
-        <!--<module>imex-id-update</module>-->
+        <module>imex-id-update</module>
         <module>intact-mi-cluster-score</module>
         <module>structured-abstract</module>
         <module>intact-db-importer</module>
         <module>cttv-exporter</module>
-<!--        <module>intact-mutation-export</module>
-        <module>intact-complextab-export</module>-->
+        <module>intact-mutation-export</module>
+        <module>intact-complextab-export</module>
     </modules>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>external.atlassian.jgitflow</groupId>
                 <artifactId>jgitflow-maven-plugin</artifactId>
@@ -75,9 +84,31 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>disable-java8-doclint</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <additionalparam>-Xdoclint:none</additionalparam>
+            </properties>
+        </profile>
+    </profiles>
+
     <dependencyManagement>
         <dependencies>
             <!-- IntAct dependencies -->
+            <dependency>
+                <groupId>uk.ac.ebi.intact.core</groupId>
+                <artifactId>intact-core</artifactId>
+                <version>${core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.ac.ebi.intact.core</groupId>
+                <artifactId>intact-annotations</artifactId>
+                <version>${core.version}</version>
+            </dependency>
             <dependency>
                 <groupId>uk.ac.ebi.intact.commons</groupId>
                 <artifactId>intact-commons</artifactId>
@@ -152,17 +183,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- IntAct dependencies -->
-        <dependency>
-            <groupId>uk.ac.ebi.intact.core</groupId>
-            <artifactId>intact-core</artifactId>
-            <version>${core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>uk.ac.ebi.intact.core</groupId>
-            <artifactId>intact-annotations</artifactId>
-            <version>${core.version}</version>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -172,7 +192,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>3.2.9.RELEASE</version>
+            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

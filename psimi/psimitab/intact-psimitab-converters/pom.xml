@@ -3,7 +3,7 @@
     <parent>
         <artifactId>psimitab-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-        <version>3.0.10-SNAPSHOT</version>
+        <version>3.0.11-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -12,7 +12,14 @@
     <name>IntAct Data Exchange :: PSI MI :: TAB :: IntAct PSI-MI TAB Converters</name>
 
     <dependencies>
-
+        <dependency>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-annotations</artifactId>
+        </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.commons</groupId>
             <artifactId>intact-commons</artifactId>

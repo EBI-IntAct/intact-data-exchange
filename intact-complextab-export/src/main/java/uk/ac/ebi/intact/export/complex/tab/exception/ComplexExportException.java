@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.export.complex.flat.exception;
+package uk.ac.ebi.intact.export.complex.tab.exception;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).

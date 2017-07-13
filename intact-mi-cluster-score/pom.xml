@@ -4,7 +4,7 @@
     <parent>
         <artifactId>intact-dataexchange-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-        <version>3.0.10-SNAPSHOT</version>
+        <version>3.0.11-SNAPSHOT</version>
     </parent>
 
     <artifactId>intact-mi-cluster-score</artifactId>
@@ -406,7 +406,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>3.2.9.RELEASE</version>
+            <version>${spring.version}</version>
             <scope>compile</scope>
         </dependency>
 
