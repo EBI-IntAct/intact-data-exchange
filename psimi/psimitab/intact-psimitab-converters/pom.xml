@@ -12,7 +12,14 @@
     <name>IntAct Data Exchange :: PSI MI :: TAB :: IntAct PSI-MI TAB Converters</name>
 
     <dependencies>
-
+        <dependency>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-annotations</artifactId>
+        </dependency>
         <dependency>
             <groupId>uk.ac.ebi.intact.commons</groupId>
             <artifactId>intact-commons</artifactId>

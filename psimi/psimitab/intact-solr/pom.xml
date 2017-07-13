@@ -30,6 +30,14 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-annotations</artifactId>
+        </dependency>
         <!-- PSI MITAB -->
         <dependency>
             <groupId>psidev.psi.mi</groupId>

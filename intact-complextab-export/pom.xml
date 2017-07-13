@@ -68,17 +68,11 @@
     </profiles>
 
     <dependencies>
-        <dependency>
-            <groupId>psidev.psi.mi.jami</groupId>
-            <artifactId>jami-core</artifactId>
-            <version>1.2.4</version>
-        </dependency>
-
         <!-- JAMI -->
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>1.2.13</version>
+            <version>${intact.jami.version}</version>
         </dependency>
 
         <dependency>
