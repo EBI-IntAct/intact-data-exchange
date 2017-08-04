@@ -249,6 +249,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 "or lower(p.source.shortName) = :mbinfo " +
                 "or lower(p.source.shortName) = :mpidb " +
                 "or lower(p.source.shortName) = :mint " +
+                "or lower(p.source.shortName) = :hpidb " +
                 "or lower(p.source.shortName) = :bhf" +
                 ") " +
                 "and p.ac not in (" +
@@ -275,6 +276,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("mpidb", "mpidb");
         query.setParameter("mint", "mint");
         query.setParameter("bhf", "bhf-ucl");
+        query.setParameter("hpidb", "hpidb");
 
         return query.getResultList();
     }
