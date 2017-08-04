@@ -22,9 +22,9 @@
         <core.version>2.6.11</core.version>
         <bridges.version>2.1.19</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.jami.version>1.2.18</intact.jami.version>
+        <intact.jami.version>1.2.19-SNAPSHOT</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
-        <psi.jami.version>3.0.7</psi.jami.version>
+        <psi.jami.version>3.0.8-SNAPSHOT</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
         <ols.client.version>2.4</ols.client.version>
     </properties>
