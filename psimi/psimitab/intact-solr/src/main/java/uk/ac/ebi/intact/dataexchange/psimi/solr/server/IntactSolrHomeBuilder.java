@@ -57,8 +57,8 @@ public class IntactSolrHomeBuilder extends SolrHomeBuilder {
                 FileUtils.copyDirectory(solrHomeToCopy, solrHomeToCreate);
 
                 if (!solrWarToCreate.exists() && getSolrWar() == null){
-                    File solrWarToCopy = new File(IntactSolrHomeBuilder.class.getResource("/solr.war").getFile());
-                    FileUtils.copyFile(solrWarToCopy, solrWarToCreate);
+                    InputStream solrWarToCopy = IntactSolrHomeBuilder.class.getResourceAsStream("/solr.war");
+                    FileUtils.copyInputStreamToFile(solrWarToCopy, solrWarToCreate);
                 }
             }
             // is in the jar in the dependencies
@@ -115,8 +115,8 @@ public class IntactSolrHomeBuilder extends SolrHomeBuilder {
             File solrHomeToCopy = new File(IntactSolrHomeBuilder.class.getResource("/home").getFile());
             // is in the resources
             if (solrHomeToCopy.exists()){
-                File solrWarToCopy = new File(IntactSolrHomeBuilder.class.getResource("/solr.war").getFile());
-                FileUtils.copyFileToDirectory(solrWarToCopy, solrWorkingDir);
+                InputStream solrWarToCopy = IntactSolrHomeBuilder.class.getResourceAsStream("/solr.war");
+                FileUtils.copyInputStreamToFile(solrWarToCopy, new File(solrWorkingDir + "/solr.war"));
             }
             // is in the jar in the dependencies
             else {
