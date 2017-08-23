@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.10.1</version>
+        <version>3.0.11</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -76,34 +76,14 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>3.2.9.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
-
 
         <!-- Other third party dependencies -->
-        <!-- Tests -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>3.2.4.RELEASE</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 </project>

@@ -2,7 +2,7 @@
 
 # Runs the protein update
 #
-# Usage $0 database folder
+# Usage $0 folder
 #
 #
 ##################################################################
@@ -10,12 +10,12 @@
 if [ $# -ne 1 ]; then
       echo ""
       echo "ERROR: wrong number of parameters ($#)."
-      echo "usage: $0 DATABASE_PROFILE[ebi-test, ebi-prod, etc] FOLDER LOG_FILE"
+      echo "usage: $0 FOLDER"
       echo ""
       exit 1
 fi
 
-FOLDER=$2
+FOLDER=$1
 
 rm -rf target
 mkdir target

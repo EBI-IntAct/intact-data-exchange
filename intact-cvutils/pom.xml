@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.10.1</version>
+        <version>3.0.11</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -24,6 +24,14 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.intact.core</groupId>
+            <artifactId>intact-annotations</artifactId>
+        </dependency>
         <!--To be removed when Dataexchange 2.0.1 is released -->
         <dependency>
             <groupId>uk.ac.ebi</groupId>

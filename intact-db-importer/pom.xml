@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.10.1</version>
+        <version>3.0.11</version>
     </parent>
 
     <artifactId>intact-db-importer</artifactId>
@@ -97,7 +97,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
-            <version>${intact.jami.verson}</version>
+            <version>${intact.jami.version}</version>
         </dependency>
 
         <!-- JAMI enricher dependencies-->
@@ -119,13 +119,6 @@
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-batch</artifactId>
             <version>${psi.jami.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
