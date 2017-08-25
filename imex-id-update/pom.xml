@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.11.1</version>
+        <version>3.0.12</version>
     </parent>
 
     <groupId>uk.ac.ebi.intact.dataexchange.imex</groupId>
@@ -31,4 +31,14 @@
             <version>2.4</version>
         </dependency>
     </dependencies>
+
+    <!--Temporary solution to find all the imex central dependencies. -->
+    <!--TODO: copy dependencies in ebi nexus-->
+    <repositories>
+        <repository>
+            <id>nexus-ebi-repo-old-snapshots</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots/</url>
+        </repository>
+
+    </repositories>
 </project>
