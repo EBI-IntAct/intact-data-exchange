@@ -57,8 +57,9 @@ public class IntactSolrHomeBuilder extends SolrHomeBuilder {
                 FileUtils.copyDirectory(solrHomeToCopy, solrHomeToCreate);
 
                 if (!solrWarToCreate.exists() && getSolrWar() == null){
-                    InputStream solrWarToCopy = IntactSolrHomeBuilder.class.getResourceAsStream("/solr.war");
-                    FileUtils.copyInputStreamToFile(solrWarToCopy, solrWarToCreate);
+                    try (InputStream solrWarToCopy = IntactSolrHomeBuilder.class.getResourceAsStream("/solr.war")) {
+                        FileUtils.copyInputStreamToFile(solrWarToCopy, solrWarToCreate);
+                    }
                 }
             }
             // is in the jar in the dependencies
@@ -94,13 +95,8 @@ public class IntactSolrHomeBuilder extends SolrHomeBuilder {
                             continue;
                         }
 
-                        InputStream inputStream = jarFile.getInputStream(entry);
-
-                        try{
+                        try (InputStream inputStream = jarFile.getInputStream(entry)) {
                             FileUtils.copyInputStreamToFile(inputStream, fileToCreate);
-                        }
-                        finally {
-                            inputStream.close();
                         }
                     }
                 }
@@ -115,8 +111,9 @@ public class IntactSolrHomeBuilder extends SolrHomeBuilder {
             File solrHomeToCopy = new File(IntactSolrHomeBuilder.class.getResource("/home").getFile());
             // is in the resources
             if (solrHomeToCopy.exists()){
-                InputStream solrWarToCopy = IntactSolrHomeBuilder.class.getResourceAsStream("/solr.war");
-                FileUtils.copyInputStreamToFile(solrWarToCopy, new File(solrWorkingDir + "/solr.war"));
+                try(InputStream solrWarToCopy = IntactSolrHomeBuilder.class.getResourceAsStream("/solr.war")) {
+                    FileUtils.copyInputStreamToFile(solrWarToCopy, new File(solrWorkingDir + "/solr.war"));
+                }
             }
             // is in the jar in the dependencies
             else {
@@ -135,13 +132,8 @@ public class IntactSolrHomeBuilder extends SolrHomeBuilder {
                     if (entry.getName().endsWith("solr.war")) {
                         File fileToCreate = new File(solrWorkingDir, entry.toString());
 
-                        InputStream inputStream = jarFile.getInputStream(entry);
-
-                        try{
+                        try (InputStream inputStream = jarFile.getInputStream(entry)) {
                             FileUtils.copyInputStreamToFile(inputStream, fileToCreate);
-                        }
-                        finally {
-                            inputStream.close();
                         }
                     }
                 }
