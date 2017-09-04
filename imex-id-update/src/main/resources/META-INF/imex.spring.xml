@@ -7,6 +7,8 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
+    <!-- Example of configuration file to be used in the application calling imex-id-update -->
+
     <!-- Needed by Spring to find the annotations in the code -->
     <context:component-scan base-package="uk.ac.ebi.intact.dataexchange.imex.idassigner"/>
 
