@@ -6,7 +6,6 @@
     <context:annotation-config/>
     <context:component-scan base-package="uk.ac.ebi.intact.jami"/>
     <context:component-scan base-package="uk.ac.ebi.intact.export"/>
-    <context:component-scan base-package="uk.ac.ebi.intact.bridges"/>
 
     <!--<tx:annotation-driven proxy-target-class="true"/>-->
 
