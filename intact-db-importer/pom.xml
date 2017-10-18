@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.13</version>
+        <version>3.0.14</version>
     </parent>
 
     <artifactId>intact-db-importer</artifactId>
@@ -56,7 +56,6 @@
         </profile>
         <profile>
             <id>restart-import</id>
-
             <build>
                 <plugins>
                     <plugin>
@@ -105,7 +104,23 @@
             <groupId>uk.ac.ebi.intact.dataexchange</groupId>
             <artifactId>intact-enricher</artifactId>
             <version>${pom.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+        <!--Add it back to avoid a dependency conflict inside of the uniprot-japi
+        related with the exclusion in jami-uniprot -->
+        <!--TODO check if it is solve in a future release of uniprot-japi-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.7.5</version>
+        </dependency>
+
 
         <!-- JAMI file dependencies -->
         <dependency>
@@ -125,6 +140,12 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>1.4.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
