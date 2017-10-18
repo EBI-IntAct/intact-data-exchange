@@ -21,16 +21,6 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>-Xmx512m</argLine>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
     <dependencies>
@@ -71,6 +61,10 @@
                 <exclusion>
                     <groupId>uk.ac.ebi.ols</groupId>
                     <artifactId>ols-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>uk.ac.ebi.chebi.webapps.chebiWS.client</groupId>
+                    <artifactId>chebiWS-client</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>uk.ac.ebi.intact.bridges</groupId>
@@ -117,7 +111,7 @@
         <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>japi</artifactId>
-            <version>1.0.8</version>
+            <version>${uniprot.japi.version}</version>
         </dependency>
     </dependencies>
 </project>

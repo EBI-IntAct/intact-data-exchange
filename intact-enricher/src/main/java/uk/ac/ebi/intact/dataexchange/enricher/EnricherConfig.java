@@ -32,7 +32,7 @@ public class EnricherConfig {
     private boolean updateExperiments = true;
     private boolean updateInteractionShortLabels = true;
     //TODO: Just temporary... OLS!!!!!!
-    private String oboUrl = "http://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo";
+    private String oboUrl = "https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo";
     private boolean updateCvTerms = true;
     private boolean updateCellTypesAndTissues = false;
     private boolean updateCvInXrefsAliasesAnnotations = true;

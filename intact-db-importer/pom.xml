@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
@@ -43,7 +44,7 @@
                                 <argument>-Xms256m</argument>
 
                                 <argument>-classpath</argument>
-                                <classpath />
+                                <classpath/>
 
                                 <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>
                                 <argument>classpath*:/META-INF/intact-importer-spring.xml</argument>
@@ -56,7 +57,6 @@
         </profile>
         <profile>
             <id>restart-import</id>
-
             <build>
                 <plugins>
                     <plugin>
@@ -77,7 +77,7 @@
                                 <argument>-Xms256m</argument>
 
                                 <argument>-classpath</argument>
-                                <classpath />
+                                <classpath/>
 
                                 <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>
                                 <argument>classpath*:/META-INF/intact-importer-spring.xml</argument>
@@ -105,7 +105,23 @@
             <groupId>uk.ac.ebi.intact.dataexchange</groupId>
             <artifactId>intact-enricher</artifactId>
             <version>${pom.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+        <!--Add it back to avoid a dependency conflict inside of the uniprot-japi
+        related with the exclusion in jami-uniprot -->
+        <!--TODO check if it is solve in a future release of uniprot-japi-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.7.5</version>
+        </dependency>
+
 
         <!-- JAMI file dependencies -->
         <dependency>
@@ -125,6 +141,12 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>1.4.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>

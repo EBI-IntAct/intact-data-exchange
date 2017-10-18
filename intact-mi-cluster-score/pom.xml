@@ -326,7 +326,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.uniprotexport</groupId>
             <artifactId>intact-uniprot-export</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -335,17 +335,18 @@
             </exclusions>
         </dependency>
 
-<!--        <dependency>
-            <groupId>uk.ac.ebi.enfin.mi.cluster</groupId>
-            <artifactId>micluster</artifactId>
-            <version>1.7.8</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-io</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>-->
+        <!--Dependency pull by intact-uniprot-export-->
+        <!--<dependency>-->
+            <!--<groupId>uk.ac.ebi.enfin.mi.cluster</groupId>-->
+            <!--<artifactId>micluster</artifactId>-->
+            <!--<version>1.7.8</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.apache.commons</groupId>-->
+                    <!--<artifactId>commons-io</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
 
         <!-- PostgreSQL -->
         <dependency>
