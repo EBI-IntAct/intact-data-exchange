@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.export.complex.flat.writer;
+package uk.ac.ebi.intact.export.complex.tab.writer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -6,7 +6,6 @@ import org.apache.commons.logging.LogFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 

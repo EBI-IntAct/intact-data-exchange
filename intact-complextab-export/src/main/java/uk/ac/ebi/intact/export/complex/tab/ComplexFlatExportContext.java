@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.export.complex.flat;
+package uk.ac.ebi.intact.export.complex.tab;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

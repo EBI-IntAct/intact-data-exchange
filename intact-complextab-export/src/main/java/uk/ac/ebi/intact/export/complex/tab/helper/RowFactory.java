@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.export.complex.flat.helper;
+package uk.ac.ebi.intact.export.complex.tab.helper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -6,7 +6,7 @@ import psidev.psi.mi.jami.model.Alias;
 import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Source;
 import psidev.psi.mi.jami.model.Xref;
-import uk.ac.ebi.intact.export.complex.flat.exception.ComplexExportException;
+import uk.ac.ebi.intact.export.complex.tab.exception.ComplexExportException;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 import uk.ac.ebi.intact.jami.model.extension.InteractorXref;
 

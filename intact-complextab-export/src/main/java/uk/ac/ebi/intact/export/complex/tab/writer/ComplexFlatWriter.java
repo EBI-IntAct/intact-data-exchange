@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.export.complex.flat.writer;
+package uk.ac.ebi.intact.export.complex.tab.writer;
 
 import java.io.IOException;
 import java.io.Writer;
