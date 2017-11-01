@@ -53,7 +53,7 @@ public class Converter implements Runnable {
                 System.out.println(intactFeatureEvidence.getAc());
             }
         }
-        log.info("Thread killed");
+        log.info("Converter killed");
         Thread.currentThread().interrupt();
     }
 }
