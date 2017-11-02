@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Runs the protein update
+# Runs the mutation update
 #
 # Usage $0 database folder
 #

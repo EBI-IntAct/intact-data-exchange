@@ -1,5 +1,7 @@
 package uk.ac.ebi.intact.export.mutation.helper;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.export.mutation.helper.model.ExportRange;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
 import uk.ac.ebi.intact.export.mutation.processor.MutationExportProcessor;
@@ -11,11 +13,14 @@ import java.io.IOException;
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
  */
 public class Exporter implements Runnable {
+    private static final Log log = LogFactory.getLog(Exporter.class);
+
     private FileExportHandler fileExportHandler;
 
     public Exporter(FileExportHandler fileExportHandler) {
         this.fileExportHandler = fileExportHandler;
     }
+
     @Override
     public void run() {
         try {
@@ -24,10 +29,14 @@ public class Exporter implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        while (true){
+        while (true) {
+            if (MutationExportProcessor.loadedAll && MutationExportProcessor.readyToCheckQueue.isEmpty()
+                    && MutationExportProcessor.readyToConvertQueue.isEmpty() && MutationExportProcessor.readyToExportQueue.isEmpty()) {
+                break;
+            }
             MutationExportLine line = null;
             try {
-                line = MutationExportProcessor.exportMutations.take();
+                line = MutationExportProcessor.readyToExportQueue.take();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -45,5 +54,7 @@ public class Exporter implements Runnable {
                 e.printStackTrace();
             }
         }
+        log.info("Exporter killed");
+        Thread.currentThread().interrupt();
     }
 }

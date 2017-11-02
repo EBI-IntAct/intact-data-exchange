@@ -27,8 +27,6 @@ public class FeatureToExportLine {
     private final String NEW_LINE = "\n";
     private final String ONE_SPACE = " ";
     private final String COLON = ":";
-//    private final String MI_REMARKINTERNAL = "";
-//    private final String MI_NOMUTATIONUPDATE = "";
 
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
     public MutationExportLine convertFeatureToMutationExportLine(FeatureEvidence featureEvidence) {
@@ -39,7 +37,6 @@ public class FeatureToExportLine {
         InteractionEvidence interactionEvidence = intactParticipantEvidence.getInteraction();
         Experiment experiment = interactionEvidence.getExperiment();
         Publication publication = experiment.getPublication();
-
         line.setFeatureAc(featureToExportLine.extractIntactAc(featureEvidence.getIdentifiers()));
         line.setFeatureShortlabel(featureEvidence.getShortName());
         line.setFeatureType(featureToExportLine.extractFeatureType(featureEvidence.getType()));
@@ -61,7 +58,10 @@ public class FeatureToExportLine {
     private String extractFigureLegend(Collection<Annotation> annotations) {
         Annotation annotation = annotations.stream().filter(a -> a.getTopic().getShortName().equals(MI_FIGURELEGEND)).findFirst().orElse(null);
         if (annotation != null) {
-            return annotation.getValue().replaceAll(TAB, ONE_SPACE).replaceAll(NEW_LINE, ONE_SPACE);
+            String annotationString = annotation.getValue();
+            annotationString =  annotationString.replaceAll(TAB, ONE_SPACE);
+            annotationString =  annotationString.replaceAll(NEW_LINE, ONE_SPACE);
+            return annotationString;
         }
         return EMPTY_STRING;
     }
@@ -128,8 +128,11 @@ public class FeatureToExportLine {
     private ExportRange buildRange(Range range) {
         ExportRange exportRange = new ExportRange();
         exportRange.setRange(range.getStart().getStart() + "-" + range.getEnd().getEnd());
-        exportRange.setOriginalSequence(range.getResultingSequence().getOriginalSequence());
-        exportRange.setResultingSequence(range.getResultingSequence().getNewSequence());
+        String x = range.getResultingSequence().getNewSequence();
+        System.out.println(x.replaceAll("\\r\\n", ""));
+        exportRange.setOriginalSequence(range.getResultingSequence().getOriginalSequence().replaceAll(NEW_LINE, EMPTY_STRING));
+        exportRange.setResultingSequence(range.getResultingSequence().getNewSequence().replaceAll(NEW_LINE, EMPTY_STRING));
+
         return exportRange;
     }
 
@@ -148,9 +151,12 @@ public class FeatureToExportLine {
 
     private String extractAnnotations(Collection<Annotation> annotations) {
         List<Annotation> annotationsFiltered = annotations.stream().filter(annotation -> !annotation.getTopic().getShortName().equals("remark-internal") && !annotation.getTopic().getShortName().equals("no-mutation-update")).collect(Collectors.toList());
-        //        Annotation annotationsFiltered = annotations.stream().filter(a -> !a.getTopic().getShortName().equals("remark-internal") && !a.getTopic().getShortName().equals("no-mutation-update")).findAny().orElse(null);
+        //Annotation annotationsFiltered = annotations.stream().filter(a -> !a.getTopic().getShortName().equals("remark-internal") && !a.getTopic().getShortName().equals("no-mutation-update")).findAny().orElse(null);
         if (!annotationsFiltered.isEmpty()) {
-            return StringUtils.join(annotations, ",").replaceAll(TAB, ONE_SPACE).replaceAll(NEW_LINE, ONE_SPACE);
+            String annotationsString = StringUtils.join(annotations, ",");
+            annotationsString =  annotationsString.replaceAll(TAB, ONE_SPACE);
+            annotationsString =  annotationsString.replaceAll(NEW_LINE, ONE_SPACE);
+            return annotationsString;
         }
         return EMPTY_STRING;
 

@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.export.complex.tab.helper.ComplexFlatExportDaoImpl;
 import uk.ac.ebi.intact.export.complex.tab.processor.ComplexFlatExportProcessor;
 import uk.ac.ebi.intact.export.complex.tab.writer.FileExportHandler;
-
 import java.io.File;
 import java.io.IOException;
 

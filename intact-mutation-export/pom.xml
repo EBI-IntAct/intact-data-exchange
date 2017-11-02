@@ -50,7 +50,7 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Xmx2024m</argument>
+                                <argument>-Xmx4048m</argument>
                                 <argument>-Xms256m</argument>
 
                                 <argument>-classpath</argument>
