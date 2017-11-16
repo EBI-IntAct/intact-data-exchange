@@ -6,9 +6,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.intact.export.mutation.MutationExportConfig;
 import uk.ac.ebi.intact.export.mutation.MutationExportContext;
-import uk.ac.ebi.intact.export.mutation.helper.Consumer;
+import uk.ac.ebi.intact.export.mutation.helper.Checker;
+import uk.ac.ebi.intact.export.mutation.helper.Converter;
 import uk.ac.ebi.intact.export.mutation.helper.Exporter;
-import uk.ac.ebi.intact.export.mutation.helper.Producer;
 import uk.ac.ebi.intact.export.mutation.helper.model.MutationExportLine;
 import uk.ac.ebi.intact.export.mutation.listener.ExportMutationListener;
 import uk.ac.ebi.intact.jami.model.extension.IntactFeatureEvidence;
@@ -23,10 +23,11 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class MutationExportProcessor {
     private static final Log log = LogFactory.getLog(MutationExportProcessor.class);
-    public static BlockingQueue<IntactFeatureEvidence> readyToCheckMutations = new LinkedBlockingDeque<>(10);
-    public static BlockingQueue<IntactFeatureEvidence> checkedMutations = new LinkedBlockingDeque<>(20);
-    public static BlockingQueue<MutationExportLine> exportMutations = new LinkedBlockingDeque<>(20);
-    private static Thread PRODUCER;
+    public static BlockingQueue<IntactFeatureEvidence> readyToCheckQueue = new LinkedBlockingDeque<>(1000);
+    public static BlockingQueue<IntactFeatureEvidence> readyToConvertQueue = new LinkedBlockingDeque<>(2000);
+    public static BlockingQueue<MutationExportLine> readyToExportQueue = new LinkedBlockingDeque<>(5000);
+    public static Boolean loadedAll = false;
+    private static Thread CHECKER;
     private static Thread EXPORTER;
 
     private final static String MUTATION_MI_ID = "MI:0118";
@@ -44,14 +45,6 @@ public class MutationExportProcessor {
 
     private MutationExportConfig config = MutationExportContext.getInstance().getConfig();
 
-    public static boolean producerIsAlive() {
-        return MutationExportProcessor.PRODUCER.isAlive();
-    }
-
-    public static boolean isProducerAlive() {
-        return MutationExportProcessor.PRODUCER.isAlive();
-    }
-
     private void init() {
         initListener();
     }
@@ -64,60 +57,42 @@ public class MutationExportProcessor {
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
     public void exportAll() {
         init();
-        List<String> acs = getAllMutationFeatures();
-        Producer producer = new Producer();
+        List<String> acs = getAllMutationFeaturesAcs();
+
+        Checker checker = new Checker(readyToCheckQueue);
         Exporter exporter = new Exporter(config.getFileExportHandler());
 
-        MutationExportProcessor.PRODUCER = new Thread(producer);
+
+        MutationExportProcessor.CHECKER = new Thread(checker);
         MutationExportProcessor.EXPORTER = new Thread(exporter);
-        
-        Thread CONSUMER1 = new Thread(new Consumer());
-        Thread CONSUMER2 = new Thread(new Consumer());
-        Thread CONSUMER3 = new Thread(new Consumer());
-        Thread CONSUMER4 = new Thread(new Consumer());
-        Thread CONSUMER5 = new Thread(new Consumer());
-        
-        MutationExportProcessor.PRODUCER.start();
+
+        MutationExportProcessor.CHECKER.start();
         MutationExportProcessor.EXPORTER.start();
-        CONSUMER1.start();
-        CONSUMER2.start();
-        CONSUMER3.start();
-        CONSUMER4.start();
-        CONSUMER5.start();
+
+        Thread CONVERTER1 = new Thread(new Converter());
+        Thread CONVERTER2 = new Thread(new Converter());
+        Thread CONVERTER3 = new Thread(new Converter());
+        Thread CONVERTER4 = new Thread(new Converter());
+        Thread CONVERTER5 = new Thread(new Converter());
+
+        CONVERTER1.start();
+        CONVERTER2.start();
+        CONVERTER3.start();
+        CONVERTER4.start();
+        CONVERTER5.start();
 
         for (String ac : acs) {
             try {
-                readyToCheckMutations.put(config.getMutationExportDao().getFeature(ac));
+                readyToCheckQueue.put(config.getMutationExportDao().getFeature(ac));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-
-        MutationExportProcessor.PRODUCER.interrupt();
-
-        while (true) {
-            if (checkedMutations.size() == 0) {
-                CONSUMER1.interrupt();
-                CONSUMER2.interrupt();
-                CONSUMER3.interrupt();
-                CONSUMER4.interrupt();
-                CONSUMER5.interrupt();
-            }
-            if (checkedMutations.size() == 0 && exportMutations.size() == 0) {
-                MutationExportProcessor.EXPORTER.interrupt();
-                log.info("All mutations exported");
-                break;
-            }
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        loadedAll = true;
     }
 
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
-    private List<String> getAllMutationFeatures() {
+    private List<String> getAllMutationFeaturesAcs() {
         List<String> mutationTerms = new ArrayList<String>();
         mutationTerms.add(MUTATION_MI_ID);
         mutationTerms.add(MUTATION_ENABLING_INTERACTION_MI_ID);
@@ -137,7 +112,7 @@ public class MutationExportProcessor {
         mutationTerms.forEach(term -> {
             acs.addAll(config.getMutationExportDao().getFeatureEvidenceByType(term));
         });
-        log.info("Retrieved all features of type mutation. Excluded MI:0429(necessary binding region)");
+        log.info("Retrieved all features acs of type mutation. Excluded MI:0429 (necessary binding region)");
         return acs;
     }
 }

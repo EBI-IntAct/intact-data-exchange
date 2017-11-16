@@ -12,7 +12,7 @@
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.15</version>
+    <version>3.0.16</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
@@ -30,6 +30,7 @@
         <!--Properties for psixml-exchange: keept them in sync with intact-jami until the module is updated-->
         <ols.client.version>2.11</ols.client.version>
         <uniprot.japi.version>1.0.15</uniprot.japi.version>
+        <chebiws.client.version>2.3.2</chebiws.client.version>
 
         <micluster.version>1.7.13</micluster.version>
     </properties>
@@ -68,6 +69,8 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!--mvn jgitflow:release-start -Dgit.user=xxxx -Dgit.password=xxxx-->
+                <!--mvn jgitflow:release-finish -Dmaven.javadoc.skip=true -Dgit.user=xxxx -Dgit.password=xxxx-->
                 <groupId>external.atlassian.jgitflow</groupId>
                 <artifactId>jgitflow-maven-plugin</artifactId>
                 <version>1.0-m5.1</version>
@@ -82,6 +85,13 @@
                     </flowInitContext>
                     <!-- see goals wiki page for configuration options -->
                     <allowUntracked>true</allowUntracked>
+                    <username>${git.user}</username>
+                    <password>${git.password}</password>
+                    <pullMaster>true</pullMaster>
+                    <pullDevelop>true</pullDevelop>
+                    <pushReleases>true</pushReleases>
+                    <pushHotfixes>true</pushHotfixes>
+                    <pushFeatures>true</pushFeatures>
                 </configuration>
             </plugin>
         </plugins>

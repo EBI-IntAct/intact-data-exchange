@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.15</version>
+        <version>3.0.16</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -50,7 +50,7 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Xmx2024m</argument>
+                                <argument>-Xmx4048m</argument>
                                 <argument>-Xms256m</argument>
 
                                 <argument>-classpath</argument>

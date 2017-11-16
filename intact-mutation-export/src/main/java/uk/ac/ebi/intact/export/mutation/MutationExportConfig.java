@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.export.mutation;
 
 import uk.ac.ebi.intact.export.mutation.helper.Exporter;
 import uk.ac.ebi.intact.export.mutation.helper.MutationExportDao;
-import uk.ac.ebi.intact.export.mutation.helper.Consumer;
 import uk.ac.ebi.intact.export.mutation.writer.FileExportHandler;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.tools.feature.shortlabel.generator.ShortlabelGenerator;

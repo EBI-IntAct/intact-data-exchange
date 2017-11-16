@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ebi.intact.export.mutation.helper.Exporter;
 import uk.ac.ebi.intact.export.mutation.helper.MutationExportDaoImpl;
-import uk.ac.ebi.intact.export.mutation.helper.Consumer;
 import uk.ac.ebi.intact.export.mutation.processor.MutationExportProcessor;
 import uk.ac.ebi.intact.export.mutation.writer.FileExportHandler;
 
