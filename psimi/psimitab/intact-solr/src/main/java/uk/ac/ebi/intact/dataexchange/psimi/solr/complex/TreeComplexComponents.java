@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
+import org.hibernate.Hibernate;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.ComplexSolrEnricher;
 import uk.ac.ebi.intact.model.*;
 
@@ -33,6 +34,7 @@ public class TreeComplexComponents {
     public TreeComplexComponents(InteractionImpl c, ComplexSolrEnricher enricher) {
         complex = c ;
         complexSons = new ArrayList();
+        map = new HashMap<String,TreeComponents>();
         for ( Component component : complex.getComponents() ) {
             complexSons.add ( new TreeComponents ( component, enricher ) );
         }
@@ -116,9 +118,15 @@ public class TreeComplexComponents {
                 component = component_param ;
                 this.enricher = enricher;
                 if ( component.getInteractor() instanceof InteractionImpl ) {
+                    Hibernate.initialize(((InteractionImpl) component.getInteractor()).getComponents());
                     sons = new ArrayList();
+//                    System.out.println("Component AC: " + component.getAc());
+//                    System.out.println("Component interactor: " + component.getInteractor());
+//                    System.out.println("Component interactor compoenents: " + ((InteractionImpl) component.getInteractor()).getComponents()) ;
                     for ( Component comp : ((InteractionImpl) component.getInteractor()).getComponents() ) {
                         TreeComponents tree = null ;
+//                        System.out.println("Component: " + comp);
+//                        System.out.println("Component son AC: " + comp.getAc());
                         if ( ! map.containsKey ( comp.getAc() ) ) {
                             tree = new TreeComponents ( comp, enricher ) ;
                             map.put ( comp.getAc(), tree ) ;
