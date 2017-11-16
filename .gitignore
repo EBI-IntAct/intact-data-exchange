@@ -28,6 +28,7 @@ release.properties
 bin/**
 tmp/**
 tmp/**/*
+*/temp
 *.tmp
 *.bak
 *.swp
