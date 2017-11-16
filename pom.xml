@@ -30,6 +30,7 @@
         <!--Properties for psixml-exchange: keept them in sync with intact-jami until the module is updated-->
         <ols.client.version>2.11</ols.client.version>
         <uniprot.japi.version>1.0.15</uniprot.japi.version>
+        <chebiws.client.version>2.3.2</chebiws.client.version>
 
         <micluster.version>1.7.13</micluster.version>
     </properties>
