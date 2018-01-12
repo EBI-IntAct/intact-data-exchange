@@ -91,7 +91,6 @@ public class MutationExportProcessor {
         loadedAll = true;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
     private List<String> getAllMutationFeaturesAcs() {
         List<String> mutationTerms = new ArrayList<String>();
         mutationTerms.add(MUTATION_MI_ID);
@@ -112,6 +111,7 @@ public class MutationExportProcessor {
         mutationTerms.forEach(term -> {
             acs.addAll(config.getMutationExportDao().getFeatureEvidenceByType(term));
         });
+        /// for testing acs.add("EBI-10921757");
         log.info("Retrieved all features acs of type mutation. Excluded MI:0429 (necessary binding region)");
         return acs;
     }
