@@ -298,6 +298,7 @@ public class ImportPdbXmlFiles {
         enricherConfig.setUpdateInteractionShortLabels( true );
         enricherConfig.setUpdateExperiments( true );
         enricherConfig.setUpdateProteins( true );
+        enricherConfig.setOboUrl("https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo");
 
         InputStream is = new FileInputStream( fileToImport );
 

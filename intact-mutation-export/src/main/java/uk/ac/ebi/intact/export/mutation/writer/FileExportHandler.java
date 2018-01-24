@@ -24,7 +24,7 @@ public class FileExportHandler {
         if (!dirFile.isDirectory()) {
             throw new IOException("The file passed to the constructor has to be a directory: " + dirFile);
         }
-        this.exportWriter = new MutationExportWriter(new FileWriter(new File(dirFile, "mutation_export.tsv")));
+        this.exportWriter = new MutationExportWriter(new FileWriter(new File(dirFile, "mutations.tsv")));
     }
 
     public ExportWriter getExportWriter() {

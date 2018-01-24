@@ -15,21 +15,20 @@
  */
 package uk.ac.ebi.intact.dataexchange.psimi.xml.exchange.enricher;
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import psidev.psi.mi.xml.PsimiXmlForm;
+import psidev.psi.mi.xml.PsimiXmlReader;
+import psidev.psi.mi.xml.converter.config.PsimiXmlConverterConfig;
+import psidev.psi.mi.xml.model.Entry;
+import psidev.psi.mi.xml.model.EntrySet;
+import psidev.psi.mi.xml.stylesheets.XslTransformerUtils;
+import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 
 import java.io.*;
-
-import psidev.psi.mi.xml.PsimiXmlReader;
-import psidev.psi.mi.xml.PsimiXmlForm;
-import psidev.psi.mi.xml.converter.config.PsimiXmlConverterConfig;
-import psidev.psi.mi.xml.stylesheets.XslTransformerUtils;
-import psidev.psi.mi.xml.model.EntrySet;
-import psidev.psi.mi.xml.model.Entry;
 
 /**
  * PsiEnricher Tester.
@@ -52,6 +51,8 @@ public class PsiEnricherTest extends IntactBasicTestCase {
 
         EnricherConfig config = new EnricherConfig();
         config.setUpdateInteractionShortLabels(true);
+        config.setOboUrl("https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo");
+
 
         psiEnricher.enrichPsiXml(is, writer, config);
 
@@ -81,6 +82,7 @@ public class PsiEnricherTest extends IntactBasicTestCase {
 
         EnricherConfig config = new EnricherConfig();
         config.setUpdateInteractionShortLabels(true);
+        config.setOboUrl("https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo");
 
         // the actual method
         System.out.println( "ConverterContext.getInstance().isGenerateExpandedXml(): " + ConverterContext.getInstance().isGenerateExpandedXml() );
