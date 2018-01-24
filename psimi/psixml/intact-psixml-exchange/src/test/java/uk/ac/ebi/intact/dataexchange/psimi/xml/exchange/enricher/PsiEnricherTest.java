@@ -52,6 +52,7 @@ public class PsiEnricherTest extends IntactBasicTestCase {
 
         EnricherConfig config = new EnricherConfig();
         config.setUpdateInteractionShortLabels(true);
+        config.setOboUrl("https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo");
 
         psiEnricher.enrichPsiXml(is, writer, config);
 
@@ -81,6 +82,7 @@ public class PsiEnricherTest extends IntactBasicTestCase {
 
         EnricherConfig config = new EnricherConfig();
         config.setUpdateInteractionShortLabels(true);
+        config.setOboUrl("https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo");
 
         // the actual method
         System.out.println( "ConverterContext.getInstance().isGenerateExpandedXml(): " + ConverterContext.getInstance().isGenerateExpandedXml() );

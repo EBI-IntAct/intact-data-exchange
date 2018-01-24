@@ -101,7 +101,7 @@ public class DbImporter {
         EnricherConfig enricherConfig = new EnricherConfig();
         enricherConfig.setUpdateInteractionShortLabels(true);
         enricherConfig.setUpdateExperiments(true);
-        enricherConfig.setOboUrl("http://raw.githubusercontent.com/MICommunity/psidev/7f6056bb91c2f88d03e20d2bb5c5235a91cc54f7/psi/mi/rel25/data/psi-mi25.obo7");
+        enricherConfig.setOboUrl("https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo");
 
         //EnricherContext.getInstance().getConfig().setUpdateInteractionShortLabels(true);
 
