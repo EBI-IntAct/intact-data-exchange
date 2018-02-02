@@ -7,9 +7,11 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.TreeComplexComponents;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.ComplexSolrEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.model.util.XrefUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 
 /**
  * @author Oscar Forner (oforner@ebi.ac.uk)
@@ -49,8 +51,14 @@ public class ComplexSolrConverter {
 
     protected void indexComplexAC(InteractionImpl complex,
                                   SolrInputDocument solrDocument) throws Exception {
+        Xref  complexPrimaryXref=getComplexPrimaryXref(complex);
         // stored field
-        solrDocument.addField(ComplexFieldNames.COMPLEX_AC, complex.getAc());
+        solrDocument.addField(ComplexFieldNames.AC, complex.getAc()); // for old ac
+        if(complexPrimaryXref!=null){
+            solrDocument.addField(ComplexFieldNames.COMPLEX_AC,complexPrimaryXref.getPrimaryId());
+            solrDocument.addField(ComplexFieldNames.COMPLEX_VERSION,complexPrimaryXref.getDbRelease());
+            solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complexPrimaryXref.getPrimaryId() ) ;
+        }
         // search fields
         solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getAc ( ) ) ;
         // index source of complex id
@@ -58,6 +66,22 @@ public class ComplexSolrConverter {
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getOwner ( ).getShortLabel() ) ;
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getOwner ( ).getShortLabel() + ":" + complex.getAc ( ) ) ;
         }
+    }
+
+    protected Xref getComplexPrimaryXref(InteractionImpl complex){
+        Collection<InteractorXref> currentComplexXrefs = complex.getXrefs();
+        Xref  complexPrimaryXref=null;
+        for (Xref xref : currentComplexXrefs) {
+            if (xref.getCvXrefQualifier()!=null&&xref.getCvXrefQualifier().getIdentifier()!=null&&
+                    xref.getCvXrefQualifier().getIdentifier().equals("MI:2282")&&
+                    xref.getCvXrefQualifier().getShortLabel()!=null&&
+                    xref.getCvXrefQualifier().getShortLabel().equals("complex-primary")) {
+                complexPrimaryXref = xref;
+                break;
+            }
+        }
+
+        return complexPrimaryXref;
     }
 
     protected void indexComplexNames(InteractionImpl complex,

@@ -23,7 +23,9 @@ public interface ComplexFieldNames {
     final static String INTERACTION_TYPE_EXACT       = "type_e";
     final static String COMPLEX_XREF                 = "complex_xref";
     final static String COMPLEX_XREF_EXACT           = "complex_xref_e";
-    final static String COMPLEX_AC                   = "complex_AC";
+    final static String COMPLEX_AC                   = "complex_ac";
+    final static String AC                           = "ac";
+    final static String COMPLEX_VERSION              = "complex_version";
     final static String DESCRIPTION                  = "description";
     final static String ORGANISM_NAME                = "organism_name";
     final static String UDATE                        = "udate";
