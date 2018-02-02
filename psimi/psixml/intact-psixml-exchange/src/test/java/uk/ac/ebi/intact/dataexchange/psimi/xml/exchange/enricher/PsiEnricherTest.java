@@ -53,7 +53,6 @@ public class PsiEnricherTest extends IntactBasicTestCase {
         config.setUpdateInteractionShortLabels(true);
         config.setOboUrl("https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo");
 
-
         psiEnricher.enrichPsiXml(is, writer, config);
 
         //System.out.println(writer.toString());

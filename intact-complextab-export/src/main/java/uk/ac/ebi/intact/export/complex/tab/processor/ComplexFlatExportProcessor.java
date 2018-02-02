@@ -35,8 +35,8 @@ public class ComplexFlatExportProcessor {
             try {
                 field = RowFactory.convertComplexToExportLine(intactComplex);
             } catch (ComplexExportException e) {
-                log.error("Error found in complex:" + intactComplex.getAc() + ": " + e.getMessage());
-                log.info("Complex " + intactComplex.getAc() + " will be excluded from export.");
+                log.error("Error found in complex:" + intactComplex.getComplexAc() + ": " + e.getMessage());
+                log.info("Complex " + intactComplex.getComplexAc() + " will be excluded from export.");
             }
             if (field != null) {
                 exportFile.writeHeaderIfNecessary("Complex ac", "Recommended name", "Aliases for complex", "Taxonomy identifier", "Identifiers (and stoichiometry) of molecules in complex", "Confidence", "Experimental evidence", "Go Annotations", "Cross references", "Description", "Complex properties", "Complex assembly", "Ligand", "Disease", "Agonist", "Antagonist", "Comment", "Source");
