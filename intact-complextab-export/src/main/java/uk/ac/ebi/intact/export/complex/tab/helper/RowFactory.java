@@ -25,7 +25,7 @@ public class RowFactory {
 
     public static String[] convertComplexToExportLine(IntactComplex complex) throws ComplexExportException {
         String[] exportLine = new String[18];
-        getRowFactory().assignAc(complex, exportLine, 0);
+        getRowFactory().assignComplexAc(complex, exportLine, 0);
         getRowFactory().assignRecommendedName(complex, exportLine, 1);
         getRowFactory().assignComplexAliases(complex, exportLine, 2);
         getRowFactory().assignTaxId(complex, exportLine, 3);
@@ -118,9 +118,9 @@ public class RowFactory {
         assignComment(comments, exportLine, 16);
     }
 
-    private void assignAc(IntactComplex complex, String[] exportLine, int index) throws ComplexExportException {
+    private void assignComplexAc(IntactComplex complex, String[] exportLine, int index) throws ComplexExportException {
         try {
-            prepareString(complex.getAc(), exportLine, index);
+            prepareString(complex.getComplexAc(), exportLine, index);
         } catch (NullPointerException e) {
             throw new ComplexExportException("Null value found in column " + (index + 1) + ". Could not find complex ac.", e);
         }
