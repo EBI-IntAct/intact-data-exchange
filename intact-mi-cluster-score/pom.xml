@@ -57,7 +57,8 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Xmx2024m</argument>
+                                <argument>-Xmx16384m</argument>
+                                <argument>-XX:+UseConcMarkSweepGC</argument>
                                 <argument>-classpath</argument>
                                 <!-- automatically creates the classpath using all project dependencies,
                                      also adding the project build directory -->
