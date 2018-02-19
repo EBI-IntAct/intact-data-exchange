@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.20-SNAPSHOT</version>
+        <version>3.0.21-SNAPSHOT</version>
     </parent>
 
     <artifactId>intact-db-importer</artifactId>
