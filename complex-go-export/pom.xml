@@ -11,6 +11,8 @@
     </parent>
 
     <artifactId>complex-go-export</artifactId>
+    <name>IntAct Data Exchange :: Complex :: GO Export</name>
+
     <properties>
         <release.targetDir>target/go-export</release.targetDir>
         <release.logDir>target/go-export</release.logDir>
@@ -94,15 +96,6 @@
             <version>10.2.0.4</version>
         </dependency>
     </dependencies>
-
-    <!-- EBI repositories -->
-    <repositories>
-        <repository>
-            <id>intact.nexus</id>
-            <name>IntAct Nexus</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public</url>
-        </repository>
-    </repositories>
 
 
 </project>

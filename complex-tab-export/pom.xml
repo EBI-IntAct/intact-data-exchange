@@ -10,7 +10,7 @@
 
 
     <artifactId>intact-complextab-export</artifactId>
-    <name>IntAct Data Exchange :: Complex :: ComplexTab</name>
+    <name>IntAct Data Exchange :: Complex :: Tab Export</name>
 
     <build>
         <plugins>
