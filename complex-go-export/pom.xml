@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>complex-go-export</artifactId>
+    <version>3.0.21</version>
     <name>IntAct Data Exchange :: Complex :: GO Export</name>
 
     <properties>
