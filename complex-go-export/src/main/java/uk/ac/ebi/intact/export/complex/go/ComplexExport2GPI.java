@@ -164,7 +164,7 @@ public class ComplexExport2GPI {
         Xref identifier = interactor.getPreferredIdentifier();
 
         if (identifier == null) {
-            System.err.println("Found an interactor that doesn't have any identity: " + interactor);
+            System.err.println("ERROR: Found an interactor that doesn't have any identity: " + interactor);
             return false;
 
         } else {

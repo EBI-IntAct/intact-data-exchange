@@ -184,14 +184,12 @@ public class ComplexExport2GPA {
                     /* 13 */
                     associationSb.append(NEW_LINE);
                 } else {
-                    System.err.println("Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") without proper complex GO Xref to export");
-                    //TODO Inferred from other xrefs
+                    System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") without proper complex GO Xref to export");
                     return false;
                 }
             }
         } else {
-            System.err.println("Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") with empty complex GO Xref");
-            //TODO Inferred from other xrefs
+            System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") with empty complex GO Xref");
             return false;
         }
 
@@ -226,20 +224,20 @@ public class ComplexExport2GPA {
                 //reference = "IntAct:" + pubmed;
                 // This case shouldn't happen wrong annotation in the complex portal - report to curators
                 reference = null;
-                System.err.println("Found a go term with EBI evidence " + pubmed + " " + goTerm.getId() + " (" + evidence + ")");
+                System.err.println("ERROR: Found a go term with EBI evidence " + pubmed + " " + goTerm.getId() + " (" + evidence + ")");
             } else if (pubmed.startsWith("CPX-")) {
                 reference = COMPLEX_PORTAL + ":" + pubmed;
                 if (!ecoForCPX.contains(evidence)) {
-                    System.err.println("Found a go term with CPX evidence " + pubmed + " with wrong ECO code: " + goTerm.getId() + " (" + evidence + ")");
+                    System.err.println("ERROR: Found a go term with CPX evidence " + pubmed + " with wrong ECO code: " + goTerm.getId() + " (" + evidence + ")");
                 }
             } else {
                 reference = PMID + ":" + pubmed;
                 if (!ecoForPubMed.contains(evidence)) {
-                    System.err.println("Found a go term with PubMed evidence " + pubmed + " with wrong ECO code: " + goTerm.getId() + " (" + evidence + ")");
+                    System.err.println("ERROR: Found a go term with PubMed evidence " + pubmed + " with wrong ECO code: " + goTerm.getId() + " (" + evidence + ")");
                 }
             }
         } else {
-            System.err.println("Found a go term that doesn't have a proper pubmed id (i.e. " + goTerm.getId() + ")");
+            System.err.println("ERROR: Found a go term that doesn't have a proper pubmed id (i.e. " + goTerm.getId() + ")");
         }
 
         return reference;
