@@ -46,7 +46,7 @@
                                 <classpath/>
                                 <argument>uk.ac.ebi.intact.export.complex.go.ComplexExport2GPA</argument>
                                 <!-- The name of the folder-->
-                                <argument>${folder}</argument>
+                                <argument>${outputFile}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -79,7 +79,7 @@
                                      also adding the project build directory -->
                                 <classpath/>
                                 <argument>uk.ac.ebi.intact.export.complex.go.ComplexExport2GPI</argument>
-                                <argument>${folder}</argument>
+                                <argument>${outputFile}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
