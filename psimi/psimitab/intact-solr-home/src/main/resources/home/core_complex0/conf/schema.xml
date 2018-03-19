@@ -127,7 +127,7 @@
     </fields>
 
     <!-- field for the QueryParser to use when an explicit fieldname is absent -->
-    <defaultSearchField>default_search</defaultSearchField>
+    <defaultSearchField>text</defaultSearchField>
 
     <copyField source="id"                      dest="identifier"/>
     <copyField source="alias"                   dest="identifier"/>
