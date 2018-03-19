@@ -5,12 +5,12 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.20</version>
+        <version>3.0.21</version>
     </parent>
 
 
-    <artifactId>intact-complextab-export</artifactId>
-    <name>IntAct Data Exchange :: Complex :: ComplexTab</name>
+    <artifactId>complex-tab-export</artifactId>
+    <name>IntAct Data Exchange :: Complex :: Tab Export</name>
 
     <build>
         <plugins>
@@ -35,7 +35,7 @@
 
     <profiles>
         <profile>
-            <id>complextab-export</id>
+            <id>complex-tab-export</id>
             <build>
                 <plugins>
                     <plugin>
