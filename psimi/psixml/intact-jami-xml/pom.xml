@@ -4,11 +4,11 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>intact-psixml</artifactId>
-        <version>3.0.21-SNAPSHOT</version>
+        <version>3.0.22</version>
     </parent>
 
     <artifactId>intact-jami-xml</artifactId>
-    <name>PSI :: Intact JAMI - XML</name>
+    <name>IntAct Data Exchange :: PSI MI :: Intact JAMI - XML</name>
     <description>Intact extensions of XML writers/parsers</description>
 
     <properties>

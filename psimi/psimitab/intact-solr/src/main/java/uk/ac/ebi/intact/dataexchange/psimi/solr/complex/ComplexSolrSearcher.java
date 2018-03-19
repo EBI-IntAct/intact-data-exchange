@@ -59,7 +59,7 @@ public class ComplexSolrSearcher {
         // initialize default fields to search
         this.defaultFields = new String [ ] {
                 ComplexFieldNames.COMPLEX_XREF,     ComplexFieldNames.COMPLEX_ID,
-                ComplexFieldNames.COMPLEX_ALIAS,    ComplexFieldNames.INTERACTOR_ID,
+                ComplexFieldNames.TEXT,             ComplexFieldNames.INTERACTOR_ID,
                 ComplexFieldNames.INTERACTOR_ALIAS, ComplexFieldNames.COMPLEX_ORGANISM
         } ;
         // Initialize the logger

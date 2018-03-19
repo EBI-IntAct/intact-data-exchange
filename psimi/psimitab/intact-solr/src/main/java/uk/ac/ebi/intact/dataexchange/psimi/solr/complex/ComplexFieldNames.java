@@ -53,5 +53,6 @@ public interface ComplexFieldNames {
     //final static String PATHWAY_XREF               = "pathway_xref";
     //final static String ECO_XREF                   = "eco_xref";
     final static String PUBLICATION_ID               = "pubid";
+    final static String TEXT                         = "text";
 
 }
