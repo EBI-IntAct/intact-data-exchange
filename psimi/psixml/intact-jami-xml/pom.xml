@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>intact-jami-xml</artifactId>
-    <name>PSI :: Intact JAMI - XML</name>
+    <name>IntAct Data Exchange :: PSI MI :: Intact JAMI - XML</name>
     <description>Intact extensions of XML writers/parsers</description>
 
     <properties>

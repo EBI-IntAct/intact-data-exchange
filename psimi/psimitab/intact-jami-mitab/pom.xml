@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>intact-jami-mitab</artifactId>
-    <name>PSI :: Intact JAMI - MITAB</name>
+    <name>IntAct Data Exchange :: PSI MI :: Intact JAMI - MITAB</name>
     <description>Intact extensions of MITAB writers/parsers</description>
 
     <properties>
