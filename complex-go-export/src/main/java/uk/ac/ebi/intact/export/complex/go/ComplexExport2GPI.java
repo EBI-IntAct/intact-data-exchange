@@ -29,7 +29,15 @@ public class ComplexExport2GPI {
     private static final String COMPLEX_PORTAL = "ComplexPortal";
     private static final String INTACT = "IntAct";
 
+    private static String folder;
+
     public static void main(String[] args) throws IOException {
+
+        if (args.length != 1) {
+            System.err.println("Usage: ComplexExport2GPI <folder>");
+            System.exit(1);
+        }
+        folder = args[0];
 
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext(new String[]{"/META-INF/complex-go-export-config.xml"});
         ComplexExport2GPI service = (ComplexExport2GPI) springContext.getBean("complexExport2GPI");
@@ -50,7 +58,7 @@ public class ComplexExport2GPI {
         BufferedWriter informationWriter = null;
 
         try {
-            informationWriter = new BufferedWriter(new FileWriter(new File("complex_portal.gpi")));
+            informationWriter = new BufferedWriter(new FileWriter(new File(folder + "complex_portal.gpi")));
             informationWriter.write("!gpi-version: 1.2");
             informationWriter.write(NEW_LINE);
 

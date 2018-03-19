@@ -37,6 +37,8 @@ public class ComplexExport2GPA {
     private static final String INTACT = "IntAct";
     private static final String PMID = "PMID";
 
+    private static String folder;
+
     private static List<String> ecoForPubMed = new ArrayList<>(
             Arrays.asList(
             "ECO:0000269",
@@ -57,11 +59,16 @@ public class ComplexExport2GPA {
 
     public static void main(String[] args) throws IOException {
 
+        if (args.length != 1) {
+            System.err.println("Usage: ComplexExport2GPA <folder>");
+            System.exit(1);
+        }
+        folder = args[0];
+
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext(new String[]{"/META-INF/complex-go-export-config.xml"});
         ComplexExport2GPA service = (ComplexExport2GPA) springContext.getBean("complexExport2GPA");
 
         service.exportToGPA();
-
     }
 
     @Transactional(value = "jamiTransactionManager", readOnly = true)
@@ -76,7 +83,7 @@ public class ComplexExport2GPA {
         BufferedWriter associationWriter = null;
 
         try {
-            associationWriter = new BufferedWriter(new FileWriter(new File("complex_portal.gpa")));
+            associationWriter = new BufferedWriter(new FileWriter(new File(folder + "complex_portal.gpa")));
             associationWriter.write("!gpa-version: 1.1");
             associationWriter.write(NEW_LINE);
 
