@@ -55,7 +55,8 @@
         <module>intact-db-importer</module>
         <module>cttv-exporter</module>
         <module>intact-mutation-export</module>
-        <module>intact-complextab-export</module>
+        <module>complex-go-export</module>
+        <module>complex-tab-export</module>
     </modules>
 
     <build>
