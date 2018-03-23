@@ -12,8 +12,7 @@
     <name>IntAct Data Exchange :: Complex :: GO Export</name>
 
     <properties>
-        <release.targetDir>target/go-export</release.targetDir>
-        <release.logDir>target/go-export</release.logDir>
+        <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
     </properties>
 
     <profiles>

@@ -12,6 +12,10 @@
     <artifactId>complex-tab-export</artifactId>
     <name>IntAct Data Exchange :: Complex :: Tab Export</name>
 
+    <properties>
+        <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
