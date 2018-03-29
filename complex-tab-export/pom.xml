@@ -5,12 +5,16 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.22</version>
+        <version>3.0.23</version>
     </parent>
 
 
     <artifactId>complex-tab-export</artifactId>
     <name>IntAct Data Exchange :: Complex :: Tab Export</name>
+
+    <properties>
+        <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
+    </properties>
 
     <build>
         <plugins>
