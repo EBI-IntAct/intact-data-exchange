@@ -158,7 +158,7 @@ public class ComplexExport2GPA {
                     if (reference.startsWith(COMPLEX_PORTAL)) {
                         //This should be fix in the editor in the future, for now we move the reference to the with/from column in the export
                         /*  5 DB:Reference(s) */
-                        associationSb.append("GO_REF:0000024").append(TAB);//TODO To review the GO_REF
+                        associationSb.append("GO_REF:0000114").append(TAB);
                         /*  6 Evidence code */
                         associationSb.append(eco).append(TAB);
                         /*  7 With (or) From */
