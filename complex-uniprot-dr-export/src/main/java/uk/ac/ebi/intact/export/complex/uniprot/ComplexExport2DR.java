@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -75,7 +76,7 @@ public class ComplexExport2DR {
                     informationSb.setLength(0);
 
                     //For now we don't need to write the components of the complex
-                    boolean writeLine = drLine(informationSb, intactComplex, false);
+                    boolean writeLine = drComplexLines(informationSb, intactComplex, false);
 
                     if (writeLine) {
                         drWriter.write(informationSb.toString());
@@ -90,9 +91,11 @@ public class ComplexExport2DR {
         }
     }
 
-    private static boolean drLine(StringBuilder informationSb, IntactComplex intactComplex, boolean writeParentComplex) {
+    private static boolean drComplexLines(StringBuilder informationSb, IntactComplex intactComplex, boolean writeParentComplex) {
 
         if (intactComplex.getParticipants() != null) {
+
+            Set<String> uniqueLines = new HashSet<>();
 
             Set<Protein> proteins = intactComplex.getParticipants().stream()
                 .filter(participant -> participant.getInteractor().getInteractorType().getMIIdentifier().equals("MI:0326")) //proteins
@@ -101,25 +104,35 @@ public class ComplexExport2DR {
                 .collect(Collectors.toSet());
 
             for (Protein protein : proteins) {
-                if (!componentLine(informationSb, protein, intactComplex)) {
+                String line = componentLine(protein, intactComplex);
+                if (line == null) {
                     return false;
+                }
+                else {
+                    //Removes duplicated lines due to PRO CHAINS
+                    uniqueLines.add(line);
                 }
             }
 
             if (writeParentComplex) {
                 //TODO. Implement in the future when the reference to parent complexes are in the data and website
             }
+
+            for (String uniqueLine : uniqueLines) {
+                informationSb.append(uniqueLine);
+            }
         }
         return true;
     }
 
-    private static boolean componentLine(StringBuilder componentSb, Protein interactor, Complex intactComplex) {
+    private static String componentLine(Protein interactor, Complex intactComplex) {
 
+        StringBuilder componentSb = new StringBuilder();
         Xref identifier = interactor.getPreferredIdentifier();
 
         if (identifier == null) {
             System.err.println("ERROR: Found an interactor that doesn't have any identity: " + interactor);
-            return false;
+            return null;
 
         } else {
 
@@ -148,12 +161,12 @@ public class ComplexExport2DR {
             }
             else {
                 System.err.println("ERROR: Found a protein that doesn't have any uniprot id: " + interactor);
-                return false;
+                return null;
             }
 
         }
 
-        return true;
+        return componentSb.toString();
     }
 
     private static String extractUniprotCanonicalId(Protein protein) {
