@@ -1,45 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
         <version>3.0.24</version>
     </parent>
 
-    <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>intact-mutation-export</artifactId>
-    <name>IntAct Data Exchange :: IntAct :: Mutation Export</name>
-
+    <artifactId>complex-uniprot-dr-export</artifactId>
+    <name>IntAct Data Exchange :: Complex :: Uniprot DR Export</name>
 
     <properties>
         <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>**/*Tests.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <profiles>
         <profile>
-            <id>mutation-export</id>
+            <id>dr-export</id>
             <build>
                 <plugins>
                     <plugin>
@@ -56,13 +34,16 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Xmx4048m</argument>
+                                <argument>-Xmx2024m</argument>
                                 <argument>-Xms256m</argument>
 
                                 <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
                                 <classpath />
-                                <argument>uk.ac.ebi.intact.export.mutation.MutationExport</argument>
-                                <argument>${folder}</argument>
+                                <argument>uk.ac.ebi.intact.export.complex.uniprot.ComplexExport2DR</argument>
+                                <!-- The name of the folder-->
+                                <argument>${outputFile}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -73,23 +54,13 @@
 
 
     <dependencies>
+        <!--intact jami-->
         <dependency>
-            <groupId>uk.ac.ebi.intact.tools</groupId>
-            <artifactId>feature-shortlabel-generator</artifactId>
-            <version>1.0.9</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-
-        <!-- Other third party dependencies -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
+            <groupId>uk.ac.ebi.intact.jami</groupId>
+            <artifactId>intact-jami</artifactId>
+            <version>${intact.jami.version}</version>
         </dependency>
     </dependencies>
+
+
 </project>
