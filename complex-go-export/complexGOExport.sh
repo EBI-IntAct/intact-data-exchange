@@ -22,5 +22,5 @@ FILE=$2
 rm -rf target
 mkdir target
 
-mvn clean install -Pgpa-export,${DATABASE} -DoutputFile=${FILE}.gpi -Ddb=oracle -Dmaven.test.skip
-mvn clean install -Pgpi-export,${DATABASE} -DoutputFile=${FILE}.gpa -Ddb=oracle -Dmaven.test.skip
+mvn clean install -Pgpa-export,${DATABASE} -DoutputFile=${FILE}.gpi -Ddb=oracle -Dmaven.test.skip=true
+mvn clean install -Pgpi-export,${DATABASE} -DoutputFile=${FILE}.gpa -Ddb=oracle -Dmaven.test.skip=true
