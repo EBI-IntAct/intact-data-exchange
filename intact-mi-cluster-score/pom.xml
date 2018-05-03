@@ -4,7 +4,7 @@
     <parent>
         <artifactId>intact-dataexchange-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-        <version>3.0.26-SNAPSHOT</version>
+        <version>3.0.25</version>
     </parent>
 
     <artifactId>intact-mi-cluster-score</artifactId>

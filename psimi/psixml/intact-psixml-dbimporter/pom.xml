@@ -6,7 +6,7 @@
     <parent>
         <artifactId>intact-psixml</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-        <version>3.0.26-SNAPSHOT</version>
+        <version>3.0.25</version>
     </parent>
 
     <artifactId>intact-psixml-dbimporter</artifactId>
