@@ -22,4 +22,4 @@ FOLDER=$2
 rm -rf target
 mkdir target
 
-mvn clean install -Pcomplex-tab-export,${DATABASE},oracle -Dfolder=${FOLDER} -Dmaven.test.skip
+mvn clean install -Pcomplex-tab-export,${DATABASE},oracle -Dfolder=${FOLDER} -Dmaven.test.skip=true
