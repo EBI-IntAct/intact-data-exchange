@@ -125,13 +125,13 @@ public class ComplexExport2DR {
         return true;
     }
 
-    private static String componentLine(Protein interactor, Complex intactComplex) {
+    private static String componentLine(Protein interactor, IntactComplex intactComplex) {
 
         StringBuilder componentSb = new StringBuilder();
         Xref identifier = interactor.getPreferredIdentifier();
 
         if (identifier == null) {
-            System.err.println("ERROR: Found an interactor that doesn't have any identity: " + interactor);
+            System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found an interactor that doesn't have any identity: " + interactor);
             return null;
 
         } else {
@@ -160,7 +160,7 @@ public class ComplexExport2DR {
                 componentSb.append(NEW_LINE);
             }
             else {
-                System.err.println("ERROR: Found a protein that doesn't have any uniprot id: " + interactor);
+                System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found a protein that doesn't have any uniprot id: " + interactor);
                 return null;
             }
 

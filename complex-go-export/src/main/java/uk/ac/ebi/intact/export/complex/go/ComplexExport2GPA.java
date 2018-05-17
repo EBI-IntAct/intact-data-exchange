@@ -44,12 +44,9 @@ public class ComplexExport2GPA {
             "ECO:0000269",
             "ECO:0000314",
             "ECO:0000315",
-            "ECO:0000316",
             "ECO:0000353",
             "ECO:0005543",
-            "ECO:0005547",
-            "ECO:0000315",
-            "ECO:0000316"));
+            "ECO:0005547"));
 
     private static List<String> ecoForCPX = new ArrayList<>(
             Arrays.asList(
@@ -141,10 +138,10 @@ public class ComplexExport2GPA {
                     }
                 }
                 if (goTerm.getEvidenceType() != null) {
-                    eco = collectEco(goTerm);
+                    eco = collectEco(goTerm, intactComplex);
                 }
                 if (goTerm.getPubmed() != null) {
-                    reference = collectReference(goTerm);
+                    reference = collectReference(goTerm, intactComplex);
                 }
                 if (qualifier != null && eco != null && reference != null) {
                     /*  1 DB */
@@ -213,37 +210,37 @@ public class ComplexExport2GPA {
         return goTerms;
     }
 
-    private static String collectReference(ComplexGOXref goTerm) {
+    private static String collectReference(ComplexGOXref goTerm, IntactComplex intactComplex) {
 
         String reference = null;
         String pubmed = goTerm.getPubmed();
-        String evidence = collectEco(goTerm);
+        String evidence = collectEco(goTerm, intactComplex);
 
         if (pubmed != null) {
             if (pubmed.startsWith("EBI-")) {
                 //reference = "IntAct:" + pubmed;
                 // This case shouldn't happen wrong annotation in the complex portal - report to curators
                 reference = null;
-                System.err.println("ERROR: Found a go term with EBI evidence " + pubmed + " " + goTerm.getId() + " (" + evidence + ")");
+                System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found a go term with EBI evidence " + pubmed + " " + goTerm.getId() + " (" + evidence + ")");
             } else if (pubmed.startsWith("CPX-")) {
                 reference = COMPLEX_PORTAL + ":" + pubmed;
                 if (!ecoForCPX.contains(evidence)) {
-                    System.err.println("ERROR: Found a go term with CPX evidence " + pubmed + " with wrong ECO code: " + goTerm.getId() + " (" + evidence + ")");
+                    System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found a go term with CPX evidence " + pubmed + " with wrong ECO code: " + goTerm.getId() + " (" + evidence + ")");
                 }
             } else {
                 reference = PMID + ":" + pubmed;
                 if (!ecoForPubMed.contains(evidence)) {
-                    System.err.println("ERROR: Found a go term with PubMed evidence " + pubmed + " with wrong ECO code: " + goTerm.getId() + " (" + evidence + ")");
+                    System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found a go term with PubMed evidence " + pubmed + " with wrong ECO code: " + goTerm.getId() + " (" + evidence + ")");
                 }
             }
         } else {
-            System.err.println("ERROR: Found a go term that doesn't have a proper pubmed id (i.e. " + goTerm.getId() + ")");
+            System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found a go term that doesn't have a proper pubmed id (i.e. " + goTerm.getId() + ")");
         }
 
         return reference;
     }
 
-    private static String collectEco(ComplexGOXref goTerm) {
+    private static String collectEco(ComplexGOXref goTerm, IntactComplex intactComplex) {
 
         String eco = null;
 
@@ -252,10 +249,10 @@ public class ComplexExport2GPA {
             if (!ecoRefs.isEmpty() && ecoRefs.size() == 1) {
                 eco = ecoRefs.iterator().next().getId();
             } else {
-                System.err.println("ERROR: Found a go term that doesn't have a proper eco code ("+ goTerm.getAc() + " " + goTerm.getId() + ")");
+                System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found a go term that doesn't have a proper eco code ("+ goTerm.getAc() + " " + goTerm.getId() + ")");
             }
         } else {
-            System.err.println("ERROR: Found a go term that doesn't have a eco code ("+ goTerm.getAc() + " " + goTerm.getId() + ")");
+            System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found a go term that doesn't have an eco code ("+ goTerm.getAc() + " " + goTerm.getId() + ")");
         }
 
         return eco;
