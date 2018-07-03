@@ -6,8 +6,11 @@ import org.apache.commons.logging.LogFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
@@ -26,7 +29,9 @@ public class FileExportHandler {
         if (!dirFile.isDirectory()) {
             throw new IOException("The file passed to the constructor has to be a directory: " + dirFile);
         }
-        new FileWriter(new File(this.dirFile, this.getClass().getClassLoader().getResource("readme.htm").getFile()));
+
+        //Copy README to target directory
+        Files.copy(this.getClass().getClassLoader().getResourceAsStream("readme.htm"), new File(dirFile, "README.htm").toPath(), StandardCopyOption.REPLACE_EXISTING);
         this.dirFile = dirFile;
     }
 
