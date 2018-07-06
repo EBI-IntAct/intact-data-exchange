@@ -22,14 +22,14 @@
         <core.version>2.6.11</core.version>
         <bridges.version>2.1.23</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.jami.version>1.2.28</intact.jami.version>
+        <intact.jami.version>1.2.29</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
-        <psi.jami.version>3.0.16</psi.jami.version>
+        <psi.jami.version>3.0.17</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
 
         <!--Properties for psixml-exchange: keept them in sync with intact-jami until the module is updated-->
         <ols.client.version>2.11</ols.client.version>
-        <uniprot.japi.version>1.0.15</uniprot.japi.version>
+        <uniprot.japi.version>1.0.19</uniprot.japi.version>
         <chebiws.client.version>2.3.2</chebiws.client.version>
 
         <micluster.version>1.7.13</micluster.version>
@@ -56,6 +56,7 @@
         <module>cttv-exporter</module>
         <module>intact-mutation-export</module>
         <module>complex-go-export</module>
+        <module>complex-pdb-export</module>
         <module>complex-tab-export</module>
         <module>complex-uniprot-dr-export</module>
     </modules>
