@@ -20,11 +20,11 @@
 
     <properties>
         <core.version>2.6.11</core.version>
-        <bridges.version>2.1.23</bridges.version>
+        <bridges.version>2.1.24</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.jami.version>1.2.29</intact.jami.version>
+        <intact.jami.version>1.2.30</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
-        <psi.jami.version>3.0.17</psi.jami.version>
+        <psi.jami.version>3.0.18</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
 
         <!--Properties for psixml-exchange: keept them in sync with intact-jami until the module is updated-->
@@ -33,6 +33,7 @@
         <chebiws.client.version>2.3.2</chebiws.client.version>
 
         <micluster.version>1.7.13</micluster.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <scm>
@@ -72,6 +73,17 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.21.0</version>
+                <configuration>
+                    <!--<includes>-->
+                        <!--<include>**/*Tests.java</include>-->
+                    <!--</includes>-->
+                    <forkMode>always</forkMode>
+                </configuration>
+            </plugin>
+            <plugin>
                 <!--mvn jgitflow:release-start -Dgit.user=xxxx -Dgit.password=xxxx-->
                 <!--mvn jgitflow:release-finish -Dmaven.javadoc.skip=true -Dgit.user=xxxx -Dgit.password=xxxx-->
                 <groupId>external.atlassian.jgitflow</groupId>
@@ -88,6 +100,7 @@
                     </flowInitContext>
                     <!-- see goals wiki page for configuration options -->
                     <allowUntracked>true</allowUntracked>
+                    <noDeploy>true</noDeploy>
                     <username>${git.user}</username>
                     <password>${git.password}</password>
                     <pullMaster>true</pullMaster>
