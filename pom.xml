@@ -100,6 +100,7 @@
                     </flowInitContext>
                     <!-- see goals wiki page for configuration options -->
                     <allowUntracked>true</allowUntracked>
+                    <noDeploy>true</noDeploy>
                     <username>${git.user}</username>
                     <password>${git.password}</password>
                     <pullMaster>true</pullMaster>
