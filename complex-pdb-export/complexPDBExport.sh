@@ -10,17 +10,16 @@
 if [ $# -ne 2 ]; then
       echo ""
       echo "ERROR: wrong number of parameters ($#)."
-      echo "usage: $0 DATABASE FILE_NAME"
+      echo "usage: $0 DATABASE FOLDER"
       echo ""
       exit 1
 fi
 
 
 DATABASE=$1
-FILE=$2
+FOLDER=$2
 
 rm -rf target
 mkdir target
 
-mvn clean install -Pgpa-export,${DATABASE} -DoutputFile=${FILE}.gpa -Ddb=oracle -Dmaven.test.skip=true
-mvn clean install -Pgpi-export,${DATABASE} -DoutputFile=${FILE}.gpi -Ddb=oracle -Dmaven.test.skip=true
+mvn clean install -Pcomplex-pdb-export,${DATABASE},oracle -Dfolder=${FOLDER} -Dmaven.test.skip=true
