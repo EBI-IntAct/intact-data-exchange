@@ -27,6 +27,8 @@ import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.enricher.impl.CompositeInteractorEnricher;
 import psidev.psi.mi.jami.enricher.impl.full.FullParticipantEvidenceEnricher;
 import psidev.psi.mi.jami.enricher.listener.EntityEnricherListener;
+import psidev.psi.mi.jami.enricher.listener.impl.CvTermEnricherListenerManager;
+import psidev.psi.mi.jami.enricher.listener.impl.log.CvTermEnricherLogger;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
@@ -48,7 +50,7 @@ public class ComponentEnricher extends FullParticipantEvidenceEnricher<Participa
     private EnricherContext enricherContext;
 
     @Resource(name = "intactParticipantEnricher")
-    private psidev.psi.mi.jami.enricher.ParticipantEnricher intactParticipantEnricher;
+    private psidev.psi.mi.jami.enricher.ParticipantEnricher<ParticipantEvidence, FeatureEvidence> intactParticipantEnricher;
 
     public ComponentEnricher() {
     }
@@ -197,6 +199,8 @@ public class ComponentEnricher extends FullParticipantEvidenceEnricher<Participa
         if (super.getCvTermEnricher() == null){
             super.setCvTermEnricher((CvTermEnricher<CvTerm>) ApplicationContextProvider.getBean("miCvObjectEnricher"));
             intactParticipantEnricher.setCvTermEnricher(super.getCvTermEnricher());
+            //TODO: Find a better place to initialise the listener
+            intactParticipantEnricher.getCvTermEnricher().setCvTermEnricherListener(new CvTermEnricherListenerManager<>(new CvTermEnricherLogger()));
         }
         return super.getCvTermEnricher();
     }
