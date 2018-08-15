@@ -12,7 +12,7 @@
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.26</version>
+    <version>3.0.27</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
@@ -22,9 +22,9 @@
         <core.version>2.6.11</core.version>
         <bridges.version>2.1.24</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.jami.version>1.2.30</intact.jami.version>
+        <intact.jami.version>1.2.31</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
-        <psi.jami.version>3.0.18</psi.jami.version>
+        <psi.jami.version>3.0.19</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
 
         <!--Properties for psixml-exchange: keept them in sync with intact-jami until the module is updated-->
@@ -100,7 +100,6 @@
                     </flowInitContext>
                     <!-- see goals wiki page for configuration options -->
                     <allowUntracked>true</allowUntracked>
-                    <noDeploy>true</noDeploy>
                     <username>${git.user}</username>
                     <password>${git.password}</password>
                     <pullMaster>true</pullMaster>

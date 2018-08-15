@@ -15,8 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.fetch;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -27,6 +25,7 @@ import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
 import uk.ac.ebi.intact.dataexchange.enricher.cache.EnricherCache;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 /**
  * Protein Fetcher.
@@ -37,7 +36,7 @@ import java.util.Collection;
 @Lazy
 public class ProteinFetcher extends UniprotProteinFetcher{
 
-    private static final Log log = LogFactory.getLog(ProteinFetcher.class);
+    private static final Logger log = Logger.getLogger(ProteinFetcher.class.getName());
 
     @Autowired
     private EnricherContext enricherContext;
