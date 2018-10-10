@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.26-SNAPSHOT</version>
+        <version>3.0.29-SNAPSHOT</version>
     </parent>
 
     <artifactId>intact-db-importer</artifactId>
@@ -22,7 +22,6 @@
     <profiles>
         <profile>
             <id>import</id>
-
             <build>
                 <plugins>
                     <plugin>
@@ -88,6 +87,39 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>import-h2</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-Xms256m</argument>
+
+                                <argument>-classpath</argument>
+                                <classpath />
+
+                                <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>
+                                <argument>classpath*:/META-INF/intact-importer-h2db-spring.xml</argument>
+                                <argument>${job.name}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -97,6 +129,12 @@
             <groupId>uk.ac.ebi.intact.jami</groupId>
             <artifactId>intact-jami</artifactId>
             <version>${intact.jami.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- JAMI enricher dependencies-->
@@ -106,21 +144,11 @@
             <version>${pom.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!--Add it back to avoid a dependency conflict inside of the uniprot-japi
-        related with the exclusion in jami-uniprot -->
-        <!--TODO check if it is solve in a future release of uniprot-japi-->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.7.5</version>
-        </dependency>
-
 
         <!-- JAMI file dependencies -->
         <dependency>
@@ -160,10 +188,18 @@
             <version>${spring.version}</version>
         </dependency>
 
+        <!-- For production -->
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>oracle-thin</artifactId>
             <version>10.2.0.4</version>
+        </dependency>
+
+        <!-- For H2 database local testing -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.192</version>
         </dependency>
 
         <dependency>

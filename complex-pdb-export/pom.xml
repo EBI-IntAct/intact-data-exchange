@@ -8,8 +8,8 @@
         <version>3.0.29-SNAPSHOT</version>
     </parent>
 
-    <artifactId>complex-uniprot-dr-export</artifactId>
-    <name>IntAct Data Exchange :: Complex :: Uniprot DR Export</name>
+    <artifactId>complex-pdb-export</artifactId>
+    <name>IntAct Data Exchange :: Complex :: PDB Export</name>
 
     <properties>
         <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
@@ -17,7 +17,7 @@
 
     <profiles>
         <profile>
-            <id>dr-export</id>
+            <id>pdb-export</id>
             <build>
                 <plugins>
                     <plugin>
@@ -41,9 +41,9 @@
                                 <!-- automatically creates the classpath using all project dependencies,
                                      also adding the project build directory -->
                                 <classpath />
-                                <argument>uk.ac.ebi.intact.export.complex.uniprot.ComplexExport2DR</argument>
+                                <argument>uk.ac.ebi.intact.export.complex.pdb.ComplexExport2PDB</argument>
                                 <!-- The name of the folder-->
-                                <argument>${outputFile}</argument>
+                                <argument>${folder}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
