@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.bridges.imex.Operation;
 import psidev.psi.mi.jami.bridges.imex.extension.ImexPublication;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
 import psidev.psi.mi.jami.imex.actions.ImexCentralPublicationRegister;
@@ -313,7 +314,7 @@ public class ImexCentralManager {
             ImexPublication imexPublication = (ImexPublication)getImexCentralRegister().getExistingPublicationInImexCentral(pubId, source);
 
             // the publication is already registered in IMEx central
-            if (imexPublication != null && imexPublication.getOwner() != null && imexPublication.getOwner().toLowerCase().equals(INTACT_CURATOR)){
+            if (imexPublication != null){
 
                 getImexStatusSynchronizer().discardPublicationInImexCentral(intactPublication, imexPublication);
             }

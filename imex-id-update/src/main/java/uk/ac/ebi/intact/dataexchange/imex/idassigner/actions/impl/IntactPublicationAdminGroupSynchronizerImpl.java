@@ -4,7 +4,9 @@ import edu.ucla.mbi.imex.central.ws.v20.IcentralFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.bridges.imex.Constants;
 import psidev.psi.mi.jami.bridges.imex.ImexCentralClient;
+import psidev.psi.mi.jami.bridges.imex.ImexCentralUtility;
 import psidev.psi.mi.jami.bridges.imex.Operation;
 import psidev.psi.mi.jami.bridges.imex.extension.ImexPublication;
 import psidev.psi.mi.jami.imex.actions.impl.PublicationAdminGroupSynchronizerImpl;
@@ -13,7 +15,9 @@ import psidev.psi.mi.jami.model.Source;
 import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.jami.model.impl.DefaultSource;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class is for synchronizing the admin group of a publication in imex central
@@ -44,6 +48,9 @@ public class IntactPublicationAdminGroupSynchronizerImpl extends PublicationAdmi
     public void synchronizePublicationAdminGroup(Publication publication, ImexPublication imexPublication) throws BridgeFailedException {
 
         List<Source> sources = imexPublication.getSources();
+        Set<String> imexPartners= Constants.IMEX_PARTNERS;
+        Source imexPubOwnerGroup=getImexPublicationOwnerGroup(sources,imexPartners);
+
         String pubId = publication.getPubmedId() != null ? publication.getPubmedId() : publication.getDoi();
         String source = publication.getPubmedId() != null ? Xref.PUBMED : Xref.DOI;
         if (pubId == null && !publication.getIdentifiers().isEmpty()){
@@ -54,89 +61,43 @@ public class IntactPublicationAdminGroupSynchronizerImpl extends PublicationAdmi
 
         // add other database admin group if it exists
         Source institution = publication.getSource();
+        String imexInstitutionName=institution.getShortName().toUpperCase();
         if (source == null){
             return;
         }
 
-        if (!containsAdminGroup(sources, institution)){
-            try {
-                imexPublication = (ImexPublication)getImexCentralClient().updatePublicationAdminGroup( pubId, source, Operation.ADD,
-                        institution.getShortName().toUpperCase() );
-                log.info("Added other publication admin group : " + institution);
+        Source imexCurators=new DefaultSource(Constants.IMEX_NAME+Constants.IMEX_DB_CURATORS_SUFFIX);
+        Source sourceDBCurators=new DefaultSource(imexInstitutionName+Constants.IMEX_DB_CURATORS_SUFFIX);
 
-                // now add intact admin group curators for publications maintained by intact but not owned by INTACT
-                if (!INTACT_ADMIN.equals(institution.getShortName().toUpperCase())
-                        && !containsAdminGroup(sources, new DefaultSource(INTACT_ADMIN_CURATOR))){
-                    // add first INTACT admin curators
-                    try {
-                        imexPublication = (ImexPublication)getImexCentralClient().updatePublicationAdminGroup(pubId, source,
-                                Operation.ADD, INTACT_ADMIN_CURATOR);
-                        log.info("Updated publication admin group to: " + INTACT_ADMIN_CURATOR);
-                    } catch ( BridgeFailedException e ) {
-                        IcentralFault f = (IcentralFault) e.getCause();
-                        if( f.getFaultInfo().getFaultCode() == ImexCentralClient.UNKNOWN_GROUP ) {
-                            // unknown intact admin group, we cannot add another admin group for this institution
-                            log.warn("The intact curator admin group is not recognized in IMEx central, we cannot tag the publication as maintained " +
-                                    "and review by INTACT.");
-                        }
-                        // operation invalid is fired if group already assigned
-                        else if (f.getFaultInfo().getFaultCode() != ImexCentralClient.OPERATION_NOT_VALID) {
-                            throw e;
-                        }
-                    }
-                }
-            } catch ( BridgeFailedException e ) {
-                IcentralFault f = (IcentralFault) e.getCause();
-                if( f.getFaultInfo().getFaultCode() == ImexCentralClient.UNKNOWN_GROUP
-                        || f.getFaultInfo().getFaultCode() == ImexCentralClient.OPERATION_NOT_VALID ) {
-                    // unknown admin group, we cannot add another admin group for this institution
-                    if (f.getFaultInfo().getFaultCode() == ImexCentralClient.UNKNOWN_GROUP){
-                        log.warn("The institution " + institution + " is not recognized in IMEx central so we will add INTACT admin group.");
-                    }
-
-                    if (!INTACT_ADMIN.equals(institution.getShortName().toUpperCase()) && !containsAdminGroup(sources, new DefaultSource(INTACT_ADMIN))){
-                        try {
-                            // add first INTACT admin
-                            imexPublication = (ImexPublication)getImexCentralClient().updatePublicationAdminGroup(pubId, source, Operation.ADD, INTACT_ADMIN);
-                            log.info("Updated publication admin group to: " + INTACT_ADMIN);
-                        } catch ( BridgeFailedException e2 ) {
-                            IcentralFault f2 = (IcentralFault) e2.getCause();
-                            if( f2.getFaultInfo().getFaultCode() == ImexCentralClient.UNKNOWN_GROUP) {
-                                // unknown intact admin group, we cannot add another admin group for this institution
-                                log.warn("The intact curator admin group is not recognized in IMEx central, we cannot tag the publication as maintained and review by INTACT.");
-                            }
-                            // operation invalid is fired if group already assigned
-                            else if (f2.getFaultInfo().getFaultCode() != ImexCentralClient.OPERATION_NOT_VALID){
-                                throw e;
-                            }
-                        }
-                    }
-                }
-                else {
-                    throw e;
-                }
-            }
+        if (!containsAdminGroup(sources, institution)&&imexPubOwnerGroup==null){
+            addGroupInImexCentralForPub(pubId,source,imexInstitutionName);
+        }
+        if (!containsAdminGroup(sources, imexCurators)){
+            addGroupInImexCentralForPub(pubId,source,imexCurators.getShortName());
         }
         // now add intact admin group curators for publications maintained by intact but not owned by INTACT
-        else if (!INTACT_ADMIN.equals(institution.getShortName().toUpperCase()) && !containsAdminGroup(sources, new DefaultSource(INTACT_ADMIN_CURATOR))){
-            // add first INTACT admin curators
-            try {
-                imexPublication = (ImexPublication)getImexCentralClient().updatePublicationAdminGroup(pubId, source, Operation.ADD, INTACT_ADMIN_CURATOR);
-                log.info("Updated publication admin group to: " + INTACT_ADMIN_CURATOR);
-            } catch ( BridgeFailedException e ) {
-                IcentralFault f = (IcentralFault) e.getCause();
-                if( f.getFaultInfo().getFaultCode() == ImexCentralClient.UNKNOWN_GROUP ) {
-                    // unknown intact admin group, we cannot add another admin group for this institution
-                    log.warn("The intact curator admin group is not recognized in IMEx central, we cannot tag the publication as maintained and review by INTACT.");
-                }
-                // operation invalid is fired if group already assigned
-                else if (f.getFaultInfo().getFaultCode() != ImexCentralClient.OPERATION_NOT_VALID) {
-                    throw e;
-                }
-                else {
-                    throw e;
-                }
+        if (imexPubOwnerGroup!=null&&!imexPubOwnerGroup.getShortName().toUpperCase().equals(imexInstitutionName)){
+            addGroupInImexCentralForPub(pubId,source,sourceDBCurators.getShortName());
+        }
+    }
+
+    private void addGroupInImexCentralForPub(String pubId,String source,String groupToAdd) throws BridgeFailedException{
+        try {
+            getImexCentralClient().updatePublicationAdminGroup( pubId, source, Operation.ADD,
+                    groupToAdd);
+            log.info("Added other publication admin group : " + groupToAdd);
+
+        } catch ( BridgeFailedException e1 ) {
+            IcentralFault f2 = (IcentralFault) e1.getCause();
+            if( f2.getFaultInfo().getFaultCode() == ImexCentralClient.UNKNOWN_GROUP) {
+                // unknown intact admin group, we cannot add another admin group for this institution
+                log.warn("The admin group "+groupToAdd+ "is not recognized in IMEx central");
             }
+            // operation invalid is fired if group already assigned
+            else if (f2.getFaultInfo().getFaultCode() != ImexCentralClient.OPERATION_NOT_VALID){
+                log.warn("Operation is not valid");
+            }
+            throw e1;
         }
     }
 }

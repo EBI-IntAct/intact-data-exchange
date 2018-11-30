@@ -464,13 +464,13 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         Collection<String> potentialPublicationsForImex = publicationsElligibleForImex;
 
         // filter publications having only non PPI interactions
-        Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
+        //Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
 
         // filter publications having uniprot-dr-export no
-        Collection<String> potentialPublicationsForImexUniprotDRNoFiltered = CollectionUtils.subtract(potentialPublicationsForImexFiltered, publicationsHavingUniprotDRExportNo);
+        //Collection<String> potentialPublicationsForImexUniprotDRNoFiltered = CollectionUtils.subtract(potentialPublicationsForImex, publicationsHavingUniprotDRExportNo);
 
         // filter publications not accepted
-        Collection<String> publicationsToBeAssignedFiltered = CollectionUtils.intersection(potentialPublicationsForImexUniprotDRNoFiltered, publicationsAcceptedForRelease);
+        Collection<String> publicationsToBeAssignedFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsAcceptedForRelease);
 
         return publicationsToBeAssignedFiltered;
     }
@@ -486,9 +486,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         Collection<String> publicationsWithIMExIdToUpdate = CollectionUtils.intersection(publicationsHavingImexId, publicationsHavingImexCurationLevel);
 
         // filters publications having imex id but no PPI
-        Collection<String> publicationsWithIMExIdToUpdateFiltered = CollectionUtils.intersection(publicationsWithIMExIdToUpdate, publicationsInvolvingPPI);
+        //Collection<String> publicationsWithIMExIdToUpdateFiltered = CollectionUtils.intersection(publicationsWithIMExIdToUpdate, publicationsInvolvingPPI);
 
-        return publicationsWithIMExIdToUpdateFiltered;
+        return publicationsWithIMExIdToUpdate;
     }
 
     @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
@@ -518,10 +518,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         Collection<String> potentialPublicationsForImex = publicationsElligibleForImex;
 
         // publications having only non PPI interactions should be excluded
-        Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
+        //Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
 
         // publications having imex curation level but are not eligible for automatic IMEx assignment
-        Collection<String> publicationsNotEligibleForImexWithImexCurationLevel = CollectionUtils.subtract(publicationsWithImexCurationLevelAndNotImexId, potentialPublicationsForImexFiltered);
+        Collection<String> publicationsNotEligibleForImexWithImexCurationLevel = CollectionUtils.subtract(publicationsWithImexCurationLevelAndNotImexId, potentialPublicationsForImex);
 
         return publicationsNotEligibleForImexWithImexCurationLevel;
     }

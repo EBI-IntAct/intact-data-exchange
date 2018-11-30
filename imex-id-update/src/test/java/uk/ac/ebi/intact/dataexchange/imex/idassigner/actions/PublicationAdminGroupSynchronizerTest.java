@@ -53,7 +53,6 @@ public class PublicationAdminGroupSynchronizerTest{
         pub.getIdentifier().add(pubmed);
         pub.setAdminGroupList(new Publication.AdminGroupList());
         pub.getAdminGroupList().getGroup().add("INTACT");
-        pub.getAdminGroupList().getGroup().add("INTACT Curators");
         intactPub = new ImexPublication(pub);
         imexAdminGroupSynchronizerTest.getImexCentralClient().createPublication(intactPub);
 
@@ -95,9 +94,11 @@ public class PublicationAdminGroupSynchronizerTest{
         pubService.saveOrUpdate(intactPublication);
         
         imexAdminGroupSynchronizerTest.synchronizePublicationAdminGroup(intactPublication, noIntactPub);
-        
-        Assert.assertEquals(1, noIntactPub.getSources().size());
-        Assert.assertEquals("INTACT", noIntactPub.getSources().iterator().next().getShortName().toUpperCase());
+        Iterator<Source> group = noIntactPub.getSources().iterator();
+
+        Assert.assertEquals(2, noIntactPub.getSources().size());
+        Assert.assertEquals("INTACT", group.next().getShortName().toUpperCase());
+        Assert.assertEquals("IMEX CURATORS", group.next().getShortName().toUpperCase());
         noIntactPub.getSources().clear();
     }
 
@@ -112,9 +113,11 @@ public class PublicationAdminGroupSynchronizerTest{
         pubService.saveOrUpdate(intactPublication);
 
         imexAdminGroupSynchronizerTest.synchronizePublicationAdminGroup(intactPublication, intactPub);
+        Iterator<Source> group = intactPub.getSources().iterator();
 
         Assert.assertEquals(2, intactPub.getSources().size());
-        Assert.assertEquals("INTACT", intactPub.getSources().iterator().next().getShortName().toUpperCase());
+        Assert.assertEquals("INTACT", group.next().getShortName().toUpperCase());
+        Assert.assertEquals("IMEX CURATORS", group.next().getShortName().toUpperCase());
     }
 
     @Test
@@ -129,11 +132,12 @@ public class PublicationAdminGroupSynchronizerTest{
 
         imexAdminGroupSynchronizerTest.synchronizePublicationAdminGroup(intactPublication, intactPub2);
 
-        Assert.assertEquals(2, intactPub2.getSources().size());
+        Assert.assertEquals(3, intactPub2.getSources().size());
         Iterator<Source> group = intactPub2.getSources().iterator();
         
         Assert.assertEquals("INTACT", group.next().getShortName().toUpperCase());
-        Assert.assertEquals("MATRIXDB", group.next().getShortName().toUpperCase());
+        Assert.assertEquals("IMEX CURATORS", group.next().getShortName().toUpperCase());
+        Assert.assertEquals("MATRIXDB CURATORS", group.next().getShortName().toUpperCase());
         group.remove();
     }
 

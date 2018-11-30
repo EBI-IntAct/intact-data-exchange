@@ -76,11 +76,11 @@ public class GlobalImexPublicationUpdater {
             }
 
         // fire error event for publications having IMEx curation level but dr-export = no
-        Collection<String> publicationsWithImexCurationLevelAndUniprotDrExportNo = intactPublicationCollector.getPublicationsHavingIMExCurationLevelAndUniprotDrExportNo();
+        /*Collection<String> publicationsWithImexCurationLevelAndUniprotDrExportNo = intactPublicationCollector.getPublicationsHavingIMExCurationLevelAndUniprotDrExportNo();
         for (String pubAc : publicationsWithImexCurationLevelAndUniprotDrExportNo){
             ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.imex_curation_uniprot_dr_export_no, pubAc, null, null, null, "Publication does contain experiments having uniprot-dr-export = no and has IMEx curation level.");
             imexCentralManager.fireOnImexError(errorEvt);
-        }
+        }*/
     }
 
     private void processEnricherException(ImexCentralManager imexCentralManager, String publication, EnricherException e) {
@@ -211,10 +211,10 @@ public class GlobalImexPublicationUpdater {
             }
 
             // fire error event for publications with imex id and no PPI
-            Collection<String> publicationsWithImexIdWithoutPPIInteractions = intactPublicationCollector.getPublicationsHavingIMExIdAndNoPPI();
+            /*Collection<String> publicationsWithImexIdWithoutPPIInteractions = intactPublicationCollector.getPublicationsHavingIMExIdAndNoPPI();
             for (String pubAc : publicationsWithImexIdWithoutPPIInteractions){
                 ImexErrorEvent errorEvt = new ImexErrorEvent(this, ImexErrorType.publication_imex_id_not_PPI, pubAc, null, null, null, "Publication does have a IMEx primary reference but does not have a single PPI.");
                 imexCentralManager.fireOnImexError(errorEvt);
-            }
+            }*/
     }
 }
