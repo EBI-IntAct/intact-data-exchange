@@ -69,14 +69,16 @@ public class IntactPublicationAdminGroupSynchronizerImpl extends PublicationAdmi
         Source imexCurators=new DefaultSource(Constants.IMEX_NAME+Constants.IMEX_DB_CURATORS_SUFFIX);
         Source sourceDBCurators=new DefaultSource(imexInstitutionName+Constants.IMEX_DB_CURATORS_SUFFIX);
 
+        //add DB group
         if (!containsAdminGroup(sources, institution)&&imexPubOwnerGroup==null){
             addGroupInImexCentralForPub(pubId,source,imexInstitutionName);
         }
+        //add Imex Curators group
         if (!containsAdminGroup(sources, imexCurators)){
             addGroupInImexCentralForPub(pubId,source,imexCurators.getShortName());
         }
-        // now add intact admin group curators for publications maintained by intact but not owned by INTACT
-        if (imexPubOwnerGroup!=null&&!imexPubOwnerGroup.getShortName().toUpperCase().equals(imexInstitutionName)){
+        // add DB Curators group if a imex partner is already assigned to imex publication which is different than owner of intact publication
+        if (!containsAdminGroup(sources, sourceDBCurators)&&imexPubOwnerGroup!=null&&!imexPubOwnerGroup.getShortName().toUpperCase().equals(imexInstitutionName)){
             addGroupInImexCentralForPub(pubId,source,sourceDBCurators.getShortName());
         }
     }
