@@ -48,6 +48,8 @@ public class IntactPublicationStatusSynchronizerImpl extends PublicationStatusSy
                     return PublicationStatus.PROCESSED;
                 case RELEASED:
                     return PublicationStatus.RELEASED;
+                case READY_FOR_CHECKING:
+                    return PublicationStatus.REVIEW;
                 default:
                     return PublicationStatus.INPROGRESS;
             }
