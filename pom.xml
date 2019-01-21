@@ -77,9 +77,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.21.0</version>
                 <configuration>
-                    <!--<includes>-->
-                        <!--<include>**/*Tests.java</include>-->
-                    <!--</includes>-->
                     <forkMode>always</forkMode>
                 </configuration>
             </plugin>
