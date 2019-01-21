@@ -43,7 +43,8 @@
                                 <classpath />
                                 <argument>uk.ac.ebi.intact.export.complex.pdb.ComplexExport2PDB</argument>
                                 <!-- The name of the folder-->
-                                <argument>${folder}</argument>
+                                <argument>${prefix}</argument>
+                                <argument>${released}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
