@@ -2,7 +2,7 @@
 
 # Runs the complex export
 #
-# Usage $0 folder
+# Usage $0 database file_name_prefix released
 #
 #
 ##################################################################
@@ -10,16 +10,17 @@
 if [ $# -ne 2 ]; then
       echo ""
       echo "ERROR: wrong number of parameters ($#)."
-      echo "usage: $0 DATABASE FOLDER"
+      echo "usage: $0 DATABASE FILE_NAME_PREFIX RELEASED"
       echo ""
       exit 1
 fi
 
 
 DATABASE=$1
-FOLDER=$2
+FILE_NAME_PREFIX=$2
+RELEASED=$3
 
 rm -rf target
 mkdir target
 
-mvn clean install -Pcomplex-pdb-export,${DATABASE},oracle -Dfolder=${FOLDER} -Dmaven.test.skip=true
+mvn clean install -Pcomplex-pdb-export,${DATABASE},oracle -Dprefix=${FILE_NAME_PREFIX} -Dreleased=${RELEASED} -Dmaven.test.skip=true

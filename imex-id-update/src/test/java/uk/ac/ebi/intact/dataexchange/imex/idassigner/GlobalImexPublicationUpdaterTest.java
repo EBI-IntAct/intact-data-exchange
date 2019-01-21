@@ -109,7 +109,7 @@ public class GlobalImexPublicationUpdaterTest{
         pubService.saveOrUpdate(pubWithoutCurationDepth);
 
         // publication with imex id and no PPI -> not updated but reported
-        IntactPublication pubWithoutPPI = new IntactPublication("12347");
+        /*IntactPublication pubWithoutPPI = new IntactPublication("12347");
         Experiment exp3 = new IntactExperiment(pubWithoutPPI);
         pubWithoutPPI.addExperiment(exp3);
         pubWithoutPPI.setSource(new IntactSource("intact"));
@@ -118,7 +118,7 @@ public class GlobalImexPublicationUpdaterTest{
         exp3.addInteractionEvidence(ev5);
         pubWithoutPPI.assignImexId("IM-5");
         pubWithoutPPI.setCurationDepth(CurationDepth.IMEx);
-        pubService.saveOrUpdate(pubWithoutPPI);
+        pubService.saveOrUpdate(pubWithoutPPI);*/
 
         // update existing publications
         globalImexUpdaterTest.updateExistingImexPublications();
@@ -182,7 +182,7 @@ public class GlobalImexPublicationUpdaterTest{
         }
 
         // pub 3 is not updated because error
-        IntactPublication intactPubReloaded3 = dao.getPublicationDao().getByAc(pubWithoutPPI.getAc());
+        /*IntactPublication intactPubReloaded3 = dao.getPublicationDao().getByAc(pubWithoutPPI.getAc());
 
         Assert.assertEquals(0, intactPubReloaded3.getAnnotations().size());
         for (Experiment exp : intactPubReloaded3.getExperiments()){
@@ -192,7 +192,7 @@ public class GlobalImexPublicationUpdaterTest{
             for (Interaction inter : exp.getInteractionEvidences()){
                 Assert.assertEquals(0, inter.getXrefs().size());
             }
-        }
+        }*/
     }
 
     @Test

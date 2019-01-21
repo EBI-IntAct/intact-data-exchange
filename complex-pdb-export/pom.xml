@@ -5,7 +5,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.32</version>
+        <version>3.0.33</version>
     </parent>
 
     <artifactId>complex-pdb-export</artifactId>
@@ -43,7 +43,8 @@
                                 <classpath />
                                 <argument>uk.ac.ebi.intact.export.complex.pdb.ComplexExport2PDB</argument>
                                 <!-- The name of the folder-->
-                                <argument>${folder}</argument>
+                                <argument>${prefix}</argument>
+                                <argument>${released}</argument>
                             </arguments>
                         </configuration>
                     </plugin>

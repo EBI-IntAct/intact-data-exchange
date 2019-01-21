@@ -1,10 +1,11 @@
 package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.log4j.Logger;
+import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
+import psidev.psi.mi.jami.bridges.fetcher.OrganismFetcher;
+import psidev.psi.mi.jami.bridges.uniprot.taxonomy.CachedUniprotTaxonomyFetcher;
+import psidev.psi.mi.jami.model.Organism;
 import psidev.psi.mi.tab.model.CrossReference;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyTerm;
-import uk.ac.ebi.intact.bridges.taxonomy.UniprotTaxonomyService;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
 import java.util.Collection;
@@ -32,10 +33,10 @@ public abstract class AbstractCCLineConverter implements CCLineConverter {
     /**
      * The uniprot taxonomy service to retrieve scientific names using taxIds
      */
-    private UniprotTaxonomyService taxonomyService;
+    private OrganismFetcher taxonomyService;
 
     public AbstractCCLineConverter(){
-        taxonomyService = new UniprotTaxonomyService();
+        taxonomyService = new CachedUniprotTaxonomyFetcher();
         taxIdToScientificName = new HashMap<String, String>();
     }
 
@@ -71,14 +72,14 @@ public abstract class AbstractCCLineConverter implements CCLineConverter {
      * This method will retrieve a scientific name given the taxId using the uniprot taxonomy service
      * @param taxId
      * @return The scientific organism name associated with this taxId, null if no scientific name is associated with this taxId
-     * @throws uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException
+     * @throws BridgeFailedException if the organims can be retrieved
      */
-    protected String retrieveOrganismScientificName(String taxId) throws TaxonomyServiceException {
+    protected String retrieveOrganismScientificName(String taxId) throws BridgeFailedException {
         if (this.taxIdToScientificName.containsKey(taxId)){
             return this.taxIdToScientificName.get(taxId);
         }
 
-        TaxonomyTerm term = this.taxonomyService.getTaxonomyTerm(Integer.parseInt(taxId));
+        Organism term = this.taxonomyService.fetchByTaxID(Integer.parseInt(taxId));
 
         if (term == null){
             this.taxIdToScientificName.put(taxId, null);

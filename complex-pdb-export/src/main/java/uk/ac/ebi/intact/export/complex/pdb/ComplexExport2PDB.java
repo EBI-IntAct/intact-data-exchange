@@ -10,6 +10,7 @@ import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.dao.ComplexDao;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 import uk.ac.ebi.intact.jami.model.extension.InteractorXref;
+import uk.ac.ebi.intact.jami.model.lifecycle.LifeCycleStatus;
 import uk.ac.ebi.intact.jami.service.ComplexService;
 import uk.ac.ebi.intact.jami.utils.comparator.IntactInteractorComparator;
 
@@ -30,18 +31,17 @@ public class ComplexExport2PDB {
 
     private static final String NEW_LINE = System.getProperty("line.separator");
 
-    private static final String COMPLEX_PORTAL = "ComplexPortal";
-    private static final String INTACT = "IntAct";
-
-    private static String fileName;
+    private static String fileNamePrefix;
+    private static boolean released;
 
     public static void main(String[] args) throws IOException {
 
-        if (args.length != 1) {
-            System.err.println("Usage: ComplexExport2PDB <folder_name>");
+        if (args.length != 2) {
+            System.err.println("Usage: ComplexExport2PDB <file_name_prefix> <released data [true|false]>");
             System.exit(1);
         }
-        fileName = args[0];
+        fileNamePrefix = args[0];
+        released = Boolean.parseBoolean(args[1]);
 
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext(new String[]{"/META-INF/complex-pdb-export-config.xml"});
         ComplexExport2PDB service = (ComplexExport2PDB) springContext.getBean("complexExport2PDB");
@@ -56,42 +56,42 @@ public class ComplexExport2PDB {
         ComplexService complexService = ApplicationContextProvider.getBean("complexService");
         ComplexDao complexDao = complexService.getIntactDao().getComplexDao();
 
-        //Complex with wwpdb xrefs
-        String query = "select distinct f from IntactComplex f "  +
-                "join f.dbXrefs as x " +
-                "join x.database as dat " +
-                "join dat.dbXrefs as xref " +
-                "join xref.database as d " +
-                "join xref.qualifier as q " +
-                "where (q.shortName = :identity or q.shortName = :secondaryAc) " +
-                "and d.shortName = :psimi " +
-                "and xref.id = :mi ";
+        List<IntactComplex> complexes;
 
-        Map< String,Object> queryParameters = new HashMap<>();
-        queryParameters.put("identity", Xref.IDENTITY);
-        queryParameters.put("secondaryAc", Xref.SECONDARY);
-        queryParameters.put("psimi", CvTerm.PSI_MI);
-        queryParameters.put("mi", "MI:0805"); //wwPDB
+        int totalComplexes = (int) complexService.countAll();
 
-        long totalComplexes = complexService.countAll();
+        if(!released) {
+            String query = "select distinct f from IntactComplex f "  +
+                    "join f.cvStatus as lcStatus " +
+                    "where (lcStatus.shortName = :readyForChecking " +
+                    "or lcStatus.shortName = :curationInProgress " +
+                    "or lcStatus.shortName = :readyForRelease " +
+                    "or lcStatus.shortName = :acceptedOnHold)";
 
-        List<IntactComplex> complexes = complexDao.getByQuery(query, queryParameters, 0, (int) totalComplexes);
+            Map< String,Object> queryParameters = new HashMap<>();
+            queryParameters.put("readyForChecking", LifeCycleStatus.READY_FOR_CHECKING.shortLabel());
+            queryParameters.put("curationInProgress", LifeCycleStatus.CURATION_IN_PROGRESS.shortLabel());
+            queryParameters.put("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.shortLabel());
+            queryParameters.put("acceptedOnHold", LifeCycleStatus.ACCEPTED_ON_HOLD.shortLabel());
+
+            complexes = complexDao.getByQuery(query, queryParameters, 0, totalComplexes);
+        }
+        else {
+            complexes = (List<IntactComplex>) complexDao.getByStatus(LifeCycleStatus.RELEASED.shortLabel(), 0 , totalComplexes);
+        }
 
         // Format documentation: https://intact.atlassian.net/browse/GENISSUES-76
+        try (BufferedWriter complexWriter = new BufferedWriter(new FileWriter(new File(fileNamePrefix + "_complexes.tsv")));
+             BufferedWriter componentsWriter = new BufferedWriter(new FileWriter(new File(fileNamePrefix + "_components.tsv")));
+             BufferedWriter pdbWriter = new BufferedWriter(new FileWriter(new File(fileNamePrefix + "_xrefs.tsv")))) {
 
-
-
-        try (BufferedWriter complexWriter = new BufferedWriter(new FileWriter(new File(fileName + "_table1.tsv")));
-             BufferedWriter componentsWriter = new BufferedWriter(new FileWriter(new File(fileName + "_table2.tsv")));
-             BufferedWriter pdbWriter = new BufferedWriter(new FileWriter(new File(fileName + "_table3.tsv")))) {
-
-            complexWriter.write("complex_id, version, recommended_name, systematic_name, complex_assembly");
+            complexWriter.write("complex_id" + SEPARATOR + "version" + SEPARATOR + "recommended_name" + SEPARATOR + "systematic_name" + SEPARATOR + "complex_assembly");
             complexWriter.write(NEW_LINE);
 
-            componentsWriter.write("complex_id, version, database_name, database_ac, stoichiometry");
+            componentsWriter.write("complex_id" + SEPARATOR + "version" + SEPARATOR + "database_name" + SEPARATOR + "database_ac" + SEPARATOR + "stoichiometry");
             componentsWriter.write(NEW_LINE);
 
-            pdbWriter.write("complex_id, version, pdb_ids");
+            pdbWriter.write("complex_id" + SEPARATOR + "version" + SEPARATOR + "pdb_ids");
             pdbWriter.write(NEW_LINE);
 
             StringBuilder componentsSb = new StringBuilder(2048);
@@ -117,14 +117,11 @@ public class ComplexExport2PDB {
                         }
                     }
                 }
-
             }
         }
     }
 
     private static boolean complexLine(StringBuilder informationSb, IntactComplex intactComplex) {
-
-        // Prepare the gp_information file (complex participant) http://wiki.geneontology.org/index.php/Proposed_GPI1.2_format
 
         /*  1 complex_id */
         informationSb.append(intactComplex.getComplexAc()).append(SEPARATOR);
@@ -159,24 +156,25 @@ public class ComplexExport2PDB {
 
     private static boolean pdbLine(StringBuilder informationSb, IntactComplex intactComplex) {
 
-        /*  1 complex_id */
-        informationSb.append(intactComplex.getComplexAc()).append(SEPARATOR);
-
-        /*  2 complex_version */
-        informationSb.append(intactComplex.getComplexVersion()).append(SEPARATOR);
-
-        /*  3 pdb_ids */
         //wwpdb qualifier should be identity or subset, so it can an identifier or a xref
         Collection<Xref> pdbXrefs = XrefUtils.collectAllXrefsHavingDatabase(intactComplex.getIdentifiers(), "MI:0805", "wwpdb");
         pdbXrefs.addAll(XrefUtils.collectAllXrefsHavingDatabase(intactComplex.getXrefs(), "MI:0805", "wwpdb"));
 
-        String pdbIds = pdbXrefs.stream()
-                .map(Xref::getId)
-                .collect(Collectors.joining(","));
+        if(!pdbXrefs.isEmpty()) {
+            //We append the line only if there are pdbXrefs
 
-        informationSb.append(pdbIds).append(SEPARATOR);
+            /*  1 complex_id */
+            informationSb.append(intactComplex.getComplexAc()).append(SEPARATOR);
 
-        informationSb.append(NEW_LINE);
+            /*  2 complex_version */
+            informationSb.append(intactComplex.getComplexVersion()).append(SEPARATOR);
+
+            /*  3 pdb_ids */
+            String pdbIds = pdbXrefs.stream().map(Xref::getId).collect(Collectors.joining(","));
+            informationSb.append(pdbIds).append(SEPARATOR);
+
+            informationSb.append(NEW_LINE);
+        }
 
         return true;
     }
@@ -214,7 +212,7 @@ public class ComplexExport2PDB {
     private static boolean componentLine(StringBuilder componentSb, Interactor interactor, Integer stoichiometry, IntactComplex intactComplex) {
 
         if (interactor instanceof IntactComplex) {
-            System.err.println("\nPending interactor " + interactor.getPreferredIdentifier() + " that is a complex with stoi: " + stoichiometry);
+            System.err.println("\nComplex as interactor " + interactor.getPreferredIdentifier().getId() + " with stoi: " + stoichiometry);
             expandComponents(componentSb, (IntactComplex) interactor, stoichiometry, intactComplex);
 
         } else if (interactor instanceof Protein) { //Proteins
@@ -241,8 +239,8 @@ public class ComplexExport2PDB {
                     /*  4 database_accession */
                     componentSb.append(extractUniprotCanonicalId(protein)).append(SEPARATOR);
 
-                    /*  5 stoichiometry */ //TODO multiply the stoichiometry?
-                    componentSb.append(stoichiometry).append(SEPARATOR);
+                    /*  5 stoichiometry */
+                    componentSb.append(stoichiometry);
 
                     componentSb.append(NEW_LINE);
 

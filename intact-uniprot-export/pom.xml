@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.32</version>
+        <version>3.0.33</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -28,12 +28,20 @@
             <groupId>uk.ac.ebi.intact.bridges</groupId>
             <artifactId>intact-uniprot</artifactId>
             <version>${bridges.version}</version>
+            <exclusions>
+                <!-- Version incompatible with 2.7.2 pull by
+                    jami-uniport-taxonomy-->
+                <exclusion>
+                    <groupId>net.sf.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.intact.bridges</groupId>
-            <artifactId>intact-taxonomy</artifactId>
-            <version>${bridges.version}</version>
+            <groupId>psidev.psi.mi.jami.bridges</groupId>
+            <artifactId>jami-uniprot-taxonomy</artifactId>
+            <version>${psi.jami.version}</version>
         </dependency>
 
         <dependency>
@@ -62,6 +70,12 @@
                     <groupId>uk.ac.ebi.enfin.mi.score</groupId>
                     <artifactId>miscore</artifactId>
                 </exclusion>
+                <!-- Version incompatible with 2.7.2 pull by
+                    jami-uniprot-taxonomy-->
+                <exclusion>
+                    <groupId>net.sf.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -69,6 +83,14 @@
             <groupId>uk.ac.ebi.enfin.mi.cluster</groupId>
             <artifactId>micluster</artifactId>
             <version>${micluster.version}</version>
+            <exclusions>
+                <!-- Version incompatible with 2.7.2 pull by
+                    jami-uniprot-taxonomy-->
+                <exclusion>
+                    <groupId>net.sf.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -81,6 +103,14 @@
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psimitab-converters</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <!-- Version incompatible with 2.7.2 pull by
+                    jami-uniprot-taxonomy-->
+                <exclusion>
+                    <groupId>net.sf.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

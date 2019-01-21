@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.32</version>
+        <version>3.0.33</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.tools</groupId>
             <artifactId>feature-shortlabel-generator</artifactId>
-            <version>1.0.12</version>
+            <version>${intact.tools.version}</version>
         </dependency>
 
         <dependency>
