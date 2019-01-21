@@ -58,11 +58,6 @@
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
-            <artifactId>jami-picr</artifactId>
-            <version>${psi.jami.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-europubmedcentral</artifactId>
             <version>${psi.jami.version}</version>
         </dependency>
