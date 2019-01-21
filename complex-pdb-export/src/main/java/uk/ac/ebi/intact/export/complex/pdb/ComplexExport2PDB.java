@@ -63,9 +63,10 @@ public class ComplexExport2PDB {
         if(!released) {
             String query = "select distinct f from IntactComplex f "  +
                     "join f.cvStatus as lcStatus " +
-                    "where (lcStatus.shortName = :readyForChecking or lcStatus.shortName = :curationInProgress or lcStatus.shortName = :readyForRelease or lcStatus.shortName = :acceptedOnHold)" +
-                    "and d.shortName = :psimi " +
-                    "and xref.id = :mi ";
+                    "where (lcStatus.shortName = :readyForChecking " +
+                    "or lcStatus.shortName = :curationInProgress " +
+                    "or lcStatus.shortName = :readyForRelease " +
+                    "or lcStatus.shortName = :acceptedOnHold)";
 
             Map< String,Object> queryParameters = new HashMap<>();
             queryParameters.put("readyForChecking", LifeCycleStatus.READY_FOR_CHECKING.shortLabel());
@@ -80,9 +81,9 @@ public class ComplexExport2PDB {
         }
 
         // Format documentation: https://intact.atlassian.net/browse/GENISSUES-76
-        try (BufferedWriter complexWriter = new BufferedWriter(new FileWriter(new File(fileNamePrefix + "_complex.tsv")));
+        try (BufferedWriter complexWriter = new BufferedWriter(new FileWriter(new File(fileNamePrefix + "_complexes.tsv")));
              BufferedWriter componentsWriter = new BufferedWriter(new FileWriter(new File(fileNamePrefix + "_components.tsv")));
-             BufferedWriter pdbWriter = new BufferedWriter(new FileWriter(new File(fileNamePrefix + "_pdb_xrefs.tsv")))) {
+             BufferedWriter pdbWriter = new BufferedWriter(new FileWriter(new File(fileNamePrefix + "_xrefs.tsv")))) {
 
             complexWriter.write("complex_id" + SEPARATOR + "version" + SEPARATOR + "recommended_name" + SEPARATOR + "systematic_name" + SEPARATOR + "complex_assembly");
             complexWriter.write(NEW_LINE);
