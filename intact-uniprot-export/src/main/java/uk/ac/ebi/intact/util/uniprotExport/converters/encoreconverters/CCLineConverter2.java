@@ -2,9 +2,9 @@ package uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
+import psidev.psi.mi.jami.bridges.exception.BridgeFailedException;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
-import uk.ac.ebi.intact.bridges.taxonomy.TaxonomyServiceException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
@@ -209,7 +209,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
                         taxId2 = organismsB[0];
                         try {
                             organism2 = retrieveOrganismScientificName(taxId2);
-                        } catch (TaxonomyServiceException e) {
+                        } catch (BridgeFailedException e) {
                             logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
                             organism2 = organismsB[1];
                         }
@@ -225,7 +225,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
                         taxId2 = organismsA[0];
                         try {
                             organism2 = retrieveOrganismScientificName(taxId2);
-                        } catch (TaxonomyServiceException e) {
+                        } catch (BridgeFailedException e) {
                             logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
                             organism2 = organismsA[1];
                         }
@@ -329,7 +329,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
                         taxId2 = organismsB[0];
                         try {
                             organism2 = retrieveOrganismScientificName(taxId2);
-                        } catch (TaxonomyServiceException e) {
+                        } catch (BridgeFailedException e) {
                             logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
                             organism2 = organismsB[1];
                         }
@@ -346,7 +346,7 @@ public class CCLineConverter2 extends AbstractCCLineConverter {
                         taxId2 = organismsA[0];
                         try {
                             organism2 = retrieveOrganismScientificName(taxId2);
-                        } catch (TaxonomyServiceException e) {
+                        } catch (BridgeFailedException e) {
                             logger.fatal("Impossible to retrieve scientific name of " + taxId2 + ", we will take the common name instead.");
                             organism2 = organismsA[1];
                         }
