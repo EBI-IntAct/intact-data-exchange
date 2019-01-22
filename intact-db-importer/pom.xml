@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.33</version>
+        <version>3.0.34</version>
     </parent>
 
     <artifactId>intact-db-importer</artifactId>
@@ -124,6 +124,20 @@
 
     <dependencies>
 
+        <!-- JAMI file dependencies -->
+        <dependency>
+            <groupId>psidev.psi.mi.jami</groupId>
+            <artifactId>jami-commons</artifactId>
+            <version>${psi.jami.version}</version>
+        </dependency>
+
+        <!-- JAMI batch dependencies -->
+        <dependency>
+            <groupId>psidev.psi.mi.jami</groupId>
+            <artifactId>jami-batch</artifactId>
+            <version>${psi.jami.version}</version>
+        </dependency>
+
         <!-- JAMI intact dependencies-->
         <dependency>
             <groupId>uk.ac.ebi.intact.jami</groupId>
@@ -148,20 +162,6 @@
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!-- JAMI file dependencies -->
-        <dependency>
-            <groupId>psidev.psi.mi.jami</groupId>
-            <artifactId>jami-commons</artifactId>
-            <version>${psi.jami.version}</version>
-        </dependency>
-
-        <!-- JAMI batch dependencies -->
-        <dependency>
-            <groupId>psidev.psi.mi.jami</groupId>
-            <artifactId>jami-batch</artifactId>
-            <version>${psi.jami.version}</version>
         </dependency>
 
         <dependency>
