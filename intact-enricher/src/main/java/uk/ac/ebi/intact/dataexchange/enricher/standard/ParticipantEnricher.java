@@ -26,8 +26,10 @@ import psidev.psi.mi.jami.enricher.impl.CompositeInteractorEnricher;
 import psidev.psi.mi.jami.enricher.impl.full.FullParticipantEnricher;
 import psidev.psi.mi.jami.enricher.listener.ProteinEnricherListener;
 import psidev.psi.mi.jami.enricher.listener.impl.GeneEnricherListenerManager;
+import psidev.psi.mi.jami.enricher.listener.impl.InteractorEnricherListenerManager;
 import psidev.psi.mi.jami.enricher.listener.impl.ProteinEnricherListenerManager;
 import psidev.psi.mi.jami.enricher.listener.impl.log.GeneEnricherLogger;
+import psidev.psi.mi.jami.enricher.listener.impl.log.InteractorPoolEnricherLogger;
 import psidev.psi.mi.jami.enricher.listener.impl.log.ProteinEnricherLogger;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
@@ -155,6 +157,13 @@ public class ParticipantEnricher<P extends Participant, F extends Feature> exten
                 && super.getInteractorEnricher().getGeneEnricher().getListener() == null){
             super.getInteractorEnricher().getGeneEnricher().setListener(
                     new GeneEnricherListenerManager(new GeneEnricherLogger()));
+        }
+
+        //Initialise listeners for interactor pool enrichment
+        if(super.getInteractorEnricher().getInteractorPoolEnricher() != null
+                && super.getInteractorEnricher().getInteractorPoolEnricher().getListener() == null){
+            super.getInteractorEnricher().getInteractorPoolEnricher().setListener(
+                    new InteractorEnricherListenerManager<>(new InteractorPoolEnricherLogger()));
         }
         return super.getInteractorEnricher();
     }
