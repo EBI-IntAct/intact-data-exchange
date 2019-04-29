@@ -588,7 +588,7 @@ public class IntactPublicationCollectorImplTest {
 
         // collect publications needing IMEx id
         Collection<String> pubAcs = publicationCollectorTest.getPublicationsNeedingAnImexId();
-        Assert.assertEquals(2, pubAcs.size());
-        Assert.assertEquals(pubWithImex.getAc(), pubAcs.iterator().next());
+        Assert.assertEquals(1, pubAcs.size());
+        Assert.assertEquals(pubWithoutPPI.getAc(), pubAcs.iterator().next());
     }
 }
