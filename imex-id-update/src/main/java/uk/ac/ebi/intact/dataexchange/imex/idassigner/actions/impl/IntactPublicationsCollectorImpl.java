@@ -267,7 +267,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         query.setParameter("curation", "MI:0955");
         query.setParameter("imex", "imex curation");
         query.setParameter("imexDatabase", Xref.IMEX_MI);
-        query.setParameter("imexPrimary", Xref.IMEX_PRIMARY);
+        query.setParameter("imexPrimary", Xref.IMEX_PRIMARY_MI);
         query.setParameter("intact", "intact");
         query.setParameter("i2d", "i2d");
         query.setParameter("innatedb", "innatedb");
@@ -289,9 +289,9 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         String datasetQuery = "select distinct p.ac from IntactPublication p join p.cvStatus as s " +
                 "where s.shortName = :released or s.shortName = :accepted or s.shortName= :readyForRelease";
         Query query = manager.createQuery(datasetQuery);
-        query.setParameter("released", LifeCycleStatus.RELEASED.name().toLowerCase());
-        query.setParameter("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.name().toLowerCase());
-        query.setParameter("accepted", LifeCycleStatus.ACCEPTED.name().toLowerCase());
+        query.setParameter("released", LifeCycleStatus.RELEASED.shortLabel().toLowerCase());
+        query.setParameter("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.shortLabel().toLowerCase());
+        query.setParameter("accepted", LifeCycleStatus.ACCEPTED.shortLabel().toLowerCase());
 
         return query.getResultList();
     }
