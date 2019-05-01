@@ -223,7 +223,7 @@ public class ComplexExport2PDB {
             expandComponents(componentSb, (IntactComplex) interactor, stoichiometry, intactComplex);
 
         } else if (interactor instanceof Protein) { //Proteins
-            
+
             Protein protein = (Protein) interactor;
             Xref identifier = protein.getPreferredIdentifier();
 

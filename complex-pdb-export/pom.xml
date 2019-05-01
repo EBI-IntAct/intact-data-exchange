@@ -17,7 +17,7 @@
 
     <profiles>
         <profile>
-            <id>pdb-export</id>
+            <id>complex-pdb-export</id>
             <build>
                 <plugins>
                     <plugin>
