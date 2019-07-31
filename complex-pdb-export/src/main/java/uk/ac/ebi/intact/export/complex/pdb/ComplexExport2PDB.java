@@ -84,7 +84,7 @@ public class ComplexExport2PDB {
                     "or lcStatus.shortName = :released)";
 
             queryParameters.put("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.shortLabel());
-            queryParameters.put("acceptedOnHold", LifeCycleStatus.RELEASED.shortLabel());
+            queryParameters.put("released", LifeCycleStatus.RELEASED.shortLabel());
         }
 
         complexes = complexDao.getByQuery(query, queryParameters, 0, totalComplexes);
