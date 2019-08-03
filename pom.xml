@@ -23,9 +23,9 @@
         <bridges.version>2.1.28</bridges.version>
         <commons.version>2.1.10</commons.version>
         <intact.tools.version>1.0.15</intact.tools.version>
-        <intact.jami.version>1.3.4</intact.jami.version>
+        <intact.jami.version>1.3.5</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
-        <psi.jami.version>3.2.2</psi.jami.version>
+        <psi.jami.version>3.2.3</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
 
         <!--Properties for psixml-exchange: keep them in sync with jami-bridges until the module is updated-->
