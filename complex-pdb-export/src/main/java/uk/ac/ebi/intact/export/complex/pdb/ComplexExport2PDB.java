@@ -56,29 +56,38 @@ public class ComplexExport2PDB {
         ComplexService complexService = ApplicationContextProvider.getBean("complexService");
         ComplexDao complexDao = complexService.getIntactDao().getComplexDao();
 
+        String query;
+        Map< String,Object> queryParameters = new HashMap<>();
         List<IntactComplex> complexes;
 
         int totalComplexes = (int) complexService.countAll();
 
+        // The queries are adapted for the point in the release pipeline that are called.
+        // The update of the complex status happens while processing the release (after the pipeline finishes)
+        // however PDB need all released complexes so in to cover all we need released and ready
+        // for release to be exported
         if(!released) {
-            String query = "select distinct f from IntactComplex f "  +
+            query = "select distinct f from IntactComplex f "  +
                     "join f.cvStatus as lcStatus " +
                     "where (lcStatus.shortName = :readyForChecking " +
                     "or lcStatus.shortName = :curationInProgress " +
-                    "or lcStatus.shortName = :readyForRelease " +
                     "or lcStatus.shortName = :acceptedOnHold)";
 
-            Map< String,Object> queryParameters = new HashMap<>();
             queryParameters.put("readyForChecking", LifeCycleStatus.READY_FOR_CHECKING.shortLabel());
             queryParameters.put("curationInProgress", LifeCycleStatus.CURATION_IN_PROGRESS.shortLabel());
-            queryParameters.put("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.shortLabel());
             queryParameters.put("acceptedOnHold", LifeCycleStatus.ACCEPTED_ON_HOLD.shortLabel());
-
-            complexes = complexDao.getByQuery(query, queryParameters, 0, totalComplexes);
         }
         else {
-            complexes = (List<IntactComplex>) complexDao.getByStatus(LifeCycleStatus.RELEASED.shortLabel(), 0 , totalComplexes);
+            query = "select distinct f from IntactComplex f "  +
+                    "join f.cvStatus as lcStatus " +
+                    "where (lcStatus.shortName = :readyForRelease " +
+                    "or lcStatus.shortName = :released)";
+
+            queryParameters.put("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.shortLabel());
+            queryParameters.put("released", LifeCycleStatus.RELEASED.shortLabel());
         }
+
+        complexes = complexDao.getByQuery(query, queryParameters, 0, totalComplexes);
 
         // Format documentation: https://intact.atlassian.net/browse/GENISSUES-76
         try (BufferedWriter complexWriter = new BufferedWriter(new FileWriter(new File(fileNamePrefix + "_complexes.tsv")));
@@ -99,7 +108,6 @@ public class ComplexExport2PDB {
             StringBuilder pdbSb = new StringBuilder(2048);
 
             for (IntactComplex intactComplex : complexes) {
-
                 System.err.println("\nProcessing Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ")");
                 componentsSb.setLength(0);
                 complexSb.setLength(0);
@@ -188,7 +196,6 @@ public class ComplexExport2PDB {
                 .collect(Collectors.toList());
 
         for (Participant participant : participants) {
-
             final Interactor interactor = participant.getInteractor();
             if(parentStoichiometry != 0) {
                 int stoichiometry = participant.getStoichiometry().getMaxValue() * parentStoichiometry;
@@ -197,7 +204,6 @@ public class ComplexExport2PDB {
             else { //Stoichiometry for the parent is 0, we don not know how many molecules we have in reality
                 interactorStoichioMap.put(interactor, 0);
             }
-
         }
 
         for (Map.Entry<Interactor, Integer> interactorStoichioEntry : interactorStoichioMap.entrySet()) {
@@ -212,6 +218,7 @@ public class ComplexExport2PDB {
     private static boolean componentLine(StringBuilder componentSb, Interactor interactor, Integer stoichiometry, IntactComplex intactComplex) {
 
         if (interactor instanceof IntactComplex) {
+
             System.err.println("\nComplex as interactor " + interactor.getPreferredIdentifier().getId() + " with stoi: " + stoichiometry);
             expandComponents(componentSb, (IntactComplex) interactor, stoichiometry, intactComplex);
 
@@ -253,6 +260,7 @@ public class ComplexExport2PDB {
         } else {
             System.err.println("\nProcessing interactor " + interactor.getPreferredIdentifier() + " that is not protein or complex");
         }
+
         return true;
     }
 
@@ -268,7 +276,9 @@ public class ComplexExport2PDB {
     }
 
     private static boolean isFeatureChain(Protein protein) {
+
         Collection<InteractorXref> xrefs = protein.getXrefs();
+
         for (InteractorXref xref : xrefs) {
             if (xref.getQualifier() != null) {
                 String qualifierIdentity = xref.getQualifier().getMIIdentifier();
@@ -277,6 +287,7 @@ public class ComplexExport2PDB {
                 }
             }
         }
+
         return false;
     }
 }

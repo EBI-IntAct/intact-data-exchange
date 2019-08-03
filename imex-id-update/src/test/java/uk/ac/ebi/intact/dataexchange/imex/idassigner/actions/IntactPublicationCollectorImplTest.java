@@ -111,7 +111,7 @@ public class IntactPublicationCollectorImplTest {
 
     @Test
     @DirtiesContext
-    public void get_publications_Having_Imex_Curation_Level_But_Are_Not_Eligible_Imex_because_too_old() throws ParseException, SynchronizerException,
+    public void get_publications_Having_Imex_Curation_Level_Are_Eligible_Imex_although_too_old() throws ParseException, SynchronizerException,
             PersisterException, FinderException {
         PublicationService pubService = ApplicationContextProvider.getBean("publicationService");
         IntactDao dao = ApplicationContextProvider.getBean("intactDao");
@@ -142,9 +142,6 @@ public class IntactPublicationCollectorImplTest {
         ev4.addParticipant(new IntactParticipantEvidence(new IntactProtein("P12346")));
         exp2.addInteractionEvidence(ev3);
         exp2.addInteractionEvidence(ev4);
-        Calendar cal = GregorianCalendar.getInstance();
-        cal.set(2005, 12, 31);
-        pubWithoutImex.setCreated(cal.getTime());
         pubWithoutImex.setSource(new IntactSource("intact"));
         pubService.saveOrUpdate(pubWithoutImex);
 
@@ -152,8 +149,7 @@ public class IntactPublicationCollectorImplTest {
         publicationCollectorTest.initialise();
 
         Collection<String> pubAcs = publicationCollectorTest.getPublicationsHavingImexCurationLevelButAreNotEligibleImex();
-        Assert.assertEquals(1, pubAcs.size());
-        Assert.assertEquals(pubWithoutImex.getAc(), pubAcs.iterator().next());
+        Assert.assertEquals(0, pubAcs.size());
     }
 
     @Test

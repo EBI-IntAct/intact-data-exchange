@@ -234,9 +234,6 @@ public class GlobalImexPublicationUpdaterTest{
         pub2.setSource(new IntactSource("intact"));
         pub2.setCurationDepth(CurationDepth.IMEx);
         pub2.setStatus(LifeCycleStatus.ACCEPTED);
-        Calendar cal = GregorianCalendar.getInstance();
-        cal.set(2005, 12, 31);
-        pub2.setCreated(cal.getTime());
         pubService.saveOrUpdate(pub2);
 
         // publication without imex id but interaction does have IMEx -> not updated but reported
@@ -328,17 +325,38 @@ public class GlobalImexPublicationUpdaterTest{
             Assert.assertEquals(2, imexIds.size());
         }
 
-        // pub 2 is not updated because error
+        // pub 2 is updated. We don't take into account date as a restriction for assigning imex ids
+        // They can be updated even if the original creation date is pre-imex, it can be updated
+        // and become imex level a posteriori
         IntactPublication intactPubReloaded2 = dao.getPublicationDao().getByAc(pub2.getAc());
 
-        Assert.assertEquals(0, intactPubReloaded2.getXrefs().size());
-        Assert.assertEquals(0, intactPubReloaded2.getAnnotations().size());
+        Assert.assertEquals(1, intactPubReloaded2.getXrefs().size());
+        Assert.assertEquals(2, intactPubReloaded2.getAnnotations().size());
+
+        Assert.assertEquals(CurationDepth.IMEx, intactPubReloaded2.getCurationDepth());
+        Assert.assertEquals(2, intactPubReloaded2.getAnnotations().size());
+        hasFullCuration = false;
+        hasImexCuration = false;
+
+        for (Annotation ann : intactPubReloaded2.getAnnotations()){
+            if ("imex curation".equals(ann.getTopic().getShortName())){
+                hasImexCuration = true;
+            }
+            else if ("full coverage".equals(ann.getTopic().getShortName())
+                    && "Only protein-protein interactions".equalsIgnoreCase(ann.getValue())){
+                hasFullCuration = true;
+            }
+        }
+
+        Assert.assertTrue(hasFullCuration);
+        Assert.assertTrue(hasImexCuration);
+
         for (Experiment exp : intactPubReloaded2.getExperiments()){
-            Assert.assertEquals(0, exp.getXrefs().size());
+            Assert.assertEquals(1, exp.getXrefs().size());
 
             // updated interaction imex primary ref
             for (Interaction inter : exp.getInteractionEvidences()){
-                Assert.assertEquals(0, inter.getXrefs().size());
+                Assert.assertEquals(1, inter.getXrefs().size());
             }
         }
 
