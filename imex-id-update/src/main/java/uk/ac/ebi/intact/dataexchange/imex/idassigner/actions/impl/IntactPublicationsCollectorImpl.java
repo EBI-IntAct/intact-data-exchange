@@ -67,85 +67,6 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     public IntactPublicationsCollectorImpl(){
     }
 
-    @Deprecated
-    private List<String> collectPublicationCandidatesToImexWithJournalAndDate() {
-        List<Object[]> publicationJournalsAndYear = collectYearAndJournalFromPublicationEligibleImex();
-
-        List<String> publications = new ArrayList<String>(publicationJournalsAndYear.size());
-
-        for (Object[] o : publicationJournalsAndYear){
-            if (o.length == 3){
-                String pubAc = (String) o[0];
-                String journal = (String) o[1];
-                try{
-                    int date = Integer.parseInt((String) o[2]);
-
-                    if (CELL_JOURNAL.equalsIgnoreCase(journal) || PROTEOMICS_JOURNAL.equalsIgnoreCase(journal)
-                            || CANCER_CELL_JOURNAL.equalsIgnoreCase(journal) || J_MOL_JOURNAL.equalsIgnoreCase(journal)
-                            || ONCOGENE_JOURNAL.equalsIgnoreCase(journal)){
-                        if (date >= 2006){
-                            publications.add(pubAc);
-                        }
-                    }
-                    else if (MOL_CANCER_JOURNAL.equalsIgnoreCase(journal)){
-                        if (date >= 2010){
-                            publications.add(pubAc);
-                        }
-                    }
-                    else if (NAT_IMMUNO_JOURNAL.equalsIgnoreCase(journal)){
-                        if (date >= 2011){
-                            publications.add(pubAc);
-                        }
-                    }
-                }catch (NumberFormatException e){
-                    log.error("Publication date for " + pubAc + "is not valid and is skipped.");
-                }
-
-            }
-        }
-
-        return publications;
-    }
-
-    @Deprecated
-    private List<String> collectPublicationCandidatesToImexWithDate() {
-        List<Object[]> publicationJournalsAndYear = collectYearAndJournalFromPublicationEligibleImex();
-
-        List<String> publications = new ArrayList<String>(publicationJournalsAndYear.size());
-
-        for (Object[] o : publicationJournalsAndYear){
-            if (o.length == 3){
-                String pubAc = (String) o[0];
-                String journal = (String) o[1];
-                try{
-                    int date = Integer.parseInt((String) o[2]);
-
-                    if (CELL_JOURNAL.equalsIgnoreCase(journal) || PROTEOMICS_JOURNAL.equalsIgnoreCase(journal)
-                            || CANCER_CELL_JOURNAL.equalsIgnoreCase(journal) || J_MOL_JOURNAL.equalsIgnoreCase(journal)
-                            || ONCOGENE_JOURNAL.equalsIgnoreCase(journal)){
-                        if (date >= 2006){
-                            publications.add(pubAc);
-                        }
-                    }
-                    else if (MOL_CANCER_JOURNAL.equalsIgnoreCase(journal)){
-                        if (date >= 2010){
-                            publications.add(pubAc);
-                        }
-                    }
-                    else if (NAT_IMMUNO_JOURNAL.equalsIgnoreCase(journal)){
-                        if (date >= 2011){
-                            publications.add(pubAc);
-                        }
-                    }
-                }catch (NumberFormatException e){
-                    log.error("Publication date for " + pubAc + "is not valid and is skipped.");
-                }
-
-            }
-        }
-
-        return publications;
-    }
 
     private List<String> collectPublicationHavingAtLeastTwoProteins() {
         List<Object[]> publicationsHavingProteinPeptide = collectPublicationsHavingProteinsOrPeptides();
@@ -201,38 +122,6 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
-    /**
-     *
-     * @return list of object[] which are String[3] with publication ac, jounal and year of publication
-     * @throws ParseException
-     */
-    @Deprecated
-    private List<Object[]> collectYearAndJournalFromPublicationEligibleImex() {
-        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
-        EntityManager manager = intactDao.getEntityManager();
-        String journalDateQuery = "select distinct p.ac, a1.value, a2.value from IntactPublication p left join p.dbAnnotations as a1 " +
-                "join p.dbAnnotations as a2 " +
-                "where a1.topic.identifier = :journal and a2.topic.identifier = :dateJournal " +
-                "and " +
-                "(" +
-                "a1.value = :cell or a1.value = :proteomics or a1.value = :cancer " +
-                "or a1.value = :molSignal or a1.value = :oncogene or a1.value = :molCancer " +
-                "or a1.value = :natImmuno" +
-                ")";
-
-        Query query = manager.createQuery(journalDateQuery);
-        query.setParameter("journal", Annotation.PUBLICATION_JOURNAL_MI);
-        query.setParameter("dateJournal", Annotation.PUBLICATION_YEAR_MI);
-        query.setParameter("cell", CELL_JOURNAL);
-        query.setParameter("proteomics", PROTEOMICS_JOURNAL);
-        query.setParameter("cancer", CANCER_CELL_JOURNAL);
-        query.setParameter("molSignal", J_MOL_JOURNAL);
-        query.setParameter("oncogene", ONCOGENE_JOURNAL);
-        query.setParameter("molCancer", MOL_CANCER_JOURNAL);
-        query.setParameter("natImmuno", NAT_IMMUNO_JOURNAL);
-
-        return query.getResultList();
-    }
 
     private List<String> collectPublicationsElligibleForImex(){
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
@@ -240,7 +129,6 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         String publicationsToAssign = "select distinct p.ac from IntactPublication as p join p.dbAnnotations as a" +
                 " where a.topic.identifier = :curation " +
                 "and a.value = :imex " +
-                "and year(p.created) > year(:dateLimit) " +
                 "and ( lower(p.source.shortName) = :intact " +
                 "or lower(p.source.shortName) = :i2d " +
                 "or lower(p.source.shortName) = :innatedb " +
@@ -259,11 +147,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 " and x.qualifier.identifier = :imexPrimary " +
                 ")";
 
-        Calendar cal = GregorianCalendar.getInstance();
-        cal.set(2005, 12, 31);
-
         Query query = manager.createQuery(publicationsToAssign);
-        query.setParameter("dateLimit", cal.getTime());
         query.setParameter("curation", "MI:0955");
         query.setParameter("imex", "imex curation");
         query.setParameter("imexDatabase", Xref.IMEX_MI);
@@ -311,20 +195,6 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
-    @Deprecated
-    private List<String> collectPublicationCandidatesToImexWithDataset() {
-        IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
-        EntityManager manager = intactDao.getEntityManager();
-
-        String datasetQuery = "select distinct p2.ac from IntactPublication p2 join p2.dbAnnotations as a3 " +
-                "where a3.topic.identifier = :dataset and a3.value = :biocreative";
-
-        Query query = manager.createQuery(datasetQuery);
-        query.setParameter("dataset", DATASET_MI);
-        query.setParameter("biocreative", BIOCREATIVE_DATASET);
-
-        return query.getResultList();
-    }
 
     private List<String> collectPublicationCandidatesToImexWithImexCurationLevel() {
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
@@ -460,14 +330,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
             initialise();
         }
 
-        // publications having creation date > 2006, come from IMEx databases, has imex curation depth and does not have IMEx id
+        // publications come from IMEx databases, has imex curation depth and does not have IMEx id
         Collection<String> potentialPublicationsForImex = publicationsElligibleForImex;
-
-        // filter publications having only non PPI interactions
-        //Collection<String> potentialPublicationsForImexFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsInvolvingPPI);
-
-        // filter publications having uniprot-dr-export no
-        //Collection<String> potentialPublicationsForImexUniprotDRNoFiltered = CollectionUtils.subtract(potentialPublicationsForImex, publicationsHavingUniprotDRExportNo);
 
         // filter publications not accepted
         Collection<String> publicationsToBeAssignedFiltered = CollectionUtils.intersection(potentialPublicationsForImex, publicationsAcceptedForRelease);
