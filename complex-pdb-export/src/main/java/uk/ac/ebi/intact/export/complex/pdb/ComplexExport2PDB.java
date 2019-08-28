@@ -64,8 +64,8 @@ public class ComplexExport2PDB {
 
         // The queries are adapted for the point in the release pipeline that are called.
         // The update of the complex status happens while processing the release (after the pipeline finishes)
-        // however PDB need all released complexes so in to cover all we need released and ready
-        // for release to be exported
+        // however PDB needs all released complexes including those to be released in the running release.
+        // In order to cover all the cases we need all complexes released and ready for release to be exported.
         if(!released) {
             query = "select distinct f from IntactComplex f "  +
                     "join f.cvStatus as lcStatus " +
