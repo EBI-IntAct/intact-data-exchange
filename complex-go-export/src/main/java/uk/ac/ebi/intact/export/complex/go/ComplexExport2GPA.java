@@ -186,7 +186,7 @@ public class ComplexExport2GPA {
                 }
             }
         } else {
-            System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") with empty complex GO Xref");
+            System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") [ " + intactComplex.getOrganism().getScientificName() + "] has empty complex GO Xref");
             return false;
         }
 
