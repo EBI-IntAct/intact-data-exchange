@@ -10,5 +10,5 @@ package uk.ac.ebi.intact.dataexchange.uniprotexport.variables;
 
 public enum ExporterRule {
 
-    detection_method, mi_score, none
+    mi_score, none
 }
