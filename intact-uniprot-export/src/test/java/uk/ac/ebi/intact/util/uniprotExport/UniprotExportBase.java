@@ -50,7 +50,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
     protected String interaction5 = null;
     protected String interaction6 = null;
 
-    public List<GOParameters> createGOParameters1(){
+    public List<GOParameters> createGOParametersVersion1(){
 
         List<GOParameters> parameters = new ArrayList<GOParameters>(3);
 
@@ -83,7 +83,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return parameters;
     }
 
-    public List<GOParameters> createGOParameters2(){
+    public List<GOParameters> createGOParametersVersion2(){
 
         List<GOParameters> parameters = new ArrayList<GOParameters>(3);
 
@@ -114,157 +114,51 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         return parameters;
     }
 
-    public List<CCParameters> createCCParameters2(){
+    public List<CCParameters<SecondCCParametersVersion1>> createCCParametersVersion1(){
 
-        List<CCParameters> parameters = new ArrayList<CCParameters>(3);
-
-        String uniprotAc1 = "P28548";
-        String uniprotAc2 = "Q22534";
-        String uniprotAc3 = "O17670";
-        String uniprotAc4 = "Q21361";
-        String uniprotAc5 = "P28548-1";
-        String uniprotAc6 = "P28548-2";
-        String uniprotAc7 = "P28548-PRO_0000068244";
-
-        String intactAc1 = "EBI-327642";
-        String intactAc2 = "EBI-311862";
-        String intactAc3 = "EBI-311862";
-        String intactAc4 = "EBI-317777";
-        String intactAc5 = "EBI-317778";
-        String intactAc6 = "EBI-317779";
-
-        String geneName1 = "kin-10";
-        String geneName2 = "pat-12";
-        String geneName3 = "eya-1";
-        String geneName4 = "atf-2";
-
-        String organismName = "Caenorhabditis elegans";
-        String taxId = "6239";
-
-        String organismName2 = "Homo sapiens";
-        String taxId2 = "9606";
-
-        String pmid1 = "14704431";
-        String pmid2 = "15199141";
-        String pmid3 = "18212739";
-        String pmid4 = "15115758";
-
-        Set<String> publications1 = new TreeSet<String>();
-        publications1.add(pmid1);
-
-        Set<String> publications2 = new TreeSet<String>();
-        publications2.add(pmid1);
-        publications2.add(pmid2);
-
-        Set<String> publications3 = new TreeSet<String>();
-        publications3.add(pmid3);
-
-        Set<String> publications4 = new TreeSet<String>();
-        publications4.add(pmid4);
-        publications4.add(pmid2);
-
-        InteractionDetails detail1 = new InteractionDetailsImpl("physical association", "tandem affinity purification", false, publications1);
-        InteractionDetails detail2 = new InteractionDetailsImpl("physical association", "two hybrid pooling", false, publications2);
-        InteractionDetails detail3 = new InteractionDetailsImpl("association", "anti bait coimmunoprecipitation", true, publications3);
-        InteractionDetails detail4 = new InteractionDetailsImpl("physical association", "coimmunoprecipitation", false, publications4);
-        InteractionDetails detail5 = new InteractionDetailsImpl("physical association", "two hybrid pooling", false, publications1);
-
-        SortedSet<InteractionDetails> details1 = new TreeSet<InteractionDetails>();
-        details1.add(detail1);
-
-        SortedSet<InteractionDetails> details2 = new TreeSet<InteractionDetails>();
-        details2.add(detail2);
-
-        SortedSet<InteractionDetails> details3 = new TreeSet<InteractionDetails>();
-        details3.add(detail5);
-        details3.add(detail3);
-        details3.add(detail4);
-
-        SecondCCParameters2 secondParameters1 = new SecondCCParameters2Impl(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, organismName2, details1, true);
-        SecondCCParameters2 secondParameters2 = new SecondCCParameters2Impl(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, organismName, details2, true);
-        SecondCCParameters2 secondParameters3 = new SecondCCParameters2Impl(uniprotAc7, intactAc6, uniprotAc4, intactAc3, geneName4, taxId, organismName, details3, false);
-
-        SortedSet<SecondCCParameters2> listOfSecondInteractors1 = new TreeSet<SecondCCParameters2>();
-        listOfSecondInteractors1.add(secondParameters1);
-        listOfSecondInteractors1.add(secondParameters2);
-        listOfSecondInteractors1.add(secondParameters3);
-
-        CCParameters<SecondCCParameters2> parameters1 = new CCParameters2(uniprotAc1, geneName1, taxId, listOfSecondInteractors1);
-        parameters.add(parameters1);
-
-        SortedSet<SecondCCParameters2> listOfSecondInteractors2 = new TreeSet<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters4 = new SecondCCParameters2Impl(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, organismName, details1, true);
-        listOfSecondInteractors2.add(secondParameters4);
-
-        CCParameters<SecondCCParameters2> parameters2 = new CCParameters2(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
-        parameters.add(parameters2);
-
-        SortedSet<SecondCCParameters2> listOfSecondInteractors3 = new TreeSet<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters5 = new SecondCCParameters2Impl(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, organismName, details2, true);
-        listOfSecondInteractors3.add(secondParameters5);
-
-        CCParameters<SecondCCParameters2> parameters3 = new CCParameters2(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
-        parameters.add(parameters3);
-
-        SortedSet<SecondCCParameters2> listOfSecondInteractors4 = new TreeSet<SecondCCParameters2>();
-        SecondCCParameters2 secondParameters6 = new SecondCCParameters2Impl(uniprotAc4, intactAc3, uniprotAc7, intactAc6, geneName1, taxId, organismName, details3, false);
-        listOfSecondInteractors4.add(secondParameters6);
-
-        CCParameters<SecondCCParameters2> parameters4 = new CCParameters2(uniprotAc4, geneName4, taxId, listOfSecondInteractors4);
-        parameters.add(parameters4);
-
-        return parameters;
-    }
-
-    public List<CCParameters> createCCParameters1(){
-
-        List<CCParameters> parameters = new ArrayList<CCParameters>(3);
+        List<CCParameters<SecondCCParametersVersion1>> parameters = new ArrayList<>(3);
 
         String uniprotAc1 = "P28548";
         String uniprotAc2 = "Q22534";
         String uniprotAc3 = "O17670";
-        String uniprotAc4 = "Q21361";
         String uniprotAc5 = "P28548-1";
         String uniprotAc6 = "P28548-2";
 
         String intactAc1 = "EBI-327642";
         String intactAc2 = "EBI-311862";
-        String intactAc3 = "EBI-311862";
         String intactAc4 = "EBI-317777";
         String intactAc5 = "EBI-317778";
-        String intactAc6 = "EBI-317779";
 
         String geneName1 = "kin-10";
         String geneName2 = "pat-12";
         String geneName3 = "eya-1";
-        String geneName4 = "atf-2";
 
         String taxId = "6239";
 
         String taxId2 = "9606";
 
-        SecondCCParameters1 secondParameters1 = new SecondCCParameters1Impl(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, 1);
-        SecondCCParameters1 secondParameters2 = new SecondCCParameters1Impl(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, 2);
+        SecondCCParametersVersion1 secondParameters1 = new SecondCCParametersVersion1Impl(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, 1);
+        SecondCCParametersVersion1 secondParameters2 = new SecondCCParametersVersion1Impl(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, 2);
 
-        SortedSet<SecondCCParameters1> listOfSecondInteractors1 = new TreeSet<SecondCCParameters1>();
+        SortedSet<SecondCCParametersVersion1> listOfSecondInteractors1 = new TreeSet<SecondCCParametersVersion1>();
         listOfSecondInteractors1.add(secondParameters1);
         listOfSecondInteractors1.add(secondParameters2);
 
-        CCParameters<SecondCCParameters1> parameters1 = new CCParameters1(uniprotAc1, geneName1, taxId, listOfSecondInteractors1);
+        CCParameters<SecondCCParametersVersion1> parameters1 = new CCParametersVersion1(uniprotAc1, geneName1, taxId, listOfSecondInteractors1);
         parameters.add(parameters1);
 
-        SortedSet<SecondCCParameters1> listOfSecondInteractors2 = new TreeSet<SecondCCParameters1>();
-        SecondCCParameters1 secondParameters4 = new SecondCCParameters1Impl(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, 1);
+        SortedSet<SecondCCParametersVersion1> listOfSecondInteractors2 = new TreeSet<SecondCCParametersVersion1>();
+        SecondCCParametersVersion1 secondParameters4 = new SecondCCParametersVersion1Impl(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, 1);
         listOfSecondInteractors2.add(secondParameters4);
 
-        CCParameters<SecondCCParameters1> parameters2 = new CCParameters1(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
+        CCParameters<SecondCCParametersVersion1> parameters2 = new CCParametersVersion1(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
         parameters.add(parameters2);
 
-        SortedSet<SecondCCParameters1> listOfSecondInteractors3 = new TreeSet<SecondCCParameters1>();
-        SecondCCParameters1 secondParameters5 = new SecondCCParameters1Impl(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, 2);
+        SortedSet<SecondCCParametersVersion1> listOfSecondInteractors3 = new TreeSet<SecondCCParametersVersion1>();
+        SecondCCParametersVersion1 secondParameters5 = new SecondCCParametersVersion1Impl(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, 2);
         listOfSecondInteractors3.add(secondParameters5);
 
-        CCParameters<SecondCCParameters1> parameters3 = new CCParameters1(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
+        CCParameters<SecondCCParametersVersion1> parameters3 = new CCParametersVersion1(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
         parameters.add(parameters3);
 
         return parameters;
@@ -417,6 +311,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         return interaction;
     }
+
     public EncoreInteraction createIsoformIsoformInteraction(){
         EncoreInteraction interaction = new EncoreInteraction();
 
@@ -458,6 +353,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         return interaction;
     }
+
     public EncoreInteraction createEncoreInteractionWithTransIsoformAndMaster(){
         EncoreInteraction interaction = new EncoreInteraction();
 
@@ -499,6 +395,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
 
         return interaction;
     }
+
     public EncoreInteraction createEncoreInteractionWithTransIsoform(){
         EncoreInteraction interaction = new EncoreInteraction();
 
@@ -549,7 +446,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interactorA.put("intact", "EBI-317779");
         Map<String, String> interactorB = new HashMap<String, String>();
         interactorB.put("uniprotkb", "Q21361");
-        interactorB.put("intact", "EBI-311862");
+        interactorB.put("intact", "EBI-317743");
 
         List<String> pubmeds1 = new ArrayList<String>();
         pubmeds1.add("14704431");
