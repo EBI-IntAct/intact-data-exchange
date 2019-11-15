@@ -1,14 +1,14 @@
 package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
 
 /**
- * Default implementation of SecondCCParameters1
+ * Default implementation of SecondCCParametersVersion1
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>10/02/11</pre>
  */
 
-public class SecondCCParameters1Impl implements SecondCCParameters1{
+public class SecondCCParametersVersion1Impl implements SecondCCParametersVersion1 {
 
     private String firstUniprotAc;
     private String secondUniprotAc;
@@ -21,8 +21,8 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
 
     private int numberOfInteractionEvidences;
 
-    public SecondCCParameters1Impl(String firstUniprotAc, String firstIntactAc, String secondUniprotAc,
-                                   String secondIntactAc, String geneName, String taxId, int numberInteractions){
+    public SecondCCParametersVersion1Impl(String firstUniprotAc, String firstIntactAc, String secondUniprotAc,
+                                          String secondIntactAc, String geneName, String taxId, int numberInteractions){
 
         this.firstUniprotAc = firstUniprotAc;
         this.secondUniprotAc = secondUniprotAc;
@@ -78,9 +78,9 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
         this.numberOfInteractionEvidences = number;
     }
 
-    public int compareTo( Object o ) {
-        SecondCCParameters1Impl cc2 = null;
-        cc2 = (SecondCCParameters1Impl) o;
+    public int compareTo(Object o) {
+        SecondCCParametersVersion1Impl cc2 = null;
+        cc2 = (SecondCCParametersVersion1Impl) o;
 
         final String gene1 = getGeneName();
         final String gene2 = cc2.getGeneName();
@@ -90,38 +90,41 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
 
         // the current string comes first if it's before in the alphabetical order
 
-        if( firstUniprotAc1.equals(secondUniprotAc) && !firstUniprotAc2.equals(cc2.getSecondUniprotAc())) {
-
+        if (firstUniprotAc1.equals(secondUniprotAc) && !firstUniprotAc2.equals(cc2.getSecondUniprotAc())) {
             // we put first the Self interaction
             return -1;
-
-        } else if( firstUniprotAc2.equals(cc2.getSecondUniprotAc()) && !firstUniprotAc1.equals(secondUniprotAc)) {
-
+        } else if (firstUniprotAc2.equals(cc2.getSecondUniprotAc()) && !firstUniprotAc1.equals(secondUniprotAc)) {
             return 1;
-
         } else {
+            int score = 0;
 
-            String lovercaseGene1 = gene1.toLowerCase();
-            String lovercaseGene2 = gene2.toLowerCase();
+            if (gene1 != null && gene2 != null) {
 
-            // TODO ask Elizabeth if we still need to do the upper AND lowercase check for gene-name
+                String lovercaseGene1 = gene1.toLowerCase();
+                String lovercaseGene2 = gene2.toLowerCase();
 
-            int score = lovercaseGene1.compareTo( lovercaseGene2 );
+                // TODO ask Elizabeth if we still need to do the upper AND lowercase check for gene-name
 
-            if( score == 0 ) {
-                score = gene1.compareTo( gene2 );
+                score = lovercaseGene1.compareTo(lovercaseGene2);
 
-                if( score == 0 ) {
-                    // gene names are the same, then compare the uniprotID
-                    String uniprotID1 = getSecondUniprotAc();
-                    String uniprotID2 = cc2.getSecondUniprotAc();
+                if (score == 0) {
+                    score = gene1.compareTo(gene2);
+                }
+            }
+            //At this point either both genes are null so score is 0 or the comparison has happened
+            if (score == 0) {
+                // gene names are the same, then compare the uniprotID
+                String uniprotID1 = getSecondUniprotAc();
+                String uniprotID2 = cc2.getSecondUniprotAc();
 
-                    if( uniprotID1 != null && uniprotID2 != null ) {
-                        score = uniprotID1.compareTo( uniprotID2 );
+                if (uniprotID1 != null && uniprotID2 != null) {
+                    score = uniprotID1.compareTo(uniprotID2);
+                    //if they protein comes from a transcript with different master acs we shouldn't consider the same entry
+                    if (score == 0) {
+                        score = firstUniprotAc1.compareTo(firstUniprotAc2);
                     }
                 }
             }
-
             return score;
         }
     }
@@ -133,12 +136,12 @@ public class SecondCCParameters1Impl implements SecondCCParameters1{
         {
             return true;
         }
-        if (o == null || !(o instanceof SecondCCParameters1Impl))
+        if (o == null || !(o instanceof SecondCCParametersVersion1Impl))
         {
             return false;
         }
 
-        SecondCCParameters1Impl ccLine1 = (SecondCCParameters1Impl) o;
+        SecondCCParametersVersion1Impl ccLine1 = (SecondCCParametersVersion1Impl) o;
 
         if (geneName != null ? !geneName.equals(ccLine1.geneName) : ccLine1.geneName != null)
         {
