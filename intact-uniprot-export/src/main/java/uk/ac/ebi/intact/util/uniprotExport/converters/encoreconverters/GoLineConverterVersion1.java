@@ -20,8 +20,8 @@ import java.util.*;
  * @since <pre>31/01/11</pre>
  */
 
-public class GoLineConverter1 implements GoLineConverter<GOParameters1> {
-    private static final Logger logger = Logger.getLogger(GoLineConverter1.class);
+public class GoLineConverterVersion1 implements GoLineConverter<GOParameters1> {
+    private static final Logger logger = Logger.getLogger(GoLineConverterVersion1.class);
 
     /*
      *map containing the second interactor as a key and the list of pubmed ids associated with this second interactor
@@ -36,7 +36,7 @@ public class GoLineConverter1 implements GoLineConverter<GOParameters1> {
       */
     private Map<String, String> mapOfFirstInteractors = new HashMap<String, String>();
 
-    public GoLineConverter1(){
+    public GoLineConverterVersion1(){
         clusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
         isoformClusteredInteractionWithFeatureChains = new HashMap<String, Set<String>>();
         mapOfFirstInteractors = new HashMap<String, String>();

@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport.factory;
 
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverterVersion1;
 
 /**
  * Factory for the CC line converters
@@ -15,7 +15,7 @@ public class CCConverterFactory {
 
     public static CCLineConverter createCCConverter(int version){
         if (version == 1) {
-            return new CCLineConverter1();
+            return new CCLineConverterVersion1();
         }
         return null;
     }

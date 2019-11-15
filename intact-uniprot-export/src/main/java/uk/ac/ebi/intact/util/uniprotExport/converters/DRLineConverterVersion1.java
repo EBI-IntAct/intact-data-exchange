@@ -23,12 +23,12 @@ import java.util.Set;
  * @since <pre>31/01/11</pre>
  */
 
-public class DRLineConverter1 implements DRLineConverter {
-    private static final Logger logger = Logger.getLogger(DRLineConverter1.class);
+public class DRLineConverterVersion1 implements DRLineConverter {
+    private static final Logger logger = Logger.getLogger(DRLineConverterVersion1.class);
     
     private Set<String> processedSecondInteractors;
 
-    public DRLineConverter1(){
+    public DRLineConverterVersion1(){
         processedSecondInteractors = new HashSet<String>();
     }
 

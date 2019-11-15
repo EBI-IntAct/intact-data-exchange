@@ -18,11 +18,11 @@ import java.util.Set;
  * @since <pre>04/02/11</pre>
  */
 
-public class DRLineConverter1Test extends UniprotExportBase{
+public class DRLineConverterVersion1Test extends UniprotExportBase{
 
     @Test
     public void test_dr_convert_ok(){
-        DRLineConverter1 converter = new DRLineConverter1();
+        DRLineConverterVersion1 converter = new DRLineConverterVersion1();
 
         Set<EncoreInteraction> interactions = new HashSet<EncoreInteraction>(createEncoreInteractions()); // three interactions
         interactions.add(createIsoformIsoformInteraction()); // does not count because isoform-isoform of same uniprot entry
@@ -37,7 +37,7 @@ public class DRLineConverter1Test extends UniprotExportBase{
 
     @Test
     public void test_dr_convert_null(){
-        DRLineConverter1 converter = new DRLineConverter1();
+        DRLineConverterVersion1 converter = new DRLineConverterVersion1();
 
         DRParameters parameters = converter.convertInteractorIntoDRLine(null, Collections.EMPTY_SET, createClusterContext());
         Assert.assertNull(parameters);

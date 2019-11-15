@@ -19,11 +19,11 @@ import java.util.List;
  * @since <pre>06/01/12</pre>
  */
 
-public class GOLineConverter2Test extends UniprotExportBase {
+public class GOLineConverterVersion2Test extends UniprotExportBase {
 
     @Test
     public void test_go_convert_ok(){
-        GoLineConverter2 converter = new GoLineConverter2();
+        GoLineConverterVersion2 converter = new GoLineConverterVersion2();
 
         EncoreInteraction interaction = createEncoreInteraction();
 
@@ -38,7 +38,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
     @Test
     public void test_go_convert_no_first_interactor(){
-        GoLineConverter2 converter = new GoLineConverter2();
+        GoLineConverterVersion2 converter = new GoLineConverterVersion2();
 
         EncoreInteraction interaction = createEncoreInteraction();
         interaction.getInteractorAccsA().clear();
@@ -49,7 +49,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
     @Test
     public void test_go_convert_no_second_interactor(){
-        GoLineConverter2 converter = new GoLineConverter2();
+        GoLineConverterVersion2 converter = new GoLineConverterVersion2();
 
         EncoreInteraction interaction = createEncoreInteraction();
         interaction.getInteractorAccsB().clear();
@@ -61,7 +61,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
     @Test
     public void test_go_convert_no_publications(){
-        GoLineConverter2 converter = new GoLineConverter2();
+        GoLineConverterVersion2 converter = new GoLineConverterVersion2();
 
         EncoreInteraction interaction = createEncoreInteraction();
         interaction.getPublicationIds().clear();
@@ -72,7 +72,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
     @Test
     public void test_go_convert_one_publication_no_pubmed(){
-        GoLineConverter2 converter = new GoLineConverter2();
+        GoLineConverterVersion2 converter = new GoLineConverterVersion2();
 
         EncoreInteraction interaction = createEncoreInteraction();
         interaction.getPublicationIds().iterator().next().setDatabase("DOI");
@@ -83,7 +83,7 @@ public class GOLineConverter2Test extends UniprotExportBase {
 
     @Test
     public void test_go_convert_simulation(){
-        GoLineConverter2 converter = new GoLineConverter2();
+        GoLineConverterVersion2 converter = new GoLineConverterVersion2();
 
         List<EncoreInteraction> interactions = createEncoreInteractions();
         interactions.add(3, createIsoformIsoformInteraction()); // can be converted because isoform-isoform

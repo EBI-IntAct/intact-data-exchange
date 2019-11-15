@@ -3,12 +3,12 @@ package uk.ac.ebi.intact.util.uniprotExport;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverterVersion1;
 import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverterVersion1;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.CCLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverterVersion1;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.InteractionFilter;
 import uk.ac.ebi.intact.util.uniprotExport.iterator.UniprotEntryIterator;
@@ -101,15 +101,15 @@ public class UniprotExportProcessor {
      */
     public UniprotExportProcessor(InteractionFilter filter){
 
-        goConverter = new GoLineConverter1();
+        goConverter = new GoLineConverterVersion1();
 
         // by default, initialize a converter of the first CC line format
-        ccConverter = new CCLineConverter1();
+        ccConverter = new CCLineConverterVersion1();
 
         // by default, we use the same cc converter for silver and gold cc lines
         silverCcConverter = ccConverter;
 
-        drConverter = new DRLineConverter1();
+        drConverter = new DRLineConverterVersion1();
 
         this.filter = filter;
 
@@ -130,9 +130,9 @@ public class UniprotExportProcessor {
      */
     public UniprotExportProcessor(InteractionFilter filter, GoLineConverter goConverter, CCLineConverter ccConverter, CCLineConverter silverCcConverter, DRLineConverter drConverter){
 
-        this.goConverter = goConverter != null ? goConverter : new GoLineConverter1();
-        this.drConverter = drConverter != null ? drConverter : new DRLineConverter1();
-        this.ccConverter = ccConverter != null ? ccConverter : new CCLineConverter1();
+        this.goConverter = goConverter != null ? goConverter : new GoLineConverterVersion1();
+        this.drConverter = drConverter != null ? drConverter : new DRLineConverterVersion1();
+        this.ccConverter = ccConverter != null ? ccConverter : new CCLineConverterVersion1();
         this.silverCcConverter = silverCcConverter != null ? silverCcConverter : this.ccConverter;
 
         this.filter = filter;

@@ -4,14 +4,14 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * Default implementation of CCParameters1
+ * Default implementation of CCParametersVersion1
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
  * @since <pre>10/02/11</pre>
  */
 
-public class CCParameters1 implements CCParameters<SecondCCParameters1>{
+public class CCParametersVersion1 implements CCParameters<SecondCCParametersVersion1>{
 
     private String masterAc;
 
@@ -19,10 +19,10 @@ public class CCParameters1 implements CCParameters<SecondCCParameters1>{
 
     private String taxId;
 
-    private SortedSet<SecondCCParameters1> secondCCParameters;
+    private SortedSet<SecondCCParametersVersion1> secondCCParameters;
 
-    public CCParameters1(String firstInteractor, String firstGeneName,
-                         String firstTaxId, SortedSet<SecondCCParameters1> secondInteractors){
+    public CCParametersVersion1(String firstInteractor, String firstGeneName,
+                                String firstTaxId, SortedSet<SecondCCParametersVersion1> secondInteractors){
 
         this.masterAc = firstInteractor;
 
@@ -30,7 +30,7 @@ public class CCParameters1 implements CCParameters<SecondCCParameters1>{
         this.taxId = firstTaxId;
 
         if (secondInteractors == null){
-            this.secondCCParameters = new TreeSet<SecondCCParameters1>();
+            this.secondCCParameters = new TreeSet<SecondCCParametersVersion1>();
         }
         else{
             this.secondCCParameters = secondInteractors;
@@ -53,7 +53,7 @@ public class CCParameters1 implements CCParameters<SecondCCParameters1>{
     }
 
     @Override
-    public SortedSet<SecondCCParameters1> getSecondCCParameters() {
+    public SortedSet<SecondCCParametersVersion1> getSecondCCParameters() {
         return this.secondCCParameters;
     }
 }

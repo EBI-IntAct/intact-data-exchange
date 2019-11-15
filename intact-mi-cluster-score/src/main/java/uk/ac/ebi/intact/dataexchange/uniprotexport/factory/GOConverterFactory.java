@@ -1,8 +1,8 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport.factory;
 
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter1;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter2;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverterVersion1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverterVersion2;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 
 /**
@@ -18,9 +18,9 @@ public class GOConverterFactory {
     public static GoLineConverter<? extends GOParameters> createGOConverter(int version){
          switch (version) {
             case 1:
-                return new GoLineConverter1();
+                return new GoLineConverterVersion1();
              case 2:
-                 return new GoLineConverter2();
+                 return new GoLineConverterVersion2();
             default:
                 return null;
         }

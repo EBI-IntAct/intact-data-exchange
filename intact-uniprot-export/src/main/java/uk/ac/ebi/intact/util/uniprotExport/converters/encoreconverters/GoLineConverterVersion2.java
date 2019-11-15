@@ -19,8 +19,8 @@ import java.util.*;
  * @since <pre>04/01/12</pre>
  */
 
-public class GoLineConverter2 implements GoLineConverter<GOParameters2> {
-    private static final Logger logger = Logger.getLogger(GoLineConverter2.class);
+public class GoLineConverterVersion2 implements GoLineConverter<GOParameters2> {
+    private static final Logger logger = Logger.getLogger(GoLineConverterVersion2.class);
 
     /**
      * Converts an EncoreInteraction into GOParameters
