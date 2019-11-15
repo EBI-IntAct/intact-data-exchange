@@ -113,12 +113,12 @@ public class IntActClusterScore extends InteractionClusterScore implements Intac
      */
     public void setDirectInteractionWeight_5(){
         Map<String,Float> customOntologyTypeScores = new HashMap<String,Float>();
-        customOntologyTypeScores.put("MI:0208", 0.25f);
+        customOntologyTypeScores.put("MI:0208", 0.25f); // genetic interaction
         customOntologyTypeScores.put("MI:0403", 0.2f); // colocalization
-        customOntologyTypeScores.put("MI:0914", 1f);
-        customOntologyTypeScores.put("MI:0915", 2f);
-        customOntologyTypeScores.put("MI:0407", 5f);
-        customOntologyTypeScores.put("unknown", 0.1f);
+        customOntologyTypeScores.put("MI:0914", 1f); // association
+        customOntologyTypeScores.put("MI:0915", 2f); // physical association
+        customOntologyTypeScores.put("MI:0407", 5f); // direct interaction
+        customOntologyTypeScores.put("unknown", 0.1f); // unknown
         super.setCustomOntologyTypeScores(customOntologyTypeScores);
     }
 
