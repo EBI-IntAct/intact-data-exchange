@@ -1,6 +1,6 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
-import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverterVersion1;
 import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriter;
 import uk.ac.ebi.intact.util.uniprotExport.writers.drlinewriters.DRLineWriter1;
@@ -32,7 +32,7 @@ public class DRWriterFactory {
             return null;
         }
 
-        if (drConverter instanceof DRLineConverter1){
+        if (drConverter instanceof DRLineConverterVersion1){
             return new DRLineWriter1(outputStream);
         }
         else {
@@ -53,7 +53,7 @@ public class DRWriterFactory {
             return null;
         }
 
-        if (drConverter instanceof DRLineConverter1){
+        if (drConverter instanceof DRLineConverterVersion1){
             return new DRLineWriter1(new FileWriter(outputStream));
         }
         else {

@@ -1,8 +1,8 @@
 package uk.ac.ebi.intact.util.uniprotExport.writers;
 
 import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter1;
-import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverter2;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverterVersion1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.encoreconverters.GoLineConverterVersion2;
 import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriter1;
 import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriter2;
 import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriter;
@@ -34,7 +34,7 @@ public class GOWriterFactory {
             return null;
         }
 
-        if (goConverter instanceof GoLineConverter1){
+        if (goConverter instanceof GoLineConverterVersion1){
             return new GOLineWriter1(outputStream);
         }
         else {
@@ -55,10 +55,10 @@ public class GOWriterFactory {
             return null;
         }
 
-        if (goConverter instanceof GoLineConverter1){
+        if (goConverter instanceof GoLineConverterVersion1){
             return new GOLineWriter1(new FileWriter(outputStream));
         }
-        else if (goConverter instanceof GoLineConverter2){
+        else if (goConverter instanceof GoLineConverterVersion2){
             return new GOLineWriter2(new FileWriter(outputStream));
         }
         else {

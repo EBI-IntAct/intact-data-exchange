@@ -8,7 +8,7 @@ import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
 import uk.ac.ebi.intact.model.clone.IntactClonerException;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
-import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
+import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
@@ -41,7 +41,7 @@ public class IntactFilterTest extends UniprotExportBase{
         Assert.assertEquals(5, getDaoFactory().getInteractionDao().getAll().size());
         Assert.assertEquals(4, getDaoFactory().getExperimentDao().getAll().size());
 
-        IntactFilter filter = new IntactFilter(new ExporterBasedOnDetectionMethod());
+        IntactFilter filter = new IntactFilter(new ExporterBasedOnClusterScore());
 
         MiClusterScoreResults results = filter.exportInteractions();
 

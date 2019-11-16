@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportBase;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
-import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriter1Test;
+import uk.ac.ebi.intact.util.uniprotExport.writers.golinewriters.GOLineWriterVersion1Test;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -34,7 +34,7 @@ public class DRLineWriterTest extends UniprotExportBase{
 
             writer.close();
 
-            File template = new File(GOLineWriter1Test.class.getResource("/dr_file_test.txt").getFile());
+            File template = new File(GOLineWriterVersion1Test.class.getResource("/dr_file_test.txt").getFile());
 
             Assert.assertTrue(areFilesEqual(testFile, template));
 

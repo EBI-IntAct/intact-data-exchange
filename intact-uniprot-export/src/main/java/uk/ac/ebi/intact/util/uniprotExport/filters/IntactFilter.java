@@ -3,7 +3,9 @@ package uk.ac.ebi.intact.util.uniprotExport.filters;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.tab.model.BinaryInteraction;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
 import uk.ac.ebi.intact.core.context.DataContext;
 import uk.ac.ebi.intact.core.context.IntactContext;
@@ -13,7 +15,6 @@ import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.QueryBuilder;
-import uk.ac.ebi.intact.util.uniprotExport.exporters.rules.ExporterBasedOnDetectionMethod;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterConfig;
 import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.miscore.extension.IntActFileMiScoreDistribution;
@@ -765,36 +766,6 @@ public class IntactFilter implements InteractionFilter {
         extractComputedMiScoresFor(negativeInteractions.getInteractionsToExport(), fileDataExported, fileDataNotExported, negativeInteractions.getCluster());
 
         return results;
-    }
-
-    public MiClusterScoreResults exportReleasedHighConfidenceTrueBinaryInteractions(String fileInteractionEligible, String fileTotal, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
-
-        System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
-
-        if (this.exporter instanceof ExporterBasedOnDetectionMethod){
-            ExporterBasedOnDetectionMethod extractor = (ExporterBasedOnDetectionMethod) this.exporter;
-            List<String> eligibleBinaryInteractions = extractor.filterBinaryInteractionsFrom(eligibleInteractions, fileInteractionEligible);
-
-            System.out.println("computes MI score");
-            MiClusterScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);
-            exporter.exportInteractionsFrom(results);
-
-            ExportedClusteredInteractions positiveInteractions = results.getPositiveClusteredInteractions();
-            ExportedClusteredInteractions negativeInteractions = results.getNegativeClusteredInteractions();
-
-            positiveInteractions.getCluster().saveCluster(fileTotal);
-            negativeInteractions.getCluster().saveCluster(fileTotal);
-
-            System.out.println("export positive binary interactions from intact");
-            extractComputedMiScoresFor(positiveInteractions.getInteractionsToExport(), fileDataExported, fileDataNotExported, positiveInteractions.getCluster());
-            System.out.println("export negative binary interactions from intact");
-            extractComputedMiScoresFor(negativeInteractions.getInteractionsToExport(), fileDataExported, fileDataNotExported, negativeInteractions.getCluster());
-
-            return results;
-        }
-
-        return null;
     }
 
     public MiClusterScoreResults exportAllReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {

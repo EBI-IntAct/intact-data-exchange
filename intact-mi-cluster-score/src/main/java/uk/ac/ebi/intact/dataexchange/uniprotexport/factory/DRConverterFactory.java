@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport.factory;
 
 import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter;
-import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverter1;
+import uk.ac.ebi.intact.util.uniprotExport.converters.DRLineConverterVersion1;
 
 /**
  * Factory for the DR line converters
@@ -16,7 +16,7 @@ public class DRConverterFactory {
     public static DRLineConverter createDRLineConverter(int version){
         switch (version) {
             case 1:
-                return new DRLineConverter1();
+                return new DRLineConverterVersion1();
             default:
                 return null;
         }
