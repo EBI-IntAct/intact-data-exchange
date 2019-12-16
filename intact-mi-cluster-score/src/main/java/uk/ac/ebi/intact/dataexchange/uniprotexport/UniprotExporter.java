@@ -16,13 +16,11 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.NonClusteredMitabFilter;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 
-import java.io.IOException;
-
 /**
  * The main class for running uniprot export.
  *
  * The possible arguments are :
- * - rule : can be 'mi_score' or 'detection_method'. It defines the rules we want to apply to the binary interactions
+ * - rule : only 'mi_score' available. It defines the rules we want to apply to the binary interactions
  * - source : can be 'mitab' or 'intact' depending if we export interactions from a mitab file or directly from intact.
  * we can specify the name of the mitab file like that : -Dsource=mitab:filename
  * - drFile : name of the file containing the DR lines which will be generated. If we want to specify the version of the DR format to use we can write :
@@ -43,13 +41,13 @@ import java.io.IOException;
  */
 public class UniprotExporter {
 
-    public static void main( String[] args ) throws IOException {
+    public static void main( String[] args ) {
 
         // Six possible arguments
         if( args.length != 11 ) {
             System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <silverCCFile> <goFile> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly> <excludeInferred>" );
             System.err.println( "Usage: <rule> is the type of rule we want to use to export the interaction to uniprot. " +
-                    "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
+                    "Currently only available rule based in a modified version of 'mi_score'" );
             System.err.println( "Usage: <source> is the source of the binary interactions we want to export." +
                     " Can be 'intact' if we want to export the interactions directly from intact (no file name is necessary) or 'mitab:fileName' if we want to export from mitab. In the last case" +
                     "the file name must be given in the source option preceded by ':'" );

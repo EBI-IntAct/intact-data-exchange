@@ -29,12 +29,8 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
 
     private static final Logger logger = Logger.getLogger(CCLineConverterVersion1.class);
 
-    // set containing the SecondCCParameters in case of feature chains
-    private Set<SecondCCParametersVersion1> processedCCParametersForFeatureChains;
-
     public CCLineConverterVersion1(){
         super();
-        processedCCParametersForFeatureChains = new HashSet<SecondCCParametersVersion1>();
     }
 
     @Override
@@ -45,7 +41,6 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
 
     @Override
     public CCParameters<SecondCCParametersVersion1> convertInteractionsIntoCCLines(Set<EncoreInteraction> interactions, MiClusterContext context, String masterUniprot){
-        processedCCParametersForFeatureChains.clear();
 
         String taxId1 = null;
         String geneName1 = context.getGeneNames().get(masterUniprot);
@@ -236,7 +231,6 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
 
         logger.debug("Interactor " + masterUniprot + " doesn't have any valid second CC parameters and will be skipped.");
 
-        processedCCParametersForFeatureChains.clear();
         return null;
     }
 }
