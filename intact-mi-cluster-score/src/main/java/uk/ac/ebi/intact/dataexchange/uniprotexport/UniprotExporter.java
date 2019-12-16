@@ -16,13 +16,11 @@ import uk.ac.ebi.intact.util.uniprotExport.filters.config.FilterContext;
 import uk.ac.ebi.intact.util.uniprotExport.filters.mitab.NonClusteredMitabFilter;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
 
-import java.io.IOException;
-
 /**
  * The main class for running uniprot export.
  *
  * The possible arguments are :
- * - rule : can be 'mi_score' or 'detection_method'. It defines the rules we want to apply to the binary interactions
+ * - rule : only 'mi_score' available. It defines the rules we want to apply to the binary interactions
  * - source : can be 'mitab' or 'intact' depending if we export interactions from a mitab file or directly from intact.
  * we can specify the name of the mitab file like that : -Dsource=mitab:filename
  * - drFile : name of the file containing the DR lines which will be generated. If we want to specify the version of the DR format to use we can write :
@@ -43,7 +41,7 @@ import java.io.IOException;
  */
 public class UniprotExporter {
 
-    public static void main( String[] args ) throws IOException {
+    public static void main( String[] args ) {
 
         // Six possible arguments
         if( args.length != 11 ) {
