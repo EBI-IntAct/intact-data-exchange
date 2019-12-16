@@ -49,7 +49,7 @@ public class UniprotExporter {
         if( args.length != 11 ) {
             System.err.println( "Usage: UniprotExporter <rule> <source> <drFile> <ccFile> <silverCCFile> <goFile> <binaryOnly> <highConfidence> <proteinOnly> <positiveOnly> <excludeInferred>" );
             System.err.println( "Usage: <rule> is the type of rule we want to use to export the interaction to uniprot. " +
-                    "Can be 'detection_method' if we want the rules based on detection method or 'mi_score' if we want the rules based on mi score" );
+                    "Currently only available rule based in a modified version of 'mi_score'" );
             System.err.println( "Usage: <source> is the source of the binary interactions we want to export." +
                     " Can be 'intact' if we want to export the interactions directly from intact (no file name is necessary) or 'mitab:fileName' if we want to export from mitab. In the last case" +
                     "the file name must be given in the source option preceded by ':'" );
