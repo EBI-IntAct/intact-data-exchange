@@ -87,7 +87,11 @@ public class CCLineWriterVersion1 implements CCLineWriter<CCParameters<SecondCCP
                     firstUniprotAc = firstUniprotAc.substring(firstUniprotAc.indexOf(WriterUtils.CHAIN_PREFIX)+1);
                 }
                 if (secondUniprotAc.contains(WriterUtils.CHAIN_PREFIX)){
-                    secondUniprotAc = secondUniprotAc.substring(secondUniprotAc.indexOf(WriterUtils.CHAIN_PREFIX)+1);
+                    // secondUniprotAc = secondUniprotAc.substring(secondUniprotAc.indexOf(WriterUtils.CHAIN_PREFIX)+1);
+                    // For now Uniprot prefers to have always the master protein when there is an interaction beetwen chains
+                    // of same entry. If the change the specification, use previous line
+                    String secondMasterUniprotAc = secondUniprotAc.substring(0, secondUniprotAc.indexOf(WriterUtils.CHAIN_PREFIX));
+                    secondUniprotAc = secondUniprotAc.substring(secondUniprotAc.indexOf(WriterUtils.CHAIN_PREFIX)+1) + " [" + secondMasterUniprotAc + "]";
                 }
                 writer.write(firstUniprotAc);
                 writer.write(';');
@@ -109,7 +113,7 @@ public class CCLineWriterVersion1 implements CCLineWriter<CCParameters<SecondCCP
                 writer.write(';');
                 writer.write(' ');
                 writer.write(secondUniprotAc);
-                if(secondInteractor.getGeneName()!= null) {
+                if(secondInteractor.getGeneName()!= null && !secondInteractor.getGeneName().equals("-")) {
                     writer.write(':');
                     writer.write(' ');
                     writer.write(secondInteractor.getGeneName());
