@@ -154,7 +154,7 @@ public class ComplexExport2PDB {
             System.err.println("\nComplex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") has more than one complex-assembly annotation");
         }
         else if(assemblies.size() == 1){
-            informationSb.append(assemblies.iterator().next().getValue()).append(SEPARATOR);
+            informationSb.append(assemblies.iterator().next().getValue());
         }
 
         informationSb.append(NEW_LINE);
@@ -179,7 +179,7 @@ public class ComplexExport2PDB {
 
             /*  3 pdb_ids */
             String pdbIds = pdbXrefs.stream().map(Xref::getId).collect(Collectors.joining(","));
-            informationSb.append(pdbIds).append(SEPARATOR);
+            informationSb.append(pdbIds);
 
             informationSb.append(NEW_LINE);
         }
