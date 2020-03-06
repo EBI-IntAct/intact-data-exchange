@@ -324,7 +324,6 @@ public class UniprotExportProcessor {
         // the Dr writer
         DRLineWriter drWriter = drWriterFactory.createDRLineWriterFor(this.drConverter, DRFile);
 
-        // two CC line writers which will be initialized depending on the version (1 = old CC line format, 2 = new CC line format)
         CCLineWriter ccWriter = ccWriterFactory.createCCLineWriterFor(this.ccConverter, CCFile);
         CCLineWriter ccWriterForSilver = ccWriterFactory.createCCLineWriterFor(this.silverCcConverter, silverCCFile);
 

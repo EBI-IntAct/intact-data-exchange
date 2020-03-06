@@ -75,7 +75,7 @@ public class CCLineWriterVersion1 implements CCLineWriter<CCParameters<SecondCCP
             // P12345-5 contains master P12345 so no need of repeating the genes
             // Self interactions
             // Interactions between isoforms of same entry
-            // Interactions between chains of sam entry
+            // Interactions between chains of same entry
 
             // In case of self interactions of isoforms that are found in an external entry it gets cover
             // in the second part of the OR e.g Q9HDB5 contains Q9Y4C0-1, Q9Y4C0-3, Q9Y4C0-4 as isoforms
@@ -88,7 +88,7 @@ public class CCLineWriterVersion1 implements CCLineWriter<CCParameters<SecondCCP
                 }
                 if (secondUniprotAc.contains(WriterUtils.CHAIN_PREFIX)){
                     // secondUniprotAc = secondUniprotAc.substring(secondUniprotAc.indexOf(WriterUtils.CHAIN_PREFIX)+1);
-                    // For now Uniprot prefers to have always the master protein when there is an interaction beetwen chains
+                    // For now Uniprot prefers to have always the master protein when there is an interaction between chains
                     // of same entry. If the change the specification, use previous line
                     String secondMasterUniprotAc = secondUniprotAc.substring(0, secondUniprotAc.indexOf(WriterUtils.CHAIN_PREFIX));
                     secondUniprotAc = secondUniprotAc.substring(secondUniprotAc.indexOf(WriterUtils.CHAIN_PREFIX)+1) + " [" + secondMasterUniprotAc + "]";
@@ -121,7 +121,7 @@ public class CCLineWriterVersion1 implements CCLineWriter<CCParameters<SecondCCP
             }
 
             // generated warning message if the two protein are from different organism
-            if (secondInteractor.getTaxId() != null && !entryTaxId.equals(secondInteractor.getTaxId())) {
+            if (secondInteractor.getSecondTaxId() != null && !entryTaxId.equals(secondInteractor.getSecondTaxId())) {
                 writer.write(';');
                 writer.write(' ');
                 writer.write("Xeno");
