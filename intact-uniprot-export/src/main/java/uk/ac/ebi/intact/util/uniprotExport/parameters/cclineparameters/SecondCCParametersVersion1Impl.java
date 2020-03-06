@@ -179,37 +179,22 @@ public class SecondCCParametersVersion1Impl implements SecondCCParametersVersion
     }
 
 
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || !(o instanceof SecondCCParametersVersion1Impl))
-        {
-            return false;
-        }
-
-        SecondCCParametersVersion1Impl ccLine1 = (SecondCCParametersVersion1Impl) o;
-
-        if (!Objects.equals(geneName, ccLine1.geneName))
-        {
-            return false;
-        }
-        else if (secondUniprotAc != null ? !secondUniprotAc.equalsIgnoreCase(ccLine1.getSecondUniprotAc()) : ccLine1.secondUniprotAc != null){
-
-            return false;
-        }
-
-        return true;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SecondCCParametersVersion1Impl that = (SecondCCParametersVersion1Impl) o;
+        return firstUniprotAc.equals(that.firstUniprotAc) &&
+                secondUniprotAc.equals(that.secondUniprotAc) &&
+                secondIntact.equals(that.secondIntact) &&
+                firstIntact.equals(that.firstIntact) &&
+                Objects.equals(geneName, that.geneName) &&
+                firstTaxId.equals(that.firstTaxId) &&
+                secondTaxId.equals(that.secondTaxId);
     }
 
-    public int hashCode()
-    {
-        int result;
-        result = (geneName != null ? geneName.hashCode() : 0);
-        result = 31 * result + (secondUniprotAc != null ? secondUniprotAc.hashCode() : 0);
-        return result;
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstUniprotAc, secondUniprotAc, secondIntact, firstIntact, geneName, firstTaxId, secondTaxId);
     }
-
 }
