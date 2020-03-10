@@ -160,26 +160,53 @@ public class SecondCCParametersVersion1Impl implements SecondCCParametersVersion
                     //At this point either both genes are null so compare is 0 or the comparison has happened
                     if (compare == 0) {
                         // gene names are the same or there are no gene names, then compare the uniprotID
-                        String secondUniprotCc1 = this.secondUniprotAc;
-                        String secondUniprotCc2 = secondUniprotAcCc2;
+                        String secondUniprotCanonicalCc1 = this.secondUniprotAc;
+                        String secondUniprotCanonicalCc2 = secondUniprotAcCc2;
 
-                        if (secondUniprotCc1 != null && secondUniprotCc2 != null) {
-                            //If PRO_ we extract the Uniprot AC for sorting
-                            if (secondUniprotCc1.contains(WriterUtils.CHAIN_PREFIX)) {
-                                secondUniprotCc1 = secondUniprotCc1.substring(0, secondUniprotCc1.indexOf(WriterUtils.CHAIN_PREFIX));
-                            }
-                            if (secondUniprotCc2.contains(WriterUtils.CHAIN_PREFIX)) {
-                                secondUniprotCc2 = secondUniprotCc2.substring(0, secondUniprotCc2.indexOf(WriterUtils.CHAIN_PREFIX));
-                            }
 
-                            compare = compareWithNumbers(secondUniprotCc1, secondUniprotCc2);
-                            if (compare == 0) {
-                                //We need this case for PRO_ coming from the same Uniprot entry
-                                compare = this.secondUniprotAc.compareTo(secondUniprotAcCc2);
+                            if (secondUniprotCanonicalCc1 != null && secondUniprotCanonicalCc2 != null) {
+                                //If PRO_ we extract the Uniprot AC for sorting
+                                if (secondUniprotCanonicalCc1.contains(WriterUtils.CHAIN_PREFIX)) {
+                                    secondUniprotCanonicalCc1 = secondUniprotCanonicalCc1.substring(0, secondUniprotCanonicalCc1.indexOf(WriterUtils.CHAIN_PREFIX));
+                                } // If isoform we extract the Uniprot AC
+                                else if (secondUniprotCanonicalCc1.contains("-")) {
+                                    secondUniprotCanonicalCc1 = secondUniprotCanonicalCc1.substring(0, secondUniprotCanonicalCc1.indexOf("-"));
+                                }
 
+                                if (secondUniprotCanonicalCc2.contains(WriterUtils.CHAIN_PREFIX)) {
+                                    secondUniprotCanonicalCc2 = secondUniprotCanonicalCc2.substring(0, secondUniprotCanonicalCc2.indexOf(WriterUtils.CHAIN_PREFIX));
+                                }
+                                else if (secondUniprotCanonicalCc2.contains("-")) {
+                                    secondUniprotCanonicalCc2 = secondUniprotCanonicalCc2.substring(0, secondUniprotCanonicalCc2.indexOf("-"));
+                                }
+
+                                //Compare canonicals
+                                compare = secondUniprotCanonicalCc1.compareTo(secondUniprotCanonicalCc2);
+
+                                if (compare == 0){ //From the same entry.
+                                    if (this.secondUniprotAc.contains(WriterUtils.CHAIN_PREFIX) && !secondUniprotAcCc2.contains(WriterUtils.CHAIN_PREFIX)) {
+                                        // we put PRO_ at the end
+                                        compare = 1;
+                                    } else if (!this.secondUniprotAc.contains(WriterUtils.CHAIN_PREFIX) && secondUniprotAcCc2.contains(WriterUtils.CHAIN_PREFIX)) {
+                                        compare = -1;
+                                    } else {
+                                        // Both are PRO or none are PRO
+                                        // Because isoforms are longer than canonical the will be sorted properly with the string comparison
+
+                                        //if they protein comes from a transcript with different master acs we shouldn't consider the same entry
+                                        //This sorts interactant 1
+                                        compare = compareWithNumbers(this.secondUniprotAc, secondUniprotAcCc2);
+                                    }
+                                    if (compare == 0) {
+                                        //We need this case for PRO_ coming from the same Uniprot entry
+                                        compare = this.secondUniprotAc.compareTo(secondUniprotAcCc2);
+                                    }
+                                }
+                            } else {
+                                //TODO Log this case
                             }
-                        }
                     }
+
                 }
             }
         }
