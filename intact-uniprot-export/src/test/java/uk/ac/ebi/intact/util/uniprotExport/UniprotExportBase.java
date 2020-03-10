@@ -136,7 +136,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         String geneName2 = "pat-12";
         String geneName3 = "eya-1";
 
-        String taxId = "9606";
+        String taxId = "6239";
         String taxId2 = "9606";
 
         SecondCCParametersVersion1 secondParameters1 = new SecondCCParametersVersion1Impl(uniprotAc5, intactAc4, taxId, uniprotAc2, intactAc1, taxId2, geneName2, 1);
