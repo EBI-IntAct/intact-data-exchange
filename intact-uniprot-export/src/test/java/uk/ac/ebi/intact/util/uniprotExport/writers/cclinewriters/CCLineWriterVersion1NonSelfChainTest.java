@@ -282,7 +282,8 @@ public class CCLineWriterVersion1NonSelfChainTest extends UniprotExportBase {
 
         return interactions;
     }
-        public MiClusterContext createNonSelfChainInteractionsClusterContext(){
+
+    public MiClusterContext createNonSelfChainInteractionsClusterContext(){
         MiClusterContext context = new MiClusterContext();
 
         context.getMiTerms().put("MI:0915", "physical association");

@@ -206,7 +206,7 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
                         if (numberEvidences > 0){
                             logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " to process");
 
-                            SecondCCParametersVersion1 secondCCInteractor = new SecondCCParametersVersion1Impl(firstUniprot, firstIntactAc, secondUniprot, secondIntactAc, geneName2, taxId2, numberEvidences);
+                            SecondCCParametersVersion1 secondCCInteractor = new SecondCCParametersVersion1Impl(firstUniprot, firstIntactAc, taxId1, secondUniprot, secondIntactAc, taxId2, geneName2, numberEvidences);
                            if(!secondCCInteractors.add(secondCCInteractor)){
                                logger.error("Trying to insert a interactor pair that has been already inserted");
                            }
@@ -220,7 +220,7 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
                     }
                 }
                 else{
-                    logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the unipprot acs/ intact acs which is null.");
+                    logger.error("Interaction " + uniprot1 + " and " + uniprot2 + " has one of the uniprot acs/ intact acs which is null.");
                 }
             }
 

@@ -15,7 +15,10 @@ import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.clone.IntactClonerException;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
-import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.*;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParameters;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.CCParametersVersion1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParametersVersion1;
+import uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters.SecondCCParametersVersion1Impl;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParameters;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.drlineparameters.DRParametersImpl;
 import uk.ac.ebi.intact.util.uniprotExport.parameters.golineparameters.GOParameters;
@@ -134,11 +137,10 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         String geneName3 = "eya-1";
 
         String taxId = "6239";
-
         String taxId2 = "9606";
 
-        SecondCCParametersVersion1 secondParameters1 = new SecondCCParametersVersion1Impl(uniprotAc5, intactAc4, uniprotAc2, intactAc1, geneName2, taxId2, 1);
-        SecondCCParametersVersion1 secondParameters2 = new SecondCCParametersVersion1Impl(uniprotAc6, intactAc5, uniprotAc3, intactAc2, geneName3, taxId, 2);
+        SecondCCParametersVersion1 secondParameters1 = new SecondCCParametersVersion1Impl(uniprotAc5, intactAc4, taxId, uniprotAc2, intactAc1, taxId2, geneName2, 1);
+        SecondCCParametersVersion1 secondParameters2 = new SecondCCParametersVersion1Impl(uniprotAc6, intactAc5, taxId, uniprotAc3, intactAc2, taxId, geneName3, 2);
 
         SortedSet<SecondCCParametersVersion1> listOfSecondInteractors1 = new TreeSet<SecondCCParametersVersion1>();
         listOfSecondInteractors1.add(secondParameters1);
@@ -148,18 +150,172 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         parameters.add(parameters1);
 
         SortedSet<SecondCCParametersVersion1> listOfSecondInteractors2 = new TreeSet<SecondCCParametersVersion1>();
-        SecondCCParametersVersion1 secondParameters4 = new SecondCCParametersVersion1Impl(uniprotAc2, intactAc1, uniprotAc5, intactAc4, geneName1, taxId, 1);
+        SecondCCParametersVersion1 secondParameters4 = new SecondCCParametersVersion1Impl(uniprotAc2, intactAc1, taxId2, uniprotAc5, intactAc4, taxId, geneName1, 1);
         listOfSecondInteractors2.add(secondParameters4);
 
         CCParameters<SecondCCParametersVersion1> parameters2 = new CCParametersVersion1(uniprotAc2, geneName2, taxId2, listOfSecondInteractors2);
         parameters.add(parameters2);
 
         SortedSet<SecondCCParametersVersion1> listOfSecondInteractors3 = new TreeSet<SecondCCParametersVersion1>();
-        SecondCCParametersVersion1 secondParameters5 = new SecondCCParametersVersion1Impl(uniprotAc3, intactAc2, uniprotAc6, intactAc5, geneName1, taxId, 2);
+        SecondCCParametersVersion1 secondParameters5 = new SecondCCParametersVersion1Impl(uniprotAc3, intactAc2, taxId, uniprotAc6, intactAc5, taxId, geneName1, 2);
         listOfSecondInteractors3.add(secondParameters5);
 
         CCParameters<SecondCCParametersVersion1> parameters3 = new CCParametersVersion1(uniprotAc3, geneName3, taxId, listOfSecondInteractors3);
         parameters.add(parameters3);
+
+        return parameters;
+    }
+
+    public List<CCParameters<SecondCCParametersVersion1>> createCCParametersVersion1ForSorting(){
+
+        String masterUniprot = "O00499";
+        String masterGeneName = "BIN1";
+        String taxId = "9606";
+
+        //All human except the ones with explicit taxid
+        String uniprotAc1 = "O00499";
+        String intactAc1 = "EBI-719094";
+
+        String uniprotAc2 = "Q9UBW5";
+        String intactAc2 = "EBI-2042570";
+        String geneName2 = "Aaa";
+
+        String uniprotAc3 = "Q9Y2H0";
+        String intactAc3 = "EBI-722139";
+        String geneName3 = "aAA";
+
+        String uniprotAc4 = "Q8NFH8";
+        String intactAc4 = "EBI-7067016";
+        String geneName4 = "REPS2";
+
+        String uniprotAc5 = "Q8NFH8-2";
+        String intactAc5 = "EBI-8029141";
+        String geneName5 = "REPS2";
+
+        String uniprotAc6 = "Q13426";
+        String intactAc6 = "EBI-717592";
+        String geneName6 = "XRCC4";
+
+        String uniprotAc8 = "O00499-PRO_0000090001";
+        String intactAc8 = "EBI-000001";
+
+        String uniprotAc9 = "O95219";
+        String intactAc9 = "EBI-724909";
+        String taxId9 = "9608";
+        String geneName9 = "SNX4";
+
+        String uniprotAc10 = "P27958-PRO_0000037576";
+        String intactAc10 = "EBI-8753518";
+        String taxId10 = "11108";
+
+        String uniprotAc11 = "Q9WMX2-PRO_0000037551";
+        String intactAc11 = "EBI-6863748";
+        String taxId11 = "333284";
+
+        String uniprotAc12 = "O00499-1";
+        String intactAc12 = "EBI-6926280";
+
+        String uniprotAc13 = "P10636-7";
+        String intactAc13 = "EBI-6926270";
+        String geneName13 = "MAPT";
+
+        String uniprotAc14 = "P10636-8";
+        String intactAc14 = "EBI-366233";
+        String geneName14 = "MAPT";
+
+        String uniprotAc15 = "O00499-10";
+        String intactAc15 = "EBI-7689134";
+
+        String uniprotAc16 = "P01106";
+        String intactAc16 = "EBI-447544";
+        String geneName16 = "MYC";
+
+        String uniprotAc17 = "O00499-7";
+        String intactAc17 = "EBI-8870146";
+
+        String uniprotAc18 = "Q9UBW5";
+        String intactAc18 = "EBI-2042570";
+        String geneName18 = "Aaa";
+
+        String uniprotAc19 = "O00499-1";
+        String intactAc19 = "EBI-6926280";
+
+        String uniprotAc20 = "O00499-7";
+        String intactAc20 = "EBI-8870146";
+
+        String uniprotAc21 = "O00499-PRO_0000090001";
+        String intactAc21 = "EBI-000001";
+
+        String uniprotAc22 = "Z13496";
+        String intactAc22 = "EBI-2864109";
+        String geneName22 = "MTM1";
+        String taxId22 = "333284";
+
+        String uniprotAc23 = "P27958-PRO_0000037576";
+        String intactAc23 = "EBI-8753518";
+        String taxId23 = "333284";
+
+        String uniprotAc25 = "O00499-7";
+        String intactAc25 = "EBI-8870146";
+
+        String uniprotAc26 = "O00499-PRO_0000090002";
+        String intactAc26 = "EBI-000002";
+
+
+        List<CCParameters<SecondCCParametersVersion1>> parameters = new ArrayList<>(1);
+        SortedSet<SecondCCParametersVersion1> listOfSecondInteractors = new TreeSet<SecondCCParametersVersion1>();
+
+        CCParameters<SecondCCParametersVersion1> parameters1 = new CCParametersVersion1(masterUniprot, masterGeneName, taxId, listOfSecondInteractors);
+        parameters.add(parameters1);
+
+        // Molecule A = O00499
+        // Molecule B: not Xeno, with gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc2, intactAc2, taxId, geneName2, 2));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc3, intactAc3, taxId, geneName3, 4));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc4, intactAc4, taxId, geneName4, 6));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc5, intactAc5, taxId, geneName5, 6));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc6, intactAc6, taxId, geneName6, 4));
+
+        // Molecule B: not Xeno, without gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc1, intactAc1, taxId, null, 3));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc8, intactAc8, taxId, null, 5));
+
+        // Molecule B: Xeno, with gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc9, intactAc9, taxId9, geneName9, 4));
+
+        // Molecule B: Xeno, without gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc10, intactAc10, taxId10, null, 11));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc11, intactAc11, taxId11, null, 5));
+
+        // Molecule A = O00499-1
+        // Molecule B: not Xeno, with gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc12, intactAc12, taxId, uniprotAc13, intactAc13, taxId, geneName13, 5));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc12, intactAc12, taxId, uniprotAc14, intactAc14, taxId, geneName14, 6));
+
+        // Molecule A = O00499-10
+        // Molecule B: not Xeno, with gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc15, intactAc15, taxId, uniprotAc16, intactAc16, taxId, geneName16, 3));
+
+        // Molecule A = O00499-7
+        // Molecule B: not Xeno, with gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc17, intactAc17, taxId, uniprotAc18, intactAc18, taxId, geneName18, 2));
+
+        // Molecule B: not Xeno, without gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc17, intactAc17, taxId, uniprotAc19, intactAc19, taxId, null, 2));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc17, intactAc17, taxId, uniprotAc20, intactAc20, taxId, null, 2));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc17, intactAc17, taxId, uniprotAc21, intactAc21, taxId, null, 5));
+
+        // Molecule B: Xeno, with gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc17, intactAc17, taxId, uniprotAc22, intactAc22, taxId22, geneName22, 6));
+
+        // Molecule B: Xeno, without gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc17, intactAc17, taxId, uniprotAc23, intactAc23, taxId23, null, 2));
+
+        // Molecule A = PRO_0000090001
+        // Molecule B: not Xeno, without gene name
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc8, intactAc8, taxId, uniprotAc25, intactAc25, taxId, null, 5));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc8, intactAc8, taxId, uniprotAc8, intactAc8, taxId, null, 5));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc8, intactAc8, taxId, uniprotAc26, intactAc26, taxId, null, 5));
 
         return parameters;
     }
@@ -193,7 +349,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         interactorA.put("uniprotkb", "P28548-1");
         interactorA.put("intact", "EBI-317777");
         Map<String, String> interactorB = new HashMap<String, String>();
-        interactorB.put("uniprotkb", "Q22534");
+        interactorB.put("uniprotkb", "Q22534"); // Human for testing purposes
         interactorB.put("intact", "EBI-327642");
 
         List<String> pubmeds = new ArrayList<String>();

@@ -68,6 +68,7 @@ public class CCWriterFactory {
      * @return a CCLine writer which is compatible with this version of the CC line format, null otherwise
      * @throws IOException in case of problems writing
      */
+    @Deprecated
     public CCLineWriter createCCLineWriterFor(int version, OutputStreamWriter outputStream) throws IOException {
 
         if (version == 1){
@@ -85,6 +86,7 @@ public class CCWriterFactory {
      * @return a CCLine writer which is compatible with this version of the CC line format, null otherwise
      * @throws IOException in case of problems writing
      */
+    @Deprecated
     public CCLineWriter createCCLineWriterFor(int version, String outputStream) throws IOException {
 
         if (version == 1){

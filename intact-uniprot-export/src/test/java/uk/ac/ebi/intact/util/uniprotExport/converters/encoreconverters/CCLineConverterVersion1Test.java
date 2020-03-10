@@ -29,7 +29,7 @@ public class CCLineConverterVersion1Test extends UniprotExportBase {
         List<EncoreInteraction> interactions = createEncoreInteractions();
         interactions.add(3, createIsoformIsoformInteraction()); // with rules of 2019 an isoform-isoform can be converted
         interactions.add(4, createEncoreInteractionWithTransIsoform()); // can be converted but is written twice because another isoform of the entry already interacts with same protein
-        interactions.add(5, createEncoreInteractionWithTransIsoformAndMaster()); // can be converted because isoform and other uniprot entry, even if this isoform is not matching the master
+        interactions.add(5, createEncoreInteractionWithTransIsoformAndMaster()); // can be converted because isoform in other uniprot entry, even if this isoform is not matching the master
 
         List<EncoreInteraction> negativeInteractions = new ArrayList<EncoreInteraction>();
         negativeInteractions.add(interactions.get(5));
@@ -55,22 +55,24 @@ public class CCLineConverterVersion1Test extends UniprotExportBase {
         for (SecondCCParametersVersion1 secondPar : parameters.getSecondCCParameters()){
 
             if (i == 0){
-                Assert.assertEquals("P28548-PRO_0000068244", secondPar.getFirstUniprotAc());
-                Assert.assertEquals("Q21361", secondPar.getSecondUniprotAc());
-                Assert.assertEquals("EBI-317779", secondPar.getFirstIntactAc());
-                Assert.assertEquals("EBI-317743", secondPar.getSecondIntactAc());
-                Assert.assertEquals("atf-2", secondPar.getGeneName());
-                Assert.assertEquals(5, secondPar.getNumberOfInteractionEvidences());
-                Assert.assertEquals("9606", secondPar.getTaxId());
-            }
-            else if (i == 1){
                 Assert.assertEquals("P12347-4", secondPar.getFirstUniprotAc());
                 Assert.assertEquals("O17670", secondPar.getSecondUniprotAc());
                 Assert.assertEquals("EBI-99999999", secondPar.getFirstIntactAc());
                 Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
                 Assert.assertEquals("eya-1", secondPar.getGeneName());
                 Assert.assertEquals(2, secondPar.getNumberOfInteractionEvidences());
-                Assert.assertEquals("6239", secondPar.getTaxId());
+                Assert.assertEquals("6239", secondPar.getFirstTaxId());
+                Assert.assertEquals("6239", secondPar.getSecondTaxId());
+            }
+            else if (i == 1){
+                Assert.assertEquals("P28548-1", secondPar.getFirstUniprotAc());
+                Assert.assertEquals("Q22534", secondPar.getSecondUniprotAc());
+                Assert.assertEquals("EBI-317777", secondPar.getFirstIntactAc());
+                Assert.assertEquals("EBI-327642", secondPar.getSecondIntactAc());
+                Assert.assertEquals("pat-12", secondPar.getGeneName());
+                Assert.assertEquals(1, secondPar.getNumberOfInteractionEvidences());
+                Assert.assertEquals("6239", secondPar.getFirstTaxId());
+                Assert.assertEquals("9606", secondPar.getSecondTaxId());
             }
             else if (i == 2){
                 Assert.assertEquals("P28548-2", secondPar.getFirstUniprotAc());
@@ -79,7 +81,8 @@ public class CCLineConverterVersion1Test extends UniprotExportBase {
                 Assert.assertEquals("EBI-311862", secondPar.getSecondIntactAc());
                 Assert.assertEquals("eya-1", secondPar.getGeneName());
                 Assert.assertEquals(2, secondPar.getNumberOfInteractionEvidences());
-                Assert.assertEquals("6239", secondPar.getTaxId());
+                Assert.assertEquals("6239", secondPar.getFirstTaxId());
+                Assert.assertEquals("6239", secondPar.getSecondTaxId());
             }
             else if (i == 3){
                 Assert.assertEquals("P28548-2", secondPar.getFirstUniprotAc());
@@ -88,16 +91,18 @@ public class CCLineConverterVersion1Test extends UniprotExportBase {
                 Assert.assertEquals("EBI-317777", secondPar.getSecondIntactAc());
                 Assert.assertEquals("Kin-10", secondPar.getGeneName());
                 Assert.assertEquals(2, secondPar.getNumberOfInteractionEvidences());
-                Assert.assertEquals("6239", secondPar.getTaxId());
+                Assert.assertEquals("6239", secondPar.getFirstTaxId());
+                Assert.assertEquals("6239", secondPar.getSecondTaxId());
             }
             else if (i == 4){
-                Assert.assertEquals("P28548-1", secondPar.getFirstUniprotAc());
-                Assert.assertEquals("Q22534", secondPar.getSecondUniprotAc());
-                Assert.assertEquals("EBI-317777", secondPar.getFirstIntactAc());
-                Assert.assertEquals("EBI-327642", secondPar.getSecondIntactAc());
-                Assert.assertEquals("pat-12", secondPar.getGeneName());
-                Assert.assertEquals(1, secondPar.getNumberOfInteractionEvidences());
-                Assert.assertEquals("9606", secondPar.getTaxId());
+                Assert.assertEquals("P28548-PRO_0000068244", secondPar.getFirstUniprotAc());
+                Assert.assertEquals("Q21361", secondPar.getSecondUniprotAc());
+                Assert.assertEquals("EBI-317779", secondPar.getFirstIntactAc());
+                Assert.assertEquals("EBI-317743", secondPar.getSecondIntactAc());
+                Assert.assertEquals("atf-2", secondPar.getGeneName());
+                Assert.assertEquals(5, secondPar.getNumberOfInteractionEvidences());
+                Assert.assertEquals("6239", secondPar.getFirstTaxId());
+                Assert.assertEquals("9606", secondPar.getSecondTaxId());
             }
             i++;
         }

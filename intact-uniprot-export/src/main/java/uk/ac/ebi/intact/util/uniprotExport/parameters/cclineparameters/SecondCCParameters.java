@@ -9,7 +9,7 @@ package uk.ac.ebi.intact.util.uniprotExport.parameters.cclineparameters;
  * @since <pre>10/02/11</pre>
  */
 
-public abstract interface SecondCCParameters extends Comparable{
+public interface SecondCCParameters extends Comparable<SecondCCParameters>{
 
     /**
      * the Intact AC of the first interactor
@@ -38,8 +38,14 @@ public abstract interface SecondCCParameters extends Comparable{
     public String getGeneName();
 
     /**
+     * The taxId of the first interactor
+     * @return
+     */
+    public String getFirstTaxId();
+
+    /**
      * The taxId of the second interactor
      * @return
      */
-    public String getTaxId();
+    public String getSecondTaxId();
 }
