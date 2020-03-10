@@ -96,24 +96,23 @@ public class SecondCCParametersVersion1Impl implements SecondCCParametersVersion
         // b. isoform-specific interactions sorted alphanumerically,
         // c. PRO_xxx interactions sorted alphanumerically
 
-        final String firstUniprotCc2 = cc2.getFirstUniprotAc();
+        final String firstUniprotAcCc2 = cc2.getFirstUniprotAc();
         final String secondUniprotAcCc2 = cc2.getSecondUniprotAc();
-        int compare;
+        int compare = 0;
 
         // We detect if it is a PRO_
-        if (firstUniprotAc.contains(WriterUtils.CHAIN_PREFIX) && !firstUniprotCc2.contains(WriterUtils.CHAIN_PREFIX)) {
+        if (firstUniprotAc.contains(WriterUtils.CHAIN_PREFIX) && !firstUniprotAcCc2.contains(WriterUtils.CHAIN_PREFIX)) {
             // we put PRO_ at the end
             compare = 1;
-        } else if (!firstUniprotAc.contains(WriterUtils.CHAIN_PREFIX) && firstUniprotCc2.contains(WriterUtils.CHAIN_PREFIX)) {
+        } else if (!firstUniprotAc.contains(WriterUtils.CHAIN_PREFIX) && firstUniprotAcCc2.contains(WriterUtils.CHAIN_PREFIX)) {
             compare = -1;
         } else {
-            //Both are PRO or none are PRO
+            // Both are PRO or none are PRO
             // Because isoforms are longer than canonical the will be sorted properly with the string comparison
-            // TODO: Note check for isoforms than are part of other entries, where should be sorted because
-            // alphanumerically could end up before the canonical entry
 
             //if they protein comes from a transcript with different master acs we shouldn't consider the same entry
-            compare = this.firstUniprotAc.compareTo(firstUniprotCc2);
+            //This sorts interactant 1
+            compare = compareWithNumbers(firstUniprotAc, firstUniprotAcCc2);
 
             if (compare == 0) { //Same (either canonical, isoform, or PRO)
                 // 2. sort by Xeno (different species)
@@ -138,19 +137,26 @@ public class SecondCCParametersVersion1Impl implements SecondCCParametersVersion
                     //
                     // *sort by ID: if the "ID" is "PRO_xxx [AC]", sort first by AC, then by PRO_xxx  (to group chains from the same AC)
 
-                    final String geneNameCc2 = cc2.getGeneName();
+                    String geneNameCc1 = geneName;
+                    String geneNameCc2 = cc2.getGeneName();
 
-                    if (geneName != null && geneNameCc2 != null) {
-
-                        String lowerCaseGene1 = geneName.toLowerCase();
-                        String lowerCaseGene2 = geneNameCc2.toLowerCase();
-
-                        compare = lowerCaseGene1.compareTo(lowerCaseGene2);
-
-                        if (compare == 0) {
-                            compare = geneName.compareTo(geneNameCc2);
-                        }
+                    if (geneNameCc1 != null) {
+                        geneNameCc1 = geneName.toLowerCase();
                     }
+                    if (geneNameCc2 != null) {
+                        geneNameCc2 = geneNameCc2.toLowerCase();
+                    }
+
+                    if (geneNameCc1 == null && geneNameCc2 != null) {
+                        compare = 1;
+                    } else if (geneNameCc1 != null && geneNameCc2 == null) {
+                        compare = -1;
+                    } else if (geneNameCc1 != null && geneNameCc2 != null) {
+                        compare = geneNameCc1.compareTo(geneNameCc2);
+                    } else { //both genes are null
+                        compare = 0;
+                    }
+
                     //At this point either both genes are null so compare is 0 or the comparison has happened
                     if (compare == 0) {
                         // gene names are the same or there are no gene names, then compare the uniprotID
@@ -165,10 +171,12 @@ public class SecondCCParametersVersion1Impl implements SecondCCParametersVersion
                             if (secondUniprotCc2.contains(WriterUtils.CHAIN_PREFIX)) {
                                 secondUniprotCc2 = secondUniprotCc2.substring(0, secondUniprotCc2.indexOf(WriterUtils.CHAIN_PREFIX));
                             }
-                            compare = secondUniprotCc1.compareTo(secondUniprotCc2);
-                            if(compare == 0) {
-                                //We need this case for PRO_ comming from the same Uniprot entry
+
+                            compare = compareWithNumbers(secondUniprotCc1, secondUniprotCc2);
+                            if (compare == 0) {
+                                //We need this case for PRO_ coming from the same Uniprot entry
                                 compare = this.secondUniprotAc.compareTo(secondUniprotAcCc2);
+
                             }
                         }
                     }
@@ -178,6 +186,38 @@ public class SecondCCParametersVersion1Impl implements SecondCCParametersVersion
         return compare;
     }
 
+    private int compareWithNumbers(String o1, String o2) {
+
+        String o1StringPart = o1;
+        String o2StringPart = o2;
+
+        if (!o1.contains(WriterUtils.CHAIN_PREFIX) && !o2.contains(WriterUtils.CHAIN_PREFIX)) {
+            if (o1.contains("-")) {
+                o1StringPart = o1.substring(0, o1.indexOf("-"));
+            }
+
+            if (o2.contains("-")) {
+                o2StringPart = o2.substring(0, o2.indexOf("-"));
+            }
+
+            if (o1StringPart.equalsIgnoreCase(o2StringPart)) {
+                return extractInt(o1) - extractInt(o2);
+            }
+        }
+        return o1.compareTo(o2);
+    }
+
+    private int extractInt(String s) {
+
+        String num = "";
+
+        if(s.contains("-")) {
+            num = s.substring(s.indexOf("-") + 1);
+        }
+
+        // return 0 if no digits found
+        return num.isEmpty() ? 0 : Integer.parseInt(num);
+    }
 
     @Override
     public boolean equals(Object o) {
