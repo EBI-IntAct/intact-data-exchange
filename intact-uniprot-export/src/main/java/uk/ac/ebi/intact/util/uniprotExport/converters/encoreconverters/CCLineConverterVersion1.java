@@ -12,7 +12,10 @@ import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedPr
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * The CCLineConverterVersion1 can only convert positive encore interactions to CC parameters for the CC line format, version 1.
@@ -115,18 +118,28 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
                     boolean isUniprot2FromSameUniprotEntry = UniprotExportUtils.isFromSameUniprotEntry(masterUniprot, uniprot2, transSplicedVariants.get(masterUniprot));
 
                     // the first uniprot is from the same uniprot entry as the master uniprot but the uniprot 2 is from another uniprot entry
-                    if (isUniprot1FromSameUniprotEntry && !isUniprot2FromSameUniprotEntry){
+                    if (isUniprot1FromSameUniprotEntry && !isUniprot2FromSameUniprotEntry) {
                         firstUniprot = uniprot1;
                         secondUniprot = uniprot2;
                         geneName2 = context.getGeneNames().get(uniprot2);
+                        // mi-cluster assigned "-" as empty gene name, this creates problems in the sorting algoritm.
+                        // We remove this character to avoid problems
+                        if (geneName2 != null && geneName2.equalsIgnoreCase("-")) {
+                            geneName2 = null;
+                        }
                         taxId2 = organismsB[0];
                         secondIntactAc = intact2;
 
                         taxId1 = organismsA[0];
                         firstIntactAc = intact1;
 
-                        if (geneName1 == null){
+                        if (geneName1 == null) {
+                            // mi-cluster assigned "-" as empty gene name, this creates problems in the sorting algoritm.
+                            // We remove this character to avoid problems
                             geneName1 = context.getGeneNames().get(uniprot1);
+                            if (geneName1 != null && geneName1.equalsIgnoreCase("-")) {
+                                geneName1 = null;
+                            }
                         }
                     }
                     // the second uniprot is from the same uniprot entry as the master uniprot but the uniprot 1 is from another uniprot entry
@@ -134,6 +147,11 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
                         firstUniprot = uniprot2;
                         secondUniprot = uniprot1;
                         geneName2 = context.getGeneNames().get(uniprot1);
+                        // mi-cluster assigned "-" as empty gene name, this creates problems in the sorting algoritm.
+                        // We remove this character to avoid problems
+                        if (geneName2 != null && geneName2.equalsIgnoreCase("-")) {
+                            geneName2 = null;
+                        }
                         taxId2 = organismsA[0];
                         secondIntactAc = intact1;
 
@@ -141,7 +159,12 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
                         firstIntactAc = intact2;
 
                         if (geneName1 == null){
+                            // mi-cluster assigned "-" as empty gene name, this creates problems in the sorting algoritm.
+                            // We remove this character to avoid problems
                             geneName1 = context.getGeneNames().get(uniprot2);
+                            if (geneName1 != null && geneName1.equalsIgnoreCase("-")) {
+                                geneName1 = null;
+                            }
                         }
                     }
                     // we have an interaction which can be self interaction or which involves isoforms of same uniprot entry. They must have same gene name
@@ -158,6 +181,9 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
 
                             if (geneName1 == null){
                                 geneName1 = context.getGeneNames().get(uniprot1);
+                                if (geneName1 != null && geneName1.equalsIgnoreCase("-")) {
+                                    geneName1 = null;
+                                }
                             }
                             geneName2 = geneName1;
                         }
@@ -173,6 +199,9 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
 
                             if (geneName1 == null){
                                 geneName1 = context.getGeneNames().get(uniprot2);
+                                if (geneName1 != null && geneName1.equalsIgnoreCase("-")) {
+                                    geneName1 = null;
+                                }
                             }
                             geneName2 = geneName1;
                         }
@@ -189,6 +218,9 @@ public class CCLineConverterVersion1 extends AbstractCCLineConverter {
 
                             if (geneName1 == null){
                                 geneName1 = context.getGeneNames().get(uniprot2);
+                                if (geneName1 != null && geneName1.equalsIgnoreCase("-")) {
+                                    geneName1 = null;
+                                }
                             }
                             geneName2 = geneName1;
                             logger.info("Interaction " + uniprot1 + " and " + uniprot2 + " is  converted but the two interactors are isoforms of the same uniprot entry " + masterUniprot);

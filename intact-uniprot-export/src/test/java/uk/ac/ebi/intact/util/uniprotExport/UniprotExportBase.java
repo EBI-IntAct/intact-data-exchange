@@ -175,6 +175,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         //All human except the ones with explicit taxid
         String uniprotAc1 = "O00499";
         String intactAc1 = "EBI-719094";
+        String geneName1 = "BIN1";
 
         String uniprotAc2 = "Q9UBW5";
         String intactAc2 = "EBI-2042570";
@@ -277,7 +278,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc6, intactAc6, taxId, geneName6, 4));
 
         // Molecule B: not Xeno, without gene name
-        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc1, intactAc1, taxId, null, 3));
+        listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc1, intactAc1, taxId, geneName1, 3));
         listOfSecondInteractors.add(new SecondCCParametersVersion1Impl(uniprotAc1, intactAc1, taxId, uniprotAc8, intactAc8, taxId, null, 5));
 
         // Molecule B: Xeno, with gene name
