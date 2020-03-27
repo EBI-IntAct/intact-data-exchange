@@ -97,6 +97,11 @@ public class CCLineWriterVersion1 implements CCLineWriter<CCParameters<SecondCCP
                 writer.write(';');
                 writer.write(' ');
                 writer.write(secondUniprotAc);
+                if(secondInteractor.getGeneName()!= null) {
+                    writer.write(':');
+                    writer.write(' ');
+                    writer.write(secondInteractor.getGeneName());
+                }
 
             // The proteins are from different entries
             } else {
@@ -113,7 +118,7 @@ public class CCLineWriterVersion1 implements CCLineWriter<CCParameters<SecondCCP
                 writer.write(';');
                 writer.write(' ');
                 writer.write(secondUniprotAc);
-                if(secondInteractor.getGeneName()!= null && !secondInteractor.getGeneName().equals("-")) {
+                if(secondInteractor.getGeneName()!= null) {
                     writer.write(':');
                     writer.write(' ');
                     writer.write(secondInteractor.getGeneName());
