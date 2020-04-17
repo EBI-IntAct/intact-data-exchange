@@ -190,10 +190,15 @@
         <property name="errorResource" ref="errorResource"/>
         <property name="enricher" ref="intactInteractionEvidenceEnricher"/>
     </bean>
-    <bean id="complexProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
+    <bean id="complexEnricherProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
           lazy-init="true">
         <property name="errorResource" ref="errorResource"/>
         <property name="enricher" ref="intactComplexEnricher"/>
+    </bean>
+    <bean id="complexDataAdditionProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactComplexDataAdditionProcessor"
+          lazy-init="true">
+        <property name="errorResource" ref="errorResource"/>
+        <property name="complexService" ref="complexService"/>
     </bean>
     <bean id="modelledInteractionProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
           lazy-init="true">
@@ -208,8 +213,12 @@
     <bean id="interactionMixProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactInteractionEnricherCompositeProcessor" lazy-init="true">
         <property name="interactionEvidenceProcessor" ref="interactionEvidenceProcessor"/>
         <property name="modelledInteractionProcessor" ref="modelledInteractionProcessor"/>
-        <property name="complexProcessor" ref="complexProcessor"/>
+        <property name="complexProcessor" ref="complexEnricherProcessor"/>
         <property name="interactionProcessor" ref="interactionProcessor"/>
+    </bean>
+    <bean id="intactComplexEnricherCompositeProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactComplexEnricherCompositeProcessor" lazy-init="true">
+        <property name="intactComplexDataAdditionProcessor" ref="complexDataAdditionProcessor"/>
+        <property name="complexEnricherProcessor" ref="complexEnricherProcessor"/>
     </bean>
 
     <!-- writers -->
@@ -298,7 +307,7 @@
             </batch:listeners>
 
             <batch:chunk reader="complexReader"
-                         processor="complexProcessor"
+                         processor="intactComplexEnricherCompositeProcessor"
                          writer="complexImporter"
                          commit-interval="50"
                          retry-limit="10">
@@ -310,7 +319,8 @@
 
                 <batch:streams>
                     <batch:stream ref="complexReader"/>
-                    <batch:stream ref="complexProcessor"/>
+                    <batch:stream ref="complexEnricherProcessor"/>
+                    <batch:stream ref="complexDataAdditionProcessor"/>
                     <batch:stream ref="complexImporter"/>
                 </batch:streams>
             </batch:chunk>
@@ -339,7 +349,7 @@
                     <batch:stream ref="interactionMixImporter"/>
                     <batch:stream ref="interactionEvidenceProcessor"/>
                     <batch:stream ref="modelledInteractionProcessor"/>
-                    <batch:stream ref="complexProcessor"/>
+                    <batch:stream ref="complexEnricherProcessor"/>
                     <batch:stream ref="interactionProcessor"/>
                 </batch:streams>
             </batch:chunk>
