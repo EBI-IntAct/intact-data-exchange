@@ -27,6 +27,7 @@ public class FeatureToExportLine {
     private final String NEW_LINE = "\n";
     private final String ONE_SPACE = " ";
     private final String COLON = ":";
+    private final String MULTIVALUE_SEPARATOR = "|";
 
     @Transactional(propagation = Propagation.REQUIRED, value = "jamiTransactionManager", readOnly = true)
     public MutationExportLine convertFeatureToMutationExportLine(FeatureEvidence featureEvidence) {
@@ -59,8 +60,8 @@ public class FeatureToExportLine {
         Annotation annotation = annotations.stream().filter(a -> a.getTopic().getShortName().equals(MI_FIGURELEGEND)).findFirst().orElse(null);
         if (annotation != null) {
             String annotationString = annotation.getValue();
-            annotationString =  annotationString.replaceAll(TAB, ONE_SPACE);
-            annotationString =  annotationString.replaceAll(NEW_LINE, ONE_SPACE);
+            annotationString = annotationString.replaceAll(TAB, ONE_SPACE);
+            annotationString = annotationString.replaceAll(NEW_LINE, ONE_SPACE);
             return annotationString;
         }
         return EMPTY_STRING;
@@ -120,7 +121,7 @@ public class FeatureToExportLine {
                 "(" + extractFeatureType(p.getInteractor().getInteractorType()) +
                 ", " + extractInteractorOrganism(p.getInteractor().getOrganism()) + ")"));
         if (!participants.isEmpty()) {
-            return StringUtils.join(participants, ";");
+            return StringUtils.join(participants, MULTIVALUE_SEPARATOR);
         }
         return EMPTY_STRING;
     }
@@ -153,9 +154,9 @@ public class FeatureToExportLine {
         List<Annotation> annotationsFiltered = annotations.stream().filter(annotation -> !annotation.getTopic().getShortName().equals("remark-internal") && !annotation.getTopic().getShortName().equals("no-mutation-update")).collect(Collectors.toList());
         //Annotation annotationsFiltered = annotations.stream().filter(a -> !a.getTopic().getShortName().equals("remark-internal") && !a.getTopic().getShortName().equals("no-mutation-update")).findAny().orElse(null);
         if (!annotationsFiltered.isEmpty()) {
-            String annotationsString = StringUtils.join(annotations, ",");
-            annotationsString =  annotationsString.replaceAll(TAB, ONE_SPACE);
-            annotationsString =  annotationsString.replaceAll(NEW_LINE, ONE_SPACE);
+            String annotationsString = StringUtils.join(annotations, MULTIVALUE_SEPARATOR);
+            annotationsString = annotationsString.replaceAll(TAB, ONE_SPACE);
+            annotationsString = annotationsString.replaceAll(NEW_LINE, ONE_SPACE);
             return annotationsString;
         }
         return EMPTY_STRING;
