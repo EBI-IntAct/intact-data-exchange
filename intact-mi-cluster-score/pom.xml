@@ -4,7 +4,7 @@
     <parent>
         <artifactId>intact-dataexchange-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-        <version>3.0.49</version>
+        <version>3.0.50</version>
     </parent>
 
     <artifactId>intact-mi-cluster-score</artifactId>
@@ -57,7 +57,7 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Xmx16384m</argument>
+                                <argument>-Xmx32768m</argument>
                                 <argument>-XX:+UseConcMarkSweepGC</argument>
                                 <argument>-classpath</argument>
                                 <!-- automatically creates the classpath using all project dependencies,
