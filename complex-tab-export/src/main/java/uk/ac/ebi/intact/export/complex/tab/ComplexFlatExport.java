@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.export.complex.tab;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.ebi.intact.export.complex.tab.helper.ComplexFlatExportDaoImpl;
 import uk.ac.ebi.intact.export.complex.tab.processor.ComplexFlatExportProcessor;
 import uk.ac.ebi.intact.export.complex.tab.writer.FileExportHandler;
 import java.io.File;
@@ -22,7 +21,6 @@ public class ComplexFlatExport {
         final String filename = args[0];
 
         ComplexFlatExportConfig config = ComplexFlatExportContext.getInstance().getConfig();
-        config.setComplexFlatExportDao(new ComplexFlatExportDaoImpl());
         try {
             config.setFileExportHandler(new FileExportHandler(new File(filename)));
             ComplexFlatExportProcessor complexFlatExportProcessor = new ComplexFlatExportProcessor();

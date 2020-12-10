@@ -42,7 +42,7 @@
     <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
 
     <bean name="generator" class="uk.ac.ebi.intact.export.complex.tab.ComplexFlatExportConfig">
-        <property name="intactDao" ref="intactDao"/>
+        <property name="complexService" ref="complexService"/>
     </bean>
 
     <!-- JPATransactionManager is not dependent on hibernate. It is a more global platform -->

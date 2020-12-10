@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * Export Gene Product Information Data from complex to GOA.
  */
 @Service
-public class ComplexExport2GPI {
+public class ComplexExport2GPIVersion1 {
 
     private static final char TAB = '\t';
     private static final String NEW_LINE = System.getProperty("line.separator");
@@ -40,7 +40,7 @@ public class ComplexExport2GPI {
         fileName = args[0];
 
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext(new String[]{"/META-INF/complex-go-export-config.xml"});
-        ComplexExport2GPI service = (ComplexExport2GPI) springContext.getBean("complexExport2GPI");
+        ComplexExport2GPIVersion1 service = (ComplexExport2GPIVersion1) springContext.getBean("complexExport2GPIVersion1");
 
         service.exportToGPI();
 
@@ -91,7 +91,7 @@ public class ComplexExport2GPI {
 
     private static boolean informationLine(StringBuilder informationSb, IntactComplex intactComplex, boolean writeComponents, String parentAc) {
 
-        // Prepare the gp_information file (complex participant) http://wiki.geneontology.org/index.php/Proposed_GPI1.2_format
+        // Prepare the gp_information file (complex participant) https://github.com/geneontology/go-annotation/blob/master/specs/gpad-gpi-1_2.md
 
         /*  1 DB */
         informationSb.append(COMPLEX_PORTAL).append(TAB);
@@ -104,7 +104,7 @@ public class ComplexExport2GPI {
 
         /*  4 DB_Object_Name */
         String name = intactComplex.getRecommendedName();
-        if(name!=null) { // it can be removed for release-db
+        if (name != null) { // it can be removed for release-db
             informationSb.append(name.replaceAll("[\n\t\r]", " "));
         }
         informationSb.append(TAB);

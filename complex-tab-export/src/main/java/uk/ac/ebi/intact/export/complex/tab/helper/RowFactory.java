@@ -2,18 +2,15 @@ package uk.ac.ebi.intact.export.complex.tab.helper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import psidev.psi.mi.jami.model.Alias;
-import psidev.psi.mi.jami.model.Annotation;
-import psidev.psi.mi.jami.model.Source;
-import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.export.complex.tab.exception.ComplexExportException;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 import uk.ac.ebi.intact.jami.model.extension.InteractorXref;
+import uk.ac.ebi.intact.jami.utils.comparator.IntactInteractorComparator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
@@ -24,7 +21,7 @@ public class RowFactory {
     private static RowFactory rowFactory = new RowFactory();
 
     public static String[] convertComplexToExportLine(IntactComplex complex) throws ComplexExportException {
-        String[] exportLine = new String[18];
+        String[] exportLine = new String[19];
         getRowFactory().assignComplexAc(complex, exportLine, 0);
         getRowFactory().assignRecommendedName(complex, exportLine, 1);
         getRowFactory().assignComplexAliases(complex, exportLine, 2);
@@ -33,6 +30,7 @@ public class RowFactory {
         getRowFactory().assignXref(complex, exportLine);
         getRowFactory().assignAnnotations(complex, exportLine);
         getRowFactory().assignSource(complex, exportLine, 17);
+        getRowFactory().assignExpandedParticipantsStoichiometry(complex, exportLine, 18);
         return exportLine;
     }
 
@@ -154,18 +152,116 @@ public class RowFactory {
         }
     }
 
-    private void assignParticipants(IntactComplex values, String[] exportLine, int index) throws ComplexExportException {
+    private void assignParticipants(IntactComplex complex, String[] exportLine, int index) throws ComplexExportException {
         try {
-            List<String> list = values.getParticipants().stream()
-                    .map(modelledParticipant -> modelledParticipant.getInteractor().getPreferredIdentifier().getId()
-                            + "(" + modelledParticipant.getStoichiometry().getMaxValue() + ")")
+            Map<Interactor, Integer> interactorStoichioMap = new TreeMap<>(new IntactInteractorComparator());
+
+            for (ModelledParticipant participant : complex.getParticipants()) {
+                final Interactor interactor = participant.getInteractor();
+                int stoichiometry = participant.getStoichiometry().getMaxValue();
+                interactorStoichioMap.compute(interactor, (k, v) -> (v == null) ? stoichiometry : v + stoichiometry);
+            }
+
+            Stream<Map.Entry<Interactor, Integer>> entriesStream = interactorStoichioMap.entrySet().stream();
+            List<String> list = entriesStream
+                    .map((entry) -> entry.getKey().getPreferredIdentifier().getId() + "(" + entry.getValue() + ")")
+                    .sorted()
                     .collect(Collectors.toList());
+
             concatList(list, exportLine, index);
         } catch (NullPointerException e) {
             throw new ComplexExportException("Null value found in column " + (index + 1) + ". Error to parse complex participants.", e);
         }
     }
 
+    private void assignExpandedParticipants(IntactComplex complex, String[] exportLine, int index) throws ComplexExportException {
+        try {
+            Set<String> components = new TreeSet<>();
+            collectMembers(components, complex);
+            concatList(components, exportLine, index);
+        } catch (NullPointerException e) {
+            throw new ComplexExportException("Null value found in column " + (index + 1) + ". Error to parse complex participants.", e);
+        }
+    }
+
+    private static boolean collectMembers(Set<String> componentSb, IntactComplex intactComplex) {
+        for (ModelledParticipant participant : intactComplex.getParticipants()) {
+            final Interactor interactor = participant.getInteractor();
+            if (interactor instanceof IntactComplex) {
+                if (!collectMembers(componentSb, (IntactComplex) interactor)) {
+                    return false;
+                }
+            }
+            else if (interactor instanceof Protein) {
+                if (!idExtraction(componentSb, interactor)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void assignExpandedParticipantsStoichiometry(IntactComplex complex, String[] exportLine, int index) throws ComplexExportException {
+        try {
+            Map<Interactor, Integer> interactorStoichioMap = new TreeMap<>(new IntactInteractorComparator());
+            collectMembersStoichiometry(interactorStoichioMap, complex, 1);
+
+            Stream<Map.Entry<Interactor, Integer>> entriesStream = interactorStoichioMap.entrySet().stream();
+            List<String> list = entriesStream
+                    .filter((entry) -> entry.getKey().getInteractorType().getMIIdentifier().equals("MI:0326"))  //we print only proteins
+                    .map((entry) -> entry.getKey().getPreferredIdentifier().getId() + "(" + entry.getValue() + ")")
+                    .sorted()
+                    .collect(Collectors.toList());
+
+            concatList(list, exportLine, index);
+        } catch (NullPointerException e) {
+            throw new ComplexExportException("Null value found in column " + (index + 1) + ". Error to parse complex participants.", e);
+        }
+    }
+
+    private static boolean collectMembersStoichiometry( Map<Interactor, Integer> interactorStoichioMap, IntactComplex intactComplex, Integer parentStoichiometry) {
+
+        List<ModelledParticipant> participants = intactComplex.getParticipants().stream()
+                .filter(participant -> participant.getInteractor().getInteractorType().getMIIdentifier().equals("MI:0326") || //protein
+                participant.getInteractor().getInteractorType().getMIIdentifier().equals("MI:1302")) //complex
+                .collect(Collectors.toList());
+
+        for (ModelledParticipant participant : participants) {
+            final Interactor interactor = participant.getInteractor();
+            if (interactor instanceof IntactComplex) {
+               int complexStoichiometry = participant.getStoichiometry().getMaxValue();
+                log.info("\nComplex as interactor " + interactor.getPreferredIdentifier().getId() + " with stoi: " + complexStoichiometry);
+                //We removed the complex from the map becasue it is going to be replace with its components.
+                collectMembersStoichiometry(interactorStoichioMap, (IntactComplex) interactor, complexStoichiometry);
+            } else { //Proteins
+                if (parentStoichiometry != 0) {
+                    int stoichiometry = participant.getStoichiometry().getMaxValue() * parentStoichiometry;
+                    interactorStoichioMap.compute(interactor, (k, v) -> (v == null) ? stoichiometry : v + stoichiometry);
+                } else { //Stoichiometry for the parent is 0, we don not know how many molecules we have in reality
+                    interactorStoichioMap.put(interactor, 0);
+                }
+            }
+        }
+
+        return true;
+    }
+
+
+    private static boolean idExtraction(Set<String> componentSb, Interactor interactor) {
+
+        Xref identifier = interactor.getPreferredIdentifier();
+        if (identifier == null) {
+            log.error("ERROR: Found an interactor that doesn't have any identity: " + interactor);
+            return false;
+
+        } else {
+            String id = identifier.getId();
+            String dbName = identifier.getDatabase().getShortName();
+            componentSb.add((dbName) + (":") + (id));
+        }
+
+        return true;
+    }
     private void assignEvidenceOntology(IntactComplex complex, Xref xref, String[] exportLine, int index) throws ComplexExportException {
         try {
             if (xref == null) {
@@ -275,7 +371,7 @@ public class RowFactory {
         }
     }
 
-    private void emptyColumn(String exportLine[], int index) {
+    private void emptyColumn(String[] exportLine, int index) {
         exportLine[index] = "-";
     }
 }

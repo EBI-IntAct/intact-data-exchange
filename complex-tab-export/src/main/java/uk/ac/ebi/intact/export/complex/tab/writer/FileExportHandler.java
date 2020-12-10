@@ -35,8 +35,8 @@ public class FileExportHandler {
         this.dirFile = dirFile;
     }
 
-    public ExportWriter createExportFile(int taxId, String scientificName) throws IOException {
-        fileMap.put(taxId, new ComplexFlatWriter(new FileWriter(new File(dirFile, transformToFileName(scientificName) + ".tsv"))));
+    public ExportWriter createExportFile(int taxId) throws IOException {
+        fileMap.put(taxId, new ComplexFlatWriter(new FileWriter(new File(dirFile, taxId + ".tsv"))));
         return fileMap.get(taxId);
     }
 

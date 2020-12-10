@@ -23,7 +23,7 @@ import java.util.*;
  * Export Gene Product Association Data from complex to GOA.
  */
 @Service
-public class ComplexExport2GPA {
+public class ComplexExport2GPAVersion1 {
 
     private static final char TAB = '\t';
     private static final String NEW_LINE = System.getProperty("line.separator");
@@ -63,7 +63,7 @@ public class ComplexExport2GPA {
         fileName = args[0];
 
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext(new String[]{"/META-INF/complex-go-export-config.xml"});
-        ComplexExport2GPA service = (ComplexExport2GPA) springContext.getBean("complexExport2GPA");
+        ComplexExport2GPAVersion1 service = (ComplexExport2GPAVersion1) springContext.getBean("complexExport2GPAVersion1");
 
         service.exportToGPA();
     }
