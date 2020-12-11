@@ -38,6 +38,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
     private double negative_export_threshold = 9;
 
     private static final String COLOCALIZATION = "MI:0403";
+    private static final String PROXIMITY = "MI:2364";
 
     public ExporterBasedOnClusterScore(){
     }
@@ -66,7 +67,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
 
                     String type = context.getInteractionToMethod_type().get(ac).getType();
 
-                    if (!type.equals(COLOCALIZATION)){
+                    if (!type.equals(COLOCALIZATION) && !type.equals(PROXIMITY)){
                         logger.info("The interaction " + encore.getId() + " passed the export rules with score = " + score);
                         return true;
                     }
@@ -96,7 +97,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
 
                     String type = context.getInteractionToMethod_type().get(ac).getType();
 
-                    if (!type.equals(COLOCALIZATION)){
+                    if (!type.equals(COLOCALIZATION) && !type.equals(PROXIMITY)){
                         logger.info("The negative interaction " + ac + " passed the export rules with score = " + score);
 
                         return true;
@@ -150,7 +151,7 @@ public class ExporterBasedOnClusterScore extends AbstractInteractionExporter {
 
                         String type = context.getInteractionToMethod_type().get(ac).getType();
 
-                        if (!type.equals(COLOCALIZATION)){
+                        if (!type.equals(COLOCALIZATION) && !type.equals(PROXIMITY)){
                             logger.info("The negative interaction " + encore.getId() + " passed the export rules with score = " + score);
                             return true;
                         }

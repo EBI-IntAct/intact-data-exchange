@@ -5,7 +5,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.50</version>
+        <version>3.0.51</version>
     </parent>
 
     <artifactId>complex-go-export</artifactId>
@@ -41,7 +41,7 @@
                                 <!-- automatically creates the classpath using all project dependencies,
                                      also adding the project build directory -->
                                 <classpath />
-                                <argument>uk.ac.ebi.intact.export.complex.go.ComplexExport2GPA</argument>
+                                <argument>uk.ac.ebi.intact.export.complex.go.ComplexExport2GPAVersion1</argument>
                                 <!-- The name of the folder-->
                                 <argument>${outputFile}</argument>
                             </arguments>
@@ -75,7 +75,74 @@
                                 <!-- automatically creates the classpath using all project dependencies,
                                      also adding the project build directory -->
                                 <classpath />
-                                <argument>uk.ac.ebi.intact.export.complex.go.ComplexExport2GPI</argument>
+                                <argument>uk.ac.ebi.intact.export.complex.go.ComplexExport2GPIVersion1</argument>
+                                <argument>${outputFile}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>gpa-export-2</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-Xms256m</argument>
+
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath />
+                                <argument>uk.ac.ebi.intact.export.complex.go.ComplexExport2GPAVersion2</argument>
+                                <!-- The name of the folder-->
+                                <argument>${outputFile}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>gpi-export-2</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx2024m</argument>
+                                <argument>-Xms256m</argument>
+
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                     also adding the project build directory -->
+                                <classpath />
+                                <argument>uk.ac.ebi.intact.export.complex.go.ComplexExport2GPIVersion2</argument>
                                 <argument>${outputFile}</argument>
                             </arguments>
                         </configuration>
