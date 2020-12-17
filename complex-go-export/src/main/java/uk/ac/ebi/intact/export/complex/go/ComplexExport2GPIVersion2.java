@@ -62,7 +62,11 @@ public class ComplexExport2GPIVersion2 {
 
         // Format documentation: https://github.com/geneontology/go-annotation/blob/master/specs/gpad-gpi-2-0.md
 
-        try (BufferedWriter informationWriter = new BufferedWriter(new FileWriter(new File(fileName)))) {
+        File file = new File(fileName);
+        //Creates parent directories if they don't exist
+        file.getParentFile().mkdirs();
+
+        try (BufferedWriter informationWriter = new BufferedWriter(new FileWriter(file))) {
             informationWriter.write("!gpi-version: 2.0");
             informationWriter.write(NEW_LINE);
             informationWriter.write("!generated-by: ComplexPortal");

@@ -79,6 +79,9 @@ public class ComplexExport2GPAVersion2 {
         System.err.println("Complexes to export: " + complexService.countAll());
 
         // Format documentation: https://github.com/geneontology/go-annotation/blob/master/specs/gpad-gpi-2-0.md
+        File file = new File(fileName);
+        //Creates parent directories if they don't exist
+        file.getParentFile().mkdirs();
 
         try (BufferedWriter associationWriter = new BufferedWriter(new FileWriter(new File(fileName)))) {
             associationWriter.write("!gpa-version: 2.0");

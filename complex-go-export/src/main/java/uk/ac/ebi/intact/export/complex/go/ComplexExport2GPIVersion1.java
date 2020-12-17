@@ -58,7 +58,11 @@ public class ComplexExport2GPIVersion1 {
         BufferedWriter informationWriter = null;
 
         try {
-            informationWriter = new BufferedWriter(new FileWriter(new File(fileName)));
+            File file = new File(fileName);
+            //Creates parent directories if they don't exist
+            file.getParentFile().mkdirs();
+
+            informationWriter = new BufferedWriter(new FileWriter(file));
             informationWriter.write("!gpi-version: 1.2");
             informationWriter.write(NEW_LINE);
 

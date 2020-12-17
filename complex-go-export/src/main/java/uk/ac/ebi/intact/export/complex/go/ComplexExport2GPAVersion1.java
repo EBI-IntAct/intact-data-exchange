@@ -80,7 +80,11 @@ public class ComplexExport2GPAVersion1 {
         BufferedWriter associationWriter = null;
 
         try {
-            associationWriter = new BufferedWriter(new FileWriter(new File(fileName)));
+            File file = new File(fileName);
+            //Creates parent directories if they don't exist
+            file.getParentFile().mkdirs();
+
+            associationWriter = new BufferedWriter(new FileWriter(file));
             associationWriter.write("!gpa-version: 1.1");
             associationWriter.write(NEW_LINE);
 
