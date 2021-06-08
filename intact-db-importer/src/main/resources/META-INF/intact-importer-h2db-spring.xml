@@ -218,6 +218,11 @@
         <property name="errorResource" ref="errorResource"/>
         <property name="complexService" ref="complexService"/>
     </bean>
+    <bean id="complexValidationProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactComplexValidationProcessor"
+          lazy-init="true">
+        <property name="errorResource" ref="errorResource"/>
+        <property name="complexService" ref="complexService"/>
+    </bean>
     <bean id="modelledInteractionProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
           lazy-init="true">
         <property name="errorResource" ref="errorResource"/>
@@ -237,6 +242,7 @@
     <bean id="intactComplexEnricherCompositeProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactComplexEnricherCompositeProcessor" lazy-init="true">
         <property name="intactComplexDataAdditionProcessor" ref="complexDataAdditionProcessor"/>
         <property name="complexEnricherProcessor" ref="complexEnricherProcessor"/>
+        <property name="complexValidationProcessor" ref="complexValidationProcessor"/>
     </bean>
     <!-- writers -->
     <bean id="interactionEvidenceImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactDbImporter"
@@ -337,6 +343,7 @@
                 <batch:streams>
                     <batch:stream ref="complexReader"/>
                     <batch:stream ref="complexEnricherProcessor"/>
+                    <batch:stream ref="complexValidationProcessor"/>
                     <batch:stream ref="complexDataAdditionProcessor"/>
                     <batch:stream ref="complexImporter"/>
                 </batch:streams>
