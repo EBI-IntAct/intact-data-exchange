@@ -39,8 +39,8 @@ public class IntactComplexValidationProcessor implements ItemProcessor<Complex, 
             throw new Exception("Could not check for duplication, aborting job");
         }
         if (!complexAlreadyExistsAcs.isEmpty()) {
-            errorWriter.write("This complex already exists in intact, acs of duplicated complexes found :" + complexAlreadyExistsAcs);
-            throw new DuplicateEntityException("This complex already exists in intact, acs of duplicated complexes found :" + complexAlreadyExistsAcs);
+            errorWriter.write("This complex already exists in intact, acs of duplicate complexes found :" + complexAlreadyExistsAcs);
+            throw new DuplicateEntityException("This complex already exists in intact, acs of duplicate complexes found :" + complexAlreadyExistsAcs);
         }
 
         return item;
