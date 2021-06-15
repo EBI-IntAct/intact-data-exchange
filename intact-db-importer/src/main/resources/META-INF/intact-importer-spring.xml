@@ -174,7 +174,7 @@
     <bean id="interactionEvidenceReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.InteractionEvidenceFileReader" lazy-init="true">
         <property name="resource" ref="miFileResource"/>
     </bean>
-    <bean id="complexReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.ComplexFileReader" lazy-init="true">
+    <bean id="complexReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.ComplexFileReader" lazy-init="true" scope="step">
         <property name="resource" ref="miFileResource"/>
     </bean>
     <bean id="modelledInteractionReader" class="uk.ac.ebi.intact.dataexchange.dbimporter.reader.ModelledInteractionFileReader" lazy-init="true">
@@ -191,17 +191,18 @@
         <property name="enricher" ref="intactInteractionEvidenceEnricher"/>
     </bean>
     <bean id="complexEnricherProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactEnricherProcessor"
-          lazy-init="true">
+          lazy-init="true" scope="step">
         <property name="errorResource" ref="errorResource"/>
         <property name="enricher" ref="intactComplexEnricher"/>
     </bean>
     <bean id="complexDataAdditionProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactComplexDataAdditionProcessor"
-          lazy-init="true">
+          lazy-init="true" scope="step">
         <property name="errorResource" ref="errorResource"/>
+        <property name="importTag" value="#{jobParameters['MIJobId']}"/>
         <property name="complexService" ref="complexService"/>
     </bean>
     <bean id="complexValidationProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactComplexValidationProcessor"
-          lazy-init="true">
+          lazy-init="true" scope="step">
         <property name="errorResource" ref="errorResource"/>
         <property name="complexService" ref="complexService"/>
     </bean>
@@ -221,7 +222,7 @@
         <property name="complexProcessor" ref="complexEnricherProcessor"/>
         <property name="interactionProcessor" ref="interactionProcessor"/>
     </bean>
-    <bean id="intactComplexEnricherCompositeProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactComplexEnricherCompositeProcessor" lazy-init="true">
+    <bean id="intactComplexEnricherCompositeProcessor" class="uk.ac.ebi.intact.dataexchange.dbimporter.processor.IntactComplexEnricherCompositeProcessor" lazy-init="true" scope="step">
         <property name="intactComplexDataAdditionProcessor" ref="complexDataAdditionProcessor"/>
         <property name="complexEnricherProcessor" ref="complexEnricherProcessor"/>
         <property name="complexValidationProcessor" ref="complexValidationProcessor"/>
@@ -233,7 +234,7 @@
         <property name="intactService" ref="interactionEvidenceService"/>
     </bean>
     <bean id="complexImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactDbImporter"
-          lazy-init="true">
+          lazy-init="true" scope="step">
         <property name="intactService" ref="complexService"/>
     </bean>
     <bean id="modelledInteractionImporter" class="uk.ac.ebi.intact.dataexchange.dbimporter.writer.IntactDbImporter"
