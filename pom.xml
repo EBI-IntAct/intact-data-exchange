@@ -61,6 +61,7 @@
         <module>complex-pdb-export</module>
         <module>complex-tab-export</module>
         <module>complex-uniprot-dr-export</module>
+        <module>complex-uniprot-cc-export</module>
     </modules>
 
     <build>
