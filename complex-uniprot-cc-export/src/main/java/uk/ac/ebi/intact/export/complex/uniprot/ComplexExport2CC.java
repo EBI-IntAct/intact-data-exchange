@@ -13,9 +13,7 @@ import uk.ac.ebi.intact.jami.service.ComplexService;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -48,12 +46,12 @@ public class ComplexExport2CC {
 
         ComplexService complexService = ApplicationContextProvider.getBean("complexService");
         Iterator<Complex> complexes = complexService.iterateAll();
+        Map<String, String> proteinToComplexes = new TreeMap<>();
+
 
         System.err.println("Complexes to export: " + complexService.countAll());
 
         try (BufferedWriter ccWriter = new BufferedWriter(new FileWriter(fileName))) {
-
-            StringBuilder informationSb = new StringBuilder(2048);
 
             while (complexes.hasNext()) {
                 Complex complex = complexes.next();
@@ -62,21 +60,25 @@ public class ComplexExport2CC {
                     IntactComplex intactComplex = (IntactComplex) complex;
                     System.err.println("\nProcessing Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ")");
 
-                    informationSb.setLength(0);
-
-                    //For now we don't need to write the components of the complex
-                    boolean writeLine = ccComplexLine(informationSb, intactComplex);
-
-                    if (writeLine) {
-                        ccWriter.write(informationSb.toString());
-                        ccWriter.flush();
-                    }
+                    ccComplexLine(intactComplex, proteinToComplexes);
                 }
             }
+
+            // write lines
+            for (Map.Entry<String, String> entry : proteinToComplexes.entrySet()) {
+                ccWriter.write("AC   " + entry.getKey());
+                ccWriter.newLine();
+                ccWriter.write("CC   -!- COMPLEX:");
+                ccWriter.newLine();
+                ccWriter.write(entry.getValue());
+            }
+
         }
     }
 
-    private static boolean ccComplexLine(StringBuilder informationSb, IntactComplex intactComplex) {
+    private static boolean ccComplexLine(IntactComplex intactComplex, Map<String, String> proteinToComplexes) {
+
+        StringBuilder informationSb = new StringBuilder();
 
         if (intactComplex.getParticipants() != null) {
             String name = intactComplex.getRecommendedName();
@@ -84,11 +86,9 @@ public class ComplexExport2CC {
                 name = name.replaceAll("[\n\t\r]", " ");
             }
 
-            informationSb.append("Component of the ")
+            informationSb.append("CC       Component of the ")
                     .append(name)
                     .append(" (").append(intactComplex.getComplexAc()).append(") comprising of ");
-                  //  [gene name] [(AC)], ……and [gene name] [(AC)].
-
 
             /*  proteins(s) */
             Set<Protein> proteins = intactComplex.getParticipants().stream()
@@ -169,7 +169,15 @@ public class ComplexExport2CC {
             }
             informationSb.append(".");
             informationSb.append(NEW_LINE);
+
+            String sentence = informationSb.toString();
+
+            //Collect sentences per protein
+            for (Protein protein : proteins) {
+                proteinToComplexes.merge(extractUniprotCanonicalId(protein), sentence, String::concat);
+            }
         }
+
         return true;
     }
 
@@ -192,7 +200,7 @@ public class ComplexExport2CC {
                     proteinSb.append(" ");
                 }
                 proteinSb.append("(");
-                proteinSb.append(interactor.getUniprotkb());
+                proteinSb.append(extractProteinName(interactor));
                 proteinSb.append(")");
             }
             else {
@@ -246,6 +254,18 @@ public class ComplexExport2CC {
         }
 
         return canonicalId;
+    }
+
+    private static String extractProteinName(Protein protein) {
+
+        String proteinName = protein.getUniprotkb();
+
+        if (isFeatureChain(protein)){
+            String[] strings = proteinName.split("-");
+            proteinName = strings[1] + " ["+ strings[0]+"]";
+        }
+
+        return proteinName;
     }
 
     private static boolean isSpliceVariant(Protein protein) {
