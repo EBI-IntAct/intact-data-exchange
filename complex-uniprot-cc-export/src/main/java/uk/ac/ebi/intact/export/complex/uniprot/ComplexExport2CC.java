@@ -9,6 +9,7 @@ import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 import uk.ac.ebi.intact.jami.model.extension.InteractorXref;
 import uk.ac.ebi.intact.jami.service.ComplexService;
+import uk.ac.ebi.intact.jami.utils.comparator.IntactInteractorComparator;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -46,7 +47,7 @@ public class ComplexExport2CC {
 
         ComplexService complexService = ApplicationContextProvider.getBean("complexService");
         Iterator<Complex> complexes = complexService.iterateAll();
-        Map<String, String> proteinToComplexes = new TreeMap<>();
+        Map<String, Set<String>> proteinToComplexes = new TreeMap<>();
 
 
         System.err.println("Complexes to export: " + complexService.countAll());
@@ -65,18 +66,19 @@ public class ComplexExport2CC {
             }
 
             // write lines
-            for (Map.Entry<String, String> entry : proteinToComplexes.entrySet()) {
+            for (Map.Entry<String, Set<String>> entry : proteinToComplexes.entrySet()) {
                 ccWriter.write("AC   " + entry.getKey());
                 ccWriter.newLine();
                 ccWriter.write("CC   -!- COMPLEX:");
                 ccWriter.newLine();
-                ccWriter.write(entry.getValue());
+                ccWriter.write(String.join(NEW_LINE, entry.getValue()));
+                ccWriter.newLine();
             }
 
         }
     }
 
-    private static boolean ccComplexLine(IntactComplex intactComplex, Map<String, String> proteinToComplexes) {
+    private static boolean ccComplexLine(IntactComplex intactComplex, Map<String, Set<String>> proteinToComplexes) {
 
         StringBuilder informationSb = new StringBuilder();
 
@@ -95,7 +97,7 @@ public class ComplexExport2CC {
                     .map(ModelledParticipant::getInteractor) //proteins
                     .filter(interactor -> interactor.getInteractorType().getMIIdentifier().equals("MI:0326"))
                     .map(Protein.class::cast)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(() -> new TreeSet<>(new IntactInteractorComparator())));
 
 
             Iterator<Protein> prpteinIterator = proteins.iterator();
@@ -126,7 +128,7 @@ public class ComplexExport2CC {
             Set<Interactor> noProteins = intactComplex.getParticipants().stream()
                     .map(ModelledParticipant::getInteractor)
                     .filter(interactor -> !interactor.getInteractorType().getMIIdentifier().equals("MI:0326")) //no proteins
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(() -> new TreeSet<>(new IntactInteractorComparator())));
 
             if(!proteins.isEmpty() && !noProteins.isEmpty()){
                 //Comma between participants
@@ -168,13 +170,12 @@ public class ComplexExport2CC {
                 informationSb.append(assemblies.iterator().next().getValue().toLowerCase());
             }
             informationSb.append(".");
-            informationSb.append(NEW_LINE);
 
             String sentence = informationSb.toString();
 
             //Collect sentences per protein
             for (Protein protein : proteins) {
-                proteinToComplexes.merge(extractUniprotCanonicalId(protein), sentence, String::concat);
+                proteinToComplexes.computeIfAbsent(extractUniprotCanonicalId(protein), k -> new TreeSet<>()).add(sentence);
             }
         }
 
