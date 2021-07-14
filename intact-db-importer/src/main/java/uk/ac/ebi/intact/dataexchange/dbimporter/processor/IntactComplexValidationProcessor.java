@@ -1,13 +1,21 @@
 package uk.ac.ebi.intact.dataexchange.dbimporter.processor;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import psidev.psi.mi.jami.listener.comparator.ComplexComparatorListener;
+import psidev.psi.mi.jami.listener.comparator.analyzer.ComplexComparatorListenerAnalyzer;
+import psidev.psi.mi.jami.listener.comparator.event.ComplexComparisonEvent;
+import psidev.psi.mi.jami.listener.comparator.impl.ComplexComparatorListenerImpl;
+import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Complex;
+import psidev.psi.mi.jami.utils.AnnotationUtils;
 import uk.ac.ebi.intact.jami.service.ComplexService;
+import uk.ac.ebi.intact.jami.synchronizer.impl.ComplexSynchronizer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,8 +39,12 @@ public class IntactComplexValidationProcessor implements ItemProcessor<Complex, 
 
         // add validations
         Collection<String> complexAlreadyExistsAcs = null;
+        Collection<String> complexesDiffOnlyByStoichiometry = null;
+        ComplexComparatorListener complexComparatorListener = new ComplexComparatorListenerImpl();
         try {
             // for duplication check
+            ComplexSynchronizer complexSynchronizer = (ComplexSynchronizer) complexService.getIntactDao().getSynchronizerContext().getComplexSynchronizer();
+            complexSynchronizer.setComplexComparatorListener(complexComparatorListener);
             complexAlreadyExistsAcs = complexService.getIntactDao().getSynchronizerContext().getComplexSynchronizer().findAllMatchingAcs(item);
         } catch (Exception e) {
             errorWriter.write("Could not check for duplication");
@@ -41,7 +53,14 @@ public class IntactComplexValidationProcessor implements ItemProcessor<Complex, 
         if (!complexAlreadyExistsAcs.isEmpty()) {
             errorWriter.write("This complex already exists in intact, acs of duplicate complexes found :" + complexAlreadyExistsAcs);
             throw new DuplicateEntityException("This complex already exists in intact, acs of duplicate complexes found :" + complexAlreadyExistsAcs);
+        } else {
+            complexesDiffOnlyByStoichiometry = ComplexComparatorListenerAnalyzer.getComplexAcsDifferentOnlyByStoichiometry(complexComparatorListener);
+            if (!complexesDiffOnlyByStoichiometry.isEmpty()) {
+                Annotation annotation = AnnotationUtils.createCaution("This complex(" + item.getShortName() + ") is almost duplicate (" + ComplexComparisonEvent.EventType.ONLY_STOICHIOMETRY_DIFFERENT.getMessage() + ") with complex acs:: " + StringUtils.join(complexesDiffOnlyByStoichiometry, ", "));
+                item.getAnnotations().add(annotation);
+            }
         }
+
 
         return item;
     }
@@ -86,6 +105,7 @@ public class IntactComplexValidationProcessor implements ItemProcessor<Complex, 
                         + errorResource, e);
             }
         }
+        ((ComplexSynchronizer) complexService.getIntactDao().getSynchronizerContext().getComplexSynchronizer()).setComplexComparatorListener(null);
     }
 
     public ComplexService getComplexService() {
