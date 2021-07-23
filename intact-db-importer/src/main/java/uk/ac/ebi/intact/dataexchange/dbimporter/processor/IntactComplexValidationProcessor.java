@@ -56,7 +56,7 @@ public class IntactComplexValidationProcessor implements ItemProcessor<Complex, 
         } else {
             complexesDiffOnlyByStoichiometry = ComplexComparatorListenerAnalyzer.getComplexAcsDifferentOnlyByStoichiometry(complexComparatorListener);
             if (!complexesDiffOnlyByStoichiometry.isEmpty()) {
-                Annotation annotation = AnnotationUtils.createCaution("This complex(" + item.getShortName() + ") is almost duplicate (" + ComplexComparisonEvent.EventType.ONLY_STOICHIOMETRY_DIFFERENT.getMessage() + ") with complex acs:: " + StringUtils.join(complexesDiffOnlyByStoichiometry, ", "));
+                Annotation annotation = AnnotationUtils.createCaution("This complex is almost duplicate (" + ComplexComparisonEvent.EventType.ONLY_STOICHIOMETRY_DIFFERENT.getMessage() + ") with complex acs:: " + StringUtils.join(complexesDiffOnlyByStoichiometry, ", "));
                 item.getAnnotations().add(annotation);
             }
         }
