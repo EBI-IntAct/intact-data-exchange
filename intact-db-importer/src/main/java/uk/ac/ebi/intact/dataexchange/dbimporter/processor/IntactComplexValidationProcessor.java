@@ -45,7 +45,7 @@ public class IntactComplexValidationProcessor implements ItemProcessor<Complex, 
             // for duplication check
             ComplexSynchronizer complexSynchronizer = (ComplexSynchronizer) complexService.getIntactDao().getSynchronizerContext().getComplexSynchronizer();
             complexSynchronizer.setComplexComparatorListener(complexComparatorListener);
-            complexAlreadyExistsAcs = complexService.getIntactDao().getSynchronizerContext().getComplexSynchronizer().findAllMatchingAcs(item);
+            complexAlreadyExistsAcs = ((ComplexSynchronizer) complexService.getIntactDao().getSynchronizerContext().getComplexSynchronizer()).findAllMatchingComplexAcs(item);
         } catch (Exception e) {
             errorWriter.write("Could not check for duplication");
             throw new Exception("Could not check for duplication, aborting job");
