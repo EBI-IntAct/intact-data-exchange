@@ -5,12 +5,12 @@ import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.export.complex.tab.exception.ComplexExportException;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractorPool;
 import uk.ac.ebi.intact.jami.model.extension.InteractorXref;
 import uk.ac.ebi.intact.jami.utils.comparator.IntactInteractorComparator;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
@@ -162,11 +162,21 @@ public class RowFactory {
                 interactorStoichioMap.compute(interactor, (k, v) -> (v == null) ? stoichiometry : v + stoichiometry);
             }
 
-            Stream<Map.Entry<Interactor, Integer>> entriesStream = interactorStoichioMap.entrySet().stream();
-            List<String> list = entriesStream
-                    .map((entry) -> entry.getKey().getPreferredIdentifier().getId() + "(" + entry.getValue() + ")")
-                    .sorted()
-                    .collect(Collectors.toList());
+            List<String> list = new ArrayList<>();
+            for (Map.Entry<Interactor, Integer> entry : interactorStoichioMap.entrySet()) {
+                String s;
+                if(entry.getKey() instanceof InteractorPool){
+                    s = "[" + entry.getKey().getIdentifiers().stream()
+                            .filter(xref -> xref.getDatabase().getShortName().equals("uniprotkb"))
+                            .map(Xref::getId)
+                            .collect(Collectors.joining(",")) + "]" + "(" + entry.getValue() + ")";
+
+                }else {
+                    s = entry.getKey().getPreferredIdentifier().getId() + "(" + entry.getValue() + ")";
+                }
+                list.add(s);
+            }
+            Collections.sort(list);
 
             concatList(list, exportLine, index);
         } catch (NullPointerException e) {
@@ -174,44 +184,31 @@ public class RowFactory {
         }
     }
 
-    private void assignExpandedParticipants(IntactComplex complex, String[] exportLine, int index) throws ComplexExportException {
-        try {
-            Set<String> components = new TreeSet<>();
-            collectMembers(components, complex);
-            concatList(components, exportLine, index);
-        } catch (NullPointerException e) {
-            throw new ComplexExportException("Null value found in column " + (index + 1) + ". Error to parse complex participants.", e);
-        }
-    }
-
-    private static boolean collectMembers(Set<String> componentSb, IntactComplex intactComplex) {
-        for (ModelledParticipant participant : intactComplex.getParticipants()) {
-            final Interactor interactor = participant.getInteractor();
-            if (interactor instanceof IntactComplex) {
-                if (!collectMembers(componentSb, (IntactComplex) interactor)) {
-                    return false;
-                }
-            }
-            else if (interactor instanceof Protein) {
-                if (!idExtraction(componentSb, interactor)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     private void assignExpandedParticipantsStoichiometry(IntactComplex complex, String[] exportLine, int index) throws ComplexExportException {
         try {
             Map<Interactor, Integer> interactorStoichioMap = new TreeMap<>(new IntactInteractorComparator());
             collectMembersStoichiometry(interactorStoichioMap, complex, 1);
 
-            Stream<Map.Entry<Interactor, Integer>> entriesStream = interactorStoichioMap.entrySet().stream();
-            List<String> list = entriesStream
-                    .filter((entry) -> entry.getKey().getInteractorType().getMIIdentifier().equals("MI:0326"))  //we print only proteins
-                    .map((entry) -> entry.getKey().getPreferredIdentifier().getId() + "(" + entry.getValue() + ")")
-                    .sorted()
-                    .collect(Collectors.toList());
+            //we print only proteins or sets
+            List<String> list = new ArrayList<>();
+            for (Map.Entry<Interactor, Integer> entry : interactorStoichioMap.entrySet()) {
+                String s;
+                if (entry.getKey() instanceof IntactInteractorPool) {
+                    final IntactInteractorPool key = (IntactInteractorPool) entry.getKey();
+                    //TODO testing
+                    s = "[" + key.getXrefs().stream()
+                            .filter(xref -> xref.getDatabase().getShortName().equals("uniprotkb"))
+                            .map(Xref::getId)
+                            .collect(Collectors.joining(",")) + "]" + "(" + entry.getValue() + ")";
+                    list.add(s);
+
+
+                } else if (entry.getKey() instanceof Protein) {
+                    s = entry.getKey().getPreferredIdentifier().getId() + "(" + entry.getValue() + ")";
+                    list.add(s);
+                }
+            }
+            Collections.sort(list);
 
             concatList(list, exportLine, index);
         } catch (NullPointerException e) {
@@ -246,22 +243,6 @@ public class RowFactory {
         return true;
     }
 
-
-    private static boolean idExtraction(Set<String> componentSb, Interactor interactor) {
-
-        Xref identifier = interactor.getPreferredIdentifier();
-        if (identifier == null) {
-            log.error("ERROR: Found an interactor that doesn't have any identity: " + interactor);
-            return false;
-
-        } else {
-            String id = identifier.getId();
-            String dbName = identifier.getDatabase().getShortName();
-            componentSb.add((dbName) + (":") + (id));
-        }
-
-        return true;
-    }
     private void assignEvidenceOntology(IntactComplex complex, Xref xref, String[] exportLine, int index) throws ComplexExportException {
         try {
             if (xref == null) {
