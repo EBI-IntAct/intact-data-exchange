@@ -165,13 +165,12 @@ public class RowFactory {
             List<String> list = new ArrayList<>();
             for (Map.Entry<Interactor, Integer> entry : interactorStoichioMap.entrySet()) {
                 String s;
-                if(entry.getKey() instanceof InteractorPool){
-                    s = "[" + entry.getKey().getIdentifiers().stream()
-                            .filter(xref -> xref.getDatabase().getShortName().equals("uniprotkb"))
-                            .map(Xref::getId)
+                if (entry.getKey() instanceof InteractorPool) {
+                    final InteractorPool moleculeSet = ((InteractorPool) entry.getKey());
+                    s = "[" + moleculeSet.stream().map(interactor -> interactor.getPreferredIdentifier().getId())
                             .collect(Collectors.joining(",")) + "]" + "(" + entry.getValue() + ")";
 
-                }else {
+                } else {
                     s = entry.getKey().getPreferredIdentifier().getId() + "(" + entry.getValue() + ")";
                 }
                 list.add(s);
@@ -194,14 +193,10 @@ public class RowFactory {
             for (Map.Entry<Interactor, Integer> entry : interactorStoichioMap.entrySet()) {
                 String s;
                 if (entry.getKey() instanceof IntactInteractorPool) {
-                    final IntactInteractorPool key = (IntactInteractorPool) entry.getKey();
-                    //TODO testing
-                    s = "[" + key.getXrefs().stream()
-                            .filter(xref -> xref.getDatabase().getShortName().equals("uniprotkb"))
-                            .map(Xref::getId)
+                    final IntactInteractorPool moleculeSet = (IntactInteractorPool) entry.getKey();
+                    s = "[" + moleculeSet.stream().map(interactor -> interactor.getPreferredIdentifier().getId())
                             .collect(Collectors.joining(",")) + "]" + "(" + entry.getValue() + ")";
                     list.add(s);
-
 
                 } else if (entry.getKey() instanceof Protein) {
                     s = entry.getKey().getPreferredIdentifier().getId() + "(" + entry.getValue() + ")";
@@ -216,11 +211,12 @@ public class RowFactory {
         }
     }
 
-    private static boolean collectMembersStoichiometry( Map<Interactor, Integer> interactorStoichioMap, IntactComplex intactComplex, Integer parentStoichiometry) {
+    private static void collectMembersStoichiometry(Map<Interactor, Integer> interactorStoichioMap, IntactComplex intactComplex, Integer parentStoichiometry) {
 
         List<ModelledParticipant> participants = intactComplex.getParticipants().stream()
                 .filter(participant -> participant.getInteractor().getInteractorType().getMIIdentifier().equals("MI:0326") || //protein
-                participant.getInteractor().getInteractorType().getMIIdentifier().equals("MI:1302")) //complex
+                participant.getInteractor().getInteractorType().getMIIdentifier().equals("MI:1302") || //complex
+                participant.getInteractor().getInteractorType().getMIIdentifier().equals("MI:1304")) //molecule sets
                 .collect(Collectors.toList());
 
         for (ModelledParticipant participant : participants) {
@@ -228,9 +224,9 @@ public class RowFactory {
             if (interactor instanceof IntactComplex) {
                int complexStoichiometry = participant.getStoichiometry().getMaxValue();
                 log.info("\nComplex as interactor " + interactor.getPreferredIdentifier().getId() + " with stoi: " + complexStoichiometry);
-                //We removed the complex from the map becasue it is going to be replace with its components.
+                //We removed the complex from the map because it is going to be replace with its components.
                 collectMembersStoichiometry(interactorStoichioMap, (IntactComplex) interactor, complexStoichiometry);
-            } else { //Proteins
+            } else { //Proteins and sets
                 if (parentStoichiometry != 0) {
                     int stoichiometry = participant.getStoichiometry().getMaxValue() * parentStoichiometry;
                     interactorStoichioMap.compute(interactor, (k, v) -> (v == null) ? stoichiometry : v + stoichiometry);
@@ -239,8 +235,6 @@ public class RowFactory {
                 }
             }
         }
-
-        return true;
     }
 
     private void assignEvidenceOntology(IntactComplex complex, Xref xref, String[] exportLine, int index) throws ComplexExportException {

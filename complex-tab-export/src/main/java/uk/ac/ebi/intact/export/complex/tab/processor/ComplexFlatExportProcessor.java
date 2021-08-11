@@ -12,7 +12,7 @@ import uk.ac.ebi.intact.export.complex.tab.writer.ExportWriter;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
