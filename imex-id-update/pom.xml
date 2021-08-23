@@ -24,6 +24,19 @@
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-imex-updater</artifactId>
             <version>${psi.jami.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>edu.ucla.mbi.imex</groupId>
+                    <artifactId>icentral-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--This is so that we use our local imex repo instead
+         of the fabricated one from imex central. We will resolve this later gracefully-->
+        <dependency>
+            <groupId>edu.ucla.mbi.imex</groupId>
+            <artifactId>icentral-api</artifactId>
+            <version>2.0</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
