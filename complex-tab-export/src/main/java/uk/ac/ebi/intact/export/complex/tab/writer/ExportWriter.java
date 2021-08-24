@@ -12,6 +12,4 @@ public interface ExportWriter extends Flushable, Closeable {
 
     void writeColumnValues(String ... colValues) throws IOException;
 
-    void writeLine(String str) throws IOException;
 }
-

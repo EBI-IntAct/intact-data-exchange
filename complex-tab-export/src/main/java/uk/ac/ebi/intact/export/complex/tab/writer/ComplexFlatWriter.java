@@ -10,7 +10,7 @@ public class ComplexFlatWriter implements ExportWriter {
     private static final String COL_SEPARATOR = "\t";
     private static final String NEW_LINE = System.getProperty("line.separator");
     private static final char HEADER_CHAR = '#';
-    private Writer writer;
+    private final Writer writer;
     private boolean isContentWritten;
     private int headerCols;
 
@@ -45,10 +45,6 @@ public class ComplexFlatWriter implements ExportWriter {
         getWriter().write(sb.toString());
 
         isContentWritten = true;
-    }
-
-    public void writeLine(String str) throws IOException {
-        getWriter().write(str + NEW_LINE);
     }
 
     public Writer getWriter() {

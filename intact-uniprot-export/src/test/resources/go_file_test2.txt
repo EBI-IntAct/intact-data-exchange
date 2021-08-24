@@ -1,6 +1,6 @@
 !gaf-version: 2.2
 !generated-by: IntAct
-!date-generated: 2021-06-15
+!date-generated: 2021-08-24
 UniProtKB	Q9NET8		enables	GO:0005515	PMID:14704431	IPI	UniProtKB:Q22534-2	F			protein			IntAct		
 UniProtKB	Q22534		enables	GO:0005515	PMID:14704431	IPI	UniProtKB:Q9NET8	F			protein			IntAct	occurs_in(GO:xxxxxx2)|occurs_in(GO:xxxxxx1)	UniProtKB:Q22534-2
 UniProtKB	Q9NET8		enables	GO:0005515	PMID:14704431	IPI	UniProtKB:Q17862:PRO_xxxxxxx	F			protein			IntAct		

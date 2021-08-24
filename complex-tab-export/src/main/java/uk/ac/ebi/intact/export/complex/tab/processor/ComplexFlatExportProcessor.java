@@ -12,7 +12,7 @@ import uk.ac.ebi.intact.export.complex.tab.writer.ExportWriter;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * Created by Maximilian Koch (mkoch@ebi.ac.uk).
@@ -48,7 +48,7 @@ public class ComplexFlatExportProcessor {
                 }
                 if (field != null) {
                     exportFile.writeHeaderIfNecessary("Complex ac", "Recommended name", "Aliases for complex",
-                            "Taxonomy identifier", "Identifiers (and stoichiometry) of molecules in complex", "Confidence",
+                            "Taxonomy identifier", "Identifiers (and stoichiometry) of molecules in complex", "Evidence Code",
                             "Experimental evidence", "Go Annotations", "Cross references", "Description", "Complex properties",
                             "Complex assembly", "Ligand", "Disease", "Agonist", "Antagonist", "Comment", "Source", "Expanded participant list");
                     exportFile.writeColumnValues(field[0], field[1], field[2], field[3], field[4], field[5], field[6],
