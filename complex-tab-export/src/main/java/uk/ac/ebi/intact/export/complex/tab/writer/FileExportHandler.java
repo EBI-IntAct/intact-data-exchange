@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -31,30 +32,14 @@ public class FileExportHandler {
         }
 
         //Copy README to target directory
-        Files.copy(this.getClass().getClassLoader().getResourceAsStream("readme.htm"), new File(dirFile, "README.htm").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("readme.htm")),
+                new File(dirFile, "README.htm").toPath(), StandardCopyOption.REPLACE_EXISTING);
         this.dirFile = dirFile;
     }
 
     public ExportWriter createExportFile(int taxId) throws IOException {
         fileMap.put(taxId, new ComplexFlatWriter(new FileWriter(new File(dirFile, taxId + ".tsv"))));
         return fileMap.get(taxId);
-    }
-
-    private String transformToFileName(String scientificName) {
-        String [] array = scientificName.split("\\s+");
-        if(array.length == 1){
-            return array[0].toLowerCase();
-        } else {
-            return array[0].toLowerCase() + '_' + array[1].toLowerCase();
-        }
-    }
-
-    public File getDirFile() {
-        return dirFile;
-    }
-
-    public Map<Integer, ExportWriter> getFileMap() {
-        return fileMap;
     }
 
     public ExportWriter getExportFile(Integer taxId) {

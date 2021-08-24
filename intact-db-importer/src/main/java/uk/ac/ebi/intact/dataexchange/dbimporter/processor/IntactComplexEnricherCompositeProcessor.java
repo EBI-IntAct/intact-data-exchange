@@ -10,10 +10,11 @@ public class IntactComplexEnricherCompositeProcessor implements ItemProcessor<Co
 
     private ItemProcessor<Complex, Complex> complexEnricherProcessor;
     private ItemProcessor<Complex, Complex> intactComplexDataAdditionProcessor;
+    private ItemProcessor<Complex, Complex> complexValidationProcessor;
 
 
     public Complex process(Complex item) throws Exception {
-        if (this.complexEnricherProcessor == null || this.intactComplexDataAdditionProcessor == null) {
+        if (this.complexEnricherProcessor == null || this.intactComplexDataAdditionProcessor == null || this.complexValidationProcessor == null) {
             throw new IllegalStateException("The IntactComplexEnricherCompositeProcessor needs all the processors instantiated.");
         }
         if (item == null) {
@@ -22,9 +23,10 @@ public class IntactComplexEnricherCompositeProcessor implements ItemProcessor<Co
 
         // enrich complex
         Complex intactEnrichedItem = complexEnricherProcessor.process(item);
-
+        // validate complex before further processing
+        Complex intactValidatedComplex = complexValidationProcessor.process(intactEnrichedItem);
         // add more intact complex data
-        Complex intactComplexDataEnrichedItem = intactComplexDataAdditionProcessor.process(intactEnrichedItem);
+        Complex intactComplexDataEnrichedItem = intactComplexDataAdditionProcessor.process(intactValidatedComplex);
         return intactComplexDataEnrichedItem;
     }
 
@@ -42,5 +44,13 @@ public class IntactComplexEnricherCompositeProcessor implements ItemProcessor<Co
 
     public void setIntactComplexDataAdditionProcessor(ItemProcessor<Complex, Complex> intactComplexDataAdditionProcessor) {
         this.intactComplexDataAdditionProcessor = intactComplexDataAdditionProcessor;
+    }
+
+    public ItemProcessor<Complex, Complex> getComplexValidationProcessor() {
+        return complexValidationProcessor;
+    }
+
+    public void setComplexValidationProcessor(ItemProcessor<Complex, Complex> complexValidationProcessor) {
+        this.complexValidationProcessor = complexValidationProcessor;
     }
 }

@@ -1,33 +1,33 @@
 package uk.ac.ebi.intact.dataexchange.dbimporter.processor;
 
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import psidev.psi.mi.jami.listener.comparator.ComplexComparatorListener;
+import psidev.psi.mi.jami.listener.comparator.analyzer.ComplexComparatorListenerAnalyzer;
+import psidev.psi.mi.jami.listener.comparator.event.ComplexComparisonEvent;
+import psidev.psi.mi.jami.listener.comparator.impl.ComplexComparatorListenerImpl;
+import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Complex;
-import uk.ac.ebi.intact.jami.model.extension.InteractorAnnotation;
+import psidev.psi.mi.jami.utils.AnnotationUtils;
 import uk.ac.ebi.intact.jami.service.ComplexService;
-import uk.ac.ebi.intact.jami.utils.IntactUtils;
+import uk.ac.ebi.intact.jami.synchronizer.impl.ComplexSynchronizer;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 
-/**
- * Created by anjali on 16/04/20.
- */
-public class IntactComplexDataAdditionProcessor implements ItemProcessor<Complex, Complex>, ItemStream {
+public class IntactComplexValidationProcessor implements ItemProcessor<Complex, Complex>, ItemStream {
 
     private Resource errorResource;
     private Writer errorWriter;
     private ComplexService complexService;
-    private String importTag;
 
     public Complex process(Complex item) throws Exception {
         if (this.complexService == null) {
@@ -37,20 +37,31 @@ public class IntactComplexDataAdditionProcessor implements ItemProcessor<Complex
             return null;
         }
 
-        // add complex complex ac xref
+        // add validations
+        Collection<String> complexAlreadyExistsAcs = null;
+        Collection<String> complexesDiffOnlyByStoichiometry = null;
+        ComplexComparatorListener complexComparatorListener = new ComplexComparatorListenerImpl();
         try {
-            item.assignComplexAc(complexService.retrieveNextComplexAc(), "1");
+            // for duplication check
+            ComplexSynchronizer complexSynchronizer = (ComplexSynchronizer) complexService.getIntactDao().getSynchronizerContext().getComplexSynchronizer();
+            complexSynchronizer.setComplexComparatorListener(complexComparatorListener);
+            complexAlreadyExistsAcs = ((ComplexSynchronizer) complexService.getIntactDao().getSynchronizerContext().getComplexSynchronizer()).findAllMatchingComplexAcs(item);
         } catch (Exception e) {
-            errorWriter.write("Cannot add complex ac xref  ");
+            errorWriter.write("Could not check for duplication");
+            throw new Exception("Could not check for duplication, aborting job");
+        }
+        if (!complexAlreadyExistsAcs.isEmpty()) {
+            errorWriter.write("This complex already exists in intact, acs of duplicate complexes found :" + complexAlreadyExistsAcs);
+            throw new DuplicateEntityException("This complex already exists in intact, acs of duplicate complexes found :" + complexAlreadyExistsAcs);
+        } else {
+            complexesDiffOnlyByStoichiometry = ComplexComparatorListenerAnalyzer.getComplexAcsDifferentOnlyByStoichiometry(complexComparatorListener);
+            if (!complexesDiffOnlyByStoichiometry.isEmpty()) {
+                Annotation annotation = AnnotationUtils.createCaution("This complex is almost duplicate (" + ComplexComparisonEvent.EventType.ONLY_STOICHIOMETRY_DIFFERENT.getMessage() + ") with complex acs:: " + StringUtils.join(complexesDiffOnlyByStoichiometry, ", "));
+                item.getAnnotations().add(annotation);
+            }
         }
 
-        // add job id annotation
-        if (getImportTag() != null) {
-            item.getAnnotations().add(new InteractorAnnotation(IntactUtils.createMITopic("remark-internal", null),
-                    getImportTag()));
-        }else{
-            errorWriter.write("Could not add Job ID annotation because Job ID could not be retrieved");
-        }
+
         return item;
     }
 
@@ -94,6 +105,7 @@ public class IntactComplexDataAdditionProcessor implements ItemProcessor<Complex
                         + errorResource, e);
             }
         }
+        ((ComplexSynchronizer) complexService.getIntactDao().getSynchronizerContext().getComplexSynchronizer()).setComplexComparatorListener(null);
     }
 
     public ComplexService getComplexService() {
@@ -119,14 +131,4 @@ public class IntactComplexDataAdditionProcessor implements ItemProcessor<Complex
     public void setErrorWriter(Writer errorWriter) {
         this.errorWriter = errorWriter;
     }
-
-    public String getImportTag() {
-        return importTag;
-    }
-
-    public void setImportTag(String importTag) {
-        this.importTag = importTag;
-    }
-
-
 }
