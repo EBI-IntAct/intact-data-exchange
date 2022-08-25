@@ -12,7 +12,7 @@
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.56-SNAPSHOT</version>
+    <version>3.0.56</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
@@ -23,7 +23,7 @@
         <bridges.version>2.1.37</bridges.version>
         <commons.version>2.1.10</commons.version>
         <intact.tools.version>1.0.25</intact.tools.version>
-        <intact.jami.version>1.3.14</intact.jami.version>
+        <intact.jami.version>1.3.15</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
         <psi.jami.version>3.2.12</psi.jami.version>
         <spring.version>3.2.9.RELEASE</spring.version>
@@ -225,6 +225,10 @@
 
     <repositories>
         <repository>
+            <id>intact.nexus</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/groups/public/</url>
+        </repository>
+        <repository>
             <id>nexus-ebi-repo-old</id>
             <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
         </repository>
@@ -235,6 +239,10 @@
         <repository>
             <id>nexus-ebi-snapshot-repo</id>
             <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
+        </repository>
+        <repository>
+            <id>nexus-ebi-internal-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-internal/</url>
         </repository>
     </repositories>
 </project>

@@ -1,4 +1,4 @@
 IntAct SOLR Home
 ================
 
-Version: ${version} 
+Version: ${project.version}
