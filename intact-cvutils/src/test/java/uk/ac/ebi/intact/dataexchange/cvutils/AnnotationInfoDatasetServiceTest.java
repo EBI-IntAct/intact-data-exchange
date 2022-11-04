@@ -2,8 +2,6 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ebi.intact.core.persister.PersisterHelper;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfo;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.AnnotationInfoDataset;
 import uk.ac.ebi.intact.model.CvFeatureType;

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.2.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+    <context:component-scan base-package="uk.ac.ebi.intact"/>
+
+    <!-- Spring specific -->
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+
+    <aop:aspectj-autoproxy/>
+
+    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <property name="dataSource" ref="intactCoreDataSource"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitName" value="intact-core-default"/>
+        <property name="dataSource" ref="intactCoreDataSource"/>
+
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+            </props>
+        </property>
+
+        <property name="jpaVendorAdapter">
+            <bean class="uk.ac.ebi.intact.core.config.hibernate.IntactHibernateJpaVendorAdapter">
+                <property name="databasePlatform" value="org.hibernate.dialect.H2Dialect"/>
+                <property name="showSql" value="false"/>
+                <property name="generateDdl" value="false"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="intactCoreDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:intactcore;DB_CLOSE_DELAY=-1;LOCK_MODE=0"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+    </bean>
+
+    <!--- IntAct -->
+    <bean id="intactInitializer" class="uk.ac.ebi.intact.core.context.IntactInitializer" init-method="init"/>
+
+    <bean id="userContext" class="uk.ac.ebi.intact.core.context.UserContext">
+        <property name="userId" value="UNDEFINED_USER"/>
+    </bean>
+
+    <bean id="intactConfig" class="uk.ac.ebi.intact.core.config.IntactConfiguration">
+        <property name="acPrefix" value="TEST"/>
+        <property name="defaultInstitution" ref="institutionUndefined"/>
+        <property name="autoUpdateExperimentLabel" value="true"/>
+        <property name="autoUpdateInteractionLabel" value="true"/>
+    </bean>
+
+    <bean id="schemaVersion" class="uk.ac.ebi.intact.core.config.SchemaVersion">
+        <constructor-arg value="2"/>
+        <constructor-arg value="5"/>
+        <constructor-arg value="0"/>
+    </bean>
+
+    <bean id="persisterHelper" class="uk.ac.ebi.intact.core.persister.PersisterHelperImpl" />
+
+    <bean id="corePersister" class="uk.ac.ebi.intact.core.persister.CorePersisterImpl" scope="prototype">
+        <constructor-arg ref="intactContext"/>
+        <constructor-arg ref="finder"/>
+    </bean>
+
+    <bean id="coreDeleter" class="uk.ac.ebi.intact.core.persister.CoreDeleterImpl" scope="prototype">
+        <constructor-arg ref="intactContext"/>
+    </bean>
+
+    <bean id="finder" class="uk.ac.ebi.intact.core.persister.finder.DefaultFinder" scope="prototype">
+        <constructor-arg ref="intactContext"/>
+    </bean>
+
+    <!-- Default institutions -->
+    <bean id="institutionUndefined" class="uk.ac.ebi.intact.model.util.InstitutionFactoryBean">
+        <property name="name" value="unknown"/>
+        <property name="description" value="Undefined institution"/>
+    </bean>
+
+    <!-- Default application - Users should override this bean in specific applications -->
+    <bean id="defaultApp" class="uk.ac.ebi.intact.model.meta.Application">
+        <property name="key" value="default"/>
+        <property name="description" value="Application generated automatically by intact-core"/>
+    </bean>
+
+</beans>

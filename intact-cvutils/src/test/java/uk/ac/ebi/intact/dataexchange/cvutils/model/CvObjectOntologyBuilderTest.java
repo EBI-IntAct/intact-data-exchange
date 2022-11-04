@@ -23,7 +23,7 @@ import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.TermSubset;
-import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.dataexchange.cvutils.IntactBasicTestCase;
 import uk.ac.ebi.intact.dataexchange.cvutils.OboUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -43,7 +43,7 @@ import java.util.List;
  * @version $Id$
  * @since 2.0.1
  */
-public class CvObjectOntologyBuilderTest extends IntactBasicTestCase{
+public class CvObjectOntologyBuilderTest extends IntactBasicTestCase {
 
     private static int counter = 1;
 
