@@ -108,7 +108,7 @@ public class OntologyIndexerTest  {
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
 
-        ontologyIndexer.indexOntology(new UniprotTaxonomyOntologyIterator(0, 3));
+        ontologyIndexer.indexOntology(new UniprotTaxonomyOntologyIterator(3));
          
         SolrQuery query = new SolrQuery("*:*");
         QueryResponse queryResponse = solrServer.query(query);
