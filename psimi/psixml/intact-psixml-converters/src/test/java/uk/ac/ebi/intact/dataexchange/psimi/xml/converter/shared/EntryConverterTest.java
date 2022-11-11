@@ -16,13 +16,8 @@
 package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import static junit.framework.Assert.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import static org.easymock.classextension.EasyMock.createNiceMock;
 import org.junit.*;
-import org.xml.sax.InputSource;
 import psidev.psi.mi.xml.PsimiXmlReader;
-import psidev.psi.mi.xml.PsimiXmlWriter;
 import psidev.psi.mi.xml.model.Entry;
 import psidev.psi.mi.xml.model.EntrySet;
 import psidev.psi.mi.xml.model.Interaction;
@@ -34,14 +29,10 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ExportProfile;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.IntactEntry;
-import uk.ac.ebi.intact.util.psivalidator.PsiValidator;
-import uk.ac.ebi.intact.util.psivalidator.PsiValidatorMessage;
-import uk.ac.ebi.intact.util.psivalidator.PsiValidatorReport;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 
 /**
  * EntryConverter Tester.
@@ -51,14 +42,10 @@ import java.util.Arrays;
  */
 public class EntryConverterTest extends AbstractConverterTest {
 
-    private static final Log log = LogFactory.getLog(EntryConverterTest.class);
-
-    private Entry entry;
     private EntryConverter entryConverter;
 
     @Before
-    public void setUp() throws Exception {
-        entry = createNiceMock(Entry.class);
+    public void setUp() {
         entryConverter = new EntryConverter();
         ConversionCache.clear();
         output = false;
@@ -67,22 +54,16 @@ public class EntryConverterTest extends AbstractConverterTest {
     }
 
     @After
-    public void tearDown() throws Exception {
-        entry = null;
+    public void tearDown() {
         entryConverter = null;
 
         IdSequenceGenerator.getInstance().reset();
     }
 
     @Test
-    public void mockRountrip() throws Exception {
-        Entry beforeRountripEntry = PsiMockFactory.createMockEntry();
-
+    public void mockRountrip() {
         int idNum = IdSequenceGenerator.getInstance().currentId();
         IdSequenceGenerator.getInstance().reset();
-
-        IntactEntry intactEntry = entryConverter.psiToIntact(beforeRountripEntry);
-        Entry afterRoundtripEntry = entryConverter.intactToPsi(intactEntry);
 
         assertEquals(idNum, IdSequenceGenerator.getInstance().currentId());
 
@@ -91,7 +72,6 @@ public class EntryConverterTest extends AbstractConverterTest {
     @Test
     public void roundtrip_intact() throws Exception {
         File file = getIntactFile();
-        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(new FileInputStream(file), "European Bioinformatics Institute");
     }
@@ -100,9 +80,7 @@ public class EntryConverterTest extends AbstractConverterTest {
 
     @Test
     public void roundtrip_dip() throws Exception {
-
         File file = getDipFile();
-        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         //output = true;
         roundtripWithStream(new FileInputStream(file), "DIP");
@@ -111,7 +89,6 @@ public class EntryConverterTest extends AbstractConverterTest {
     @Test
     public void roundtrip_mint() throws Exception {
         File file = getMintFile();
-        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(new FileInputStream(file), "MINT");
     }
@@ -119,7 +96,6 @@ public class EntryConverterTest extends AbstractConverterTest {
     @Test
     public void roundtrip_similarInteractions() throws Exception {
         File file = new File(EntryConverterTest.class.getResource("/xml/dupes.xml").getFile());
-        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(new FileInputStream(file));
@@ -134,9 +110,6 @@ public class EntryConverterTest extends AbstractConverterTest {
     public void roundtrip_similarExperiments() throws Exception {
         final String resource = "/xml/similarExperiments.dip.raw.xml";
         InputStream is = EntryConverterTest.class.getResourceAsStream(resource);
-        
-        File file = new File(EntryConverterTest.class.getResource(resource).getFile());
-        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(is, "DIP");
     }
@@ -147,7 +120,6 @@ public class EntryConverterTest extends AbstractConverterTest {
         InputStream is = EntryConverterTest.class.getResourceAsStream(resource);
 
         File file = new File(EntryConverterTest.class.getResource(resource).getFile());
-        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(is, "MINT");
     }
@@ -156,9 +128,6 @@ public class EntryConverterTest extends AbstractConverterTest {
     public void roundtrip_intact_redundantExperiments() throws Exception {
         final String resource = "/xml/16267818.intact.raw.xml";
         InputStream is = EntryConverterTest.class.getResourceAsStream(resource);
-        
-        File file = new File(EntryConverterTest.class.getResource(resource).getFile());
-        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         roundtripWithStream(is, "European Bioinformatics Institute");
     }
@@ -166,7 +135,6 @@ public class EntryConverterTest extends AbstractConverterTest {
     @Test
     public void roundtrip_similarInteractions_sameLabel() throws Exception {
         File file = new File(EntryConverterTest.class.getResource("/xml/dupes.xml").getFile());
-        assertTrue("Document must be valid: " + file, xmlIsValid(new FileInputStream(file)));
 
         PsimiXmlReader reader = new PsimiXmlReader();
         EntrySet entrySet = reader.read(new FileInputStream(file));
@@ -213,8 +181,6 @@ public class EntryConverterTest extends AbstractConverterTest {
             IntactEntry intactEntry = entryConverter.psiToIntact(beforeRountripEntry);
             Entry afterRoundtripEntry = entryConverter.intactToPsi(intactEntry);
 
-            assertTrue("XML created after conversion roundtrip must be valid", xmlIsValid(afterRoundtripEntry));
-
             Assert.assertEquals(institutionShortLabel, intactEntry.getInstitution().getShortLabel());
             Assert.assertEquals(institutionShortLabel, intactEntry.getInteractions().iterator().next().getOwner().getShortLabel());
             Assert.assertEquals(institutionShortLabel, intactEntry.getExperiments().iterator().next().getOwner().getShortLabel());
@@ -230,32 +196,4 @@ public class EntryConverterTest extends AbstractConverterTest {
         }
        
     }
-
-    private static boolean xmlIsValid(InputStream xml) throws Exception {
-        PsiValidatorReport report = PsiValidator.validate(new InputSource(xml));
-        return analyzeReport(report);
-    }
-
-    private static boolean xmlIsValid(Entry entry) throws Exception {
-
-        PsimiXmlWriter writer = new PsimiXmlWriter();
-        String xml = writer.getAsString(new EntrySet(Arrays.asList(entry), 2, 5, 3));
-
-        PsiValidatorReport report = PsiValidator.validate(xml);
-        return analyzeReport(report);
-    }
-
-    private static boolean analyzeReport(PsiValidatorReport report) throws Exception {
-        return true;        
-//boolean isValid = report.isValid();
-
-        //if (!isValid && log.isErrorEnabled()) {
-        //    for (PsiValidatorMessage message : report.getMessages()) {
-        //        log.error("\t" + message);
-        //    }
-        //}
-
-        //return isValid;
-    }
-
 }
