@@ -4,7 +4,7 @@
     <parent>
         <artifactId>psimitab-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
-        <version>3.0.56-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>intact-calimocho-converters</artifactId>
@@ -15,6 +15,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.commons</groupId>
             <artifactId>intact-commons</artifactId>
+            <version>${commons.version}</version>
         </dependency>
 
         <dependency>
@@ -27,7 +28,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
             <artifactId>intact-psimitab-converters</artifactId>
-            <version>2.1.4</version>
+            <version>${pom.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>uk.ac.ebi.pride</groupId>
@@ -40,18 +41,18 @@
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>calimocho</artifactId>
-            <version>2.5.2</version>
+            <version>${calimocho.version}</version>
         </dependency>
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>calimocho-tab</artifactId>
-            <version>2.5.2</version>
+            <version>${calimocho.version}</version>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
