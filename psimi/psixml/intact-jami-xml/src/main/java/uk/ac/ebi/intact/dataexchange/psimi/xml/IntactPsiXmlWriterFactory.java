@@ -4,6 +4,7 @@ import psidev.psi.mi.jami.datasource.InteractionWriter;
 import psidev.psi.mi.jami.model.ComplexType;
 import psidev.psi.mi.jami.model.InteractionCategory;
 import psidev.psi.mi.jami.xml.PsiXmlType;
+import psidev.psi.mi.jami.xml.PsiXmlVersion;
 import psidev.psi.mi.jami.xml.io.writer.compact.*;
 import psidev.psi.mi.jami.xml.io.writer.expanded.*;
 import psidev.psi.mi.jami.xml.model.extension.factory.PsiXmlWriterFactory;
@@ -31,19 +32,22 @@ public class IntactPsiXmlWriterFactory {
         return instance;
     }
 
-    public InteractionWriter createPsiXmlWriter(InteractionCategory interactionCategory, ComplexType complexType,
+    public InteractionWriter createPsiXmlWriter(InteractionCategory interactionCategory,
+                                                PsiXmlVersion version,
+                                                ComplexType complexType,
                                                 PsiXmlType type, boolean extended, boolean named){
         PsiXmlWriterFactory writerFactory = PsiXmlWriterFactory.getInstance();
 
         switch (complexType){
             case binary:
-                return writerFactory.createPsiXmlBinaryWriter(interactionCategory, type, extended, named);
+                return writerFactory.createPsiXmlBinaryWriter(interactionCategory, version, type, extended, named);
             default:
-                return createPsiXmlWriter(interactionCategory, type, extended, named);
+                return createPsiXmlWriter(interactionCategory, type, version, extended, named);
         }
     }
 
     public InteractionWriter createPsiXmlWriter(InteractionCategory interactionCategory, PsiXmlType type,
+                                                PsiXmlVersion version,
                                                 boolean extended, boolean named){
         if (interactionCategory == null){
             interactionCategory = InteractionCategory.mixed;
@@ -52,10 +56,10 @@ public class IntactPsiXmlWriterFactory {
         PsiXmlWriterFactory writerFactory = PsiXmlWriterFactory.getInstance();
 
         if (extended){
-            return writerFactory.createPsiXmlWriter(interactionCategory, type, extended, named);
+            return writerFactory.createPsiXmlWriter(interactionCategory, type, version, extended, named);
         }
         else if (named){
-            return writerFactory.createPsiXmlWriter(interactionCategory, type, extended, named);
+            return writerFactory.createPsiXmlWriter(interactionCategory, type, version, extended, named);
         }
         else{
             switch (type){

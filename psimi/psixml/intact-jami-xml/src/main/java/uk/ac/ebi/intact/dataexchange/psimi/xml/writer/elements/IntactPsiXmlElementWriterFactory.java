@@ -137,7 +137,7 @@ public class IntactPsiXmlElementWriterFactory {
         else{
             PsiXmlElementWriter[] featureWriters = createFeatureWriter(streamWriter, extended, objectIndex, version, category, aliasWriter,
                     attributeWriter, primaryRefWriter, cvWriter, parameterWriter);
-            PsiXmlVariableNameWriter<CvTerm> experimentalCvWriter = elementWriterFactory.createExperimentalCvWriter(streamWriter, extended, objectIndex, aliasWriter,
+            PsiXmlVariableNameWriter<CvTerm> experimentalCvWriter = elementWriterFactory.createExperimentalCvWriter(streamWriter, version, extended, objectIndex, aliasWriter,
                     primaryRefWriter);
             PsiXmlElementWriter[] candidateWriters = elementWriterFactory.createParticipantCandidateWriter(streamWriter, extended, objectIndex, version, xmlType,
                     category, interactorWriter, (PsiXmlElementWriter<ModelledFeature>) featureWriters[1],
@@ -172,7 +172,7 @@ public class IntactPsiXmlElementWriterFactory {
                                     writer2.setExperimentalCvWriter(experimentalCvWriter);
                                     writer2.setParameterWriter(parameterWriter);
                                     writer2.setConfidenceWriter(confidenceWriter);
-                                    writer2.setHostOrganismWriter(elementWriterFactory.createHostOrganismWriter(streamWriter, extended,
+                                    writer2.setHostOrganismWriter(elementWriterFactory.createHostOrganismWriter(streamWriter, version, extended,
                                             objectIndex, aliasWriter,
                                             attributeWriter, primaryRefWriter, openCvWriter));
                                     writer2.setParticipantCandidateWriter(candidateWriters[0]);
@@ -205,7 +205,7 @@ public class IntactPsiXmlElementWriterFactory {
                                     writer2.setExperimentalCvWriter(experimentalCvWriter);
                                     writer2.setParameterWriter(parameterWriter);
                                     writer2.setConfidenceWriter(confidenceWriter);
-                                    writer2.setHostOrganismWriter(elementWriterFactory.createHostOrganismWriter(streamWriter, extended, objectIndex, aliasWriter,
+                                    writer2.setHostOrganismWriter(elementWriterFactory.createHostOrganismWriter(streamWriter, version, extended, objectIndex, aliasWriter,
                                             attributeWriter, primaryRefWriter, openCvWriter));
                                     writer2.setParticipantCandidateWriter(candidateWriters[0]);
 
@@ -252,7 +252,7 @@ public class IntactPsiXmlElementWriterFactory {
                                     writer2.setExperimentalCvWriter(experimentalCvWriter);
                                     writer2.setParameterWriter(parameterWriter);
                                     writer2.setConfidenceWriter(confidenceWriter);
-                                    writer2.setHostOrganismWriter(elementWriterFactory.createHostOrganismWriter(streamWriter, extended, objectIndex, aliasWriter,
+                                    writer2.setHostOrganismWriter(elementWriterFactory.createHostOrganismWriter(streamWriter, version, extended, objectIndex, aliasWriter,
                                             attributeWriter, primaryRefWriter, openCvWriter));
 
                                     return new PsiXmlParticipantWriter[]{writer2, modelledWriter2};
@@ -293,7 +293,7 @@ public class IntactPsiXmlElementWriterFactory {
                                     writer2.setExperimentalCvWriter(experimentalCvWriter);
                                     writer2.setParameterWriter(parameterWriter);
                                     writer2.setConfidenceWriter(confidenceWriter);
-                                    writer2.setHostOrganismWriter(elementWriterFactory.createHostOrganismWriter(streamWriter, extended, objectIndex, aliasWriter,
+                                    writer2.setHostOrganismWriter(elementWriterFactory.createHostOrganismWriter(streamWriter, version, extended, objectIndex, aliasWriter,
                                             attributeWriter, primaryRefWriter, openCvWriter));
 
                                     return new PsiXmlParticipantWriter[]{writer2, modelledWriter3};
@@ -625,8 +625,7 @@ public class IntactPsiXmlElementWriterFactory {
                         }
                 }
 
-            default:
-
+            case v2_5_3:
                 switch (xmlType){
                     case compact:
                         switch (complexType){
@@ -636,8 +635,8 @@ public class IntactPsiXmlElementWriterFactory {
                                         interactionTypeWriter, experimentWriter, availabilityWriter, parameterWriters, participantWriters,
                                         inferredInteractionWriter, publicationWriter, openCvWriter);
                             default:
-                                uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.compact.xml25.XmlIntactComplexWriter modelledWriter2 =
-                                        new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.compact.xml25.XmlIntactComplexWriter(streamWriter, objectIndex);
+                                uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml253.XmlIntactComplexWriter modelledWriter2 =
+                                        new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml253.XmlIntactComplexWriter(streamWriter, objectIndex);
                                 modelledWriter2.setAliasWriter(aliasWriter);
                                 modelledWriter2.setAttributeWriter(attributeWriter);
                                 modelledWriter2.setXrefWriter(primaryRefWriter);
@@ -654,8 +653,8 @@ public class IntactPsiXmlElementWriterFactory {
                                     case complex:
                                         return new PsiXmlInteractionWriter[]{modelledWriter2, modelledWriter2};
                                     case basic:
-                                        psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.XmlBasicInteractionWriter writer3 =
-                                                new psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.XmlBasicInteractionWriter(streamWriter, objectIndex);
+                                        psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.xml253.XmlBasicInteractionWriter writer3 =
+                                                new psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.xml253.XmlBasicInteractionWriter(streamWriter, objectIndex);
                                         writer3.setAttributeWriter(attributeWriter);
                                         writer3.setXrefWriter(primaryRefWriter);
                                         writer3.setInteractionTypeWriter(interactionTypeWriter);
@@ -666,8 +665,8 @@ public class IntactPsiXmlElementWriterFactory {
 
                                         return new PsiXmlInteractionWriter[]{writer3, modelledWriter2};
                                     default:
-                                        uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.compact.xml25.XmlIntactInteractionEvidenceWriter writer2 =
-                                                new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.compact.xml25.XmlIntactInteractionEvidenceWriter(streamWriter, objectIndex);
+                                        uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml253.XmlIntactInteractionEvidenceWriter writer2 =
+                                                new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml253.XmlIntactInteractionEvidenceWriter(streamWriter, objectIndex);
                                         writer2.setAttributeWriter(attributeWriter);
                                         writer2.setXrefWriter(primaryRefWriter);
                                         writer2.setInteractionTypeWriter(interactionTypeWriter);
@@ -692,8 +691,8 @@ public class IntactPsiXmlElementWriterFactory {
                                         interactionTypeWriter, experimentWriter, availabilityWriter, parameterWriters, participantWriters,
                                         inferredInteractionWriter, publicationWriter, openCvWriter);
                             default:
-                                uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.XmlIntactComplexWriter modelledWriter3 =
-                                        new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.XmlIntactComplexWriter(streamWriter, objectIndex);
+                                uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml253.XmlIntactComplexWriter modelledWriter3 =
+                                        new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml253.XmlIntactComplexWriter(streamWriter, objectIndex);
                                 modelledWriter3.setAliasWriter(aliasWriter);
                                 modelledWriter3.setAttributeWriter(attributeWriter);
                                 modelledWriter3.setXrefWriter(primaryRefWriter);
@@ -710,8 +709,8 @@ public class IntactPsiXmlElementWriterFactory {
                                     case complex:
                                         return new PsiXmlInteractionWriter[]{modelledWriter3, modelledWriter3};
                                     case basic:
-                                        psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.XmlBasicInteractionWriter writer3 =
-                                                new psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.XmlBasicInteractionWriter(streamWriter, objectIndex);
+                                        psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml253.XmlBasicInteractionWriter writer3 =
+                                                new psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml253.XmlBasicInteractionWriter(streamWriter, objectIndex);
                                         writer3.setAttributeWriter(attributeWriter);
                                         writer3.setXrefWriter(primaryRefWriter);
                                         writer3.setInteractionTypeWriter(interactionTypeWriter);
@@ -722,8 +721,123 @@ public class IntactPsiXmlElementWriterFactory {
 
                                         return new PsiXmlInteractionWriter[]{writer3, modelledWriter3};
                                     default:
-                                        psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.XmlInteractionEvidenceWriter writer2 =
-                                                new psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.XmlInteractionEvidenceWriter(streamWriter, objectIndex);
+                                        psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml253.XmlInteractionEvidenceWriter writer2 =
+                                                new psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml253.XmlInteractionEvidenceWriter(streamWriter, objectIndex);
+                                        writer2.setAttributeWriter(attributeWriter);
+                                        writer2.setXrefWriter(primaryRefWriter);
+                                        writer2.setInteractionTypeWriter(interactionTypeWriter);
+                                        writer2.setConfidenceWriter(confidenceWriters[0]);
+                                        writer2.setInferredInteractionWriter(inferredInteractionWriter);
+                                        writer2.setParticipantWriter(participantWriters[0]);
+                                        writer2.setChecksumWriter(checksumWriter);
+                                        writer2.setExperimentWriter(experimentWriter);
+                                        writer2.setParameterWriter(parameterWriters[0]);
+                                        writer2.setAvailabilityWriter(availabilityWriter);
+
+                                        return new PsiXmlInteractionWriter[]{writer2, modelledWriter3};
+                                }
+                        }
+                }
+
+            case v2_5_4:
+            default:
+                switch (xmlType){
+                    case compact:
+                        switch (complexType){
+                            case binary:
+                                return elementWriterFactory.createDefaultPsiXmlInteractionWriters(streamWriter, objectIndex, version, xmlType, interactionCategory,
+                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters, checksumWriter,
+                                        interactionTypeWriter, experimentWriter, availabilityWriter, parameterWriters, participantWriters,
+                                        inferredInteractionWriter, publicationWriter, openCvWriter);
+                            default:
+                                uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml254.XmlIntactComplexWriter modelledWriter2 =
+                                        new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml254.XmlIntactComplexWriter(streamWriter, objectIndex);
+                                modelledWriter2.setAliasWriter(aliasWriter);
+                                modelledWriter2.setAttributeWriter(attributeWriter);
+                                modelledWriter2.setXrefWriter(primaryRefWriter);
+                                modelledWriter2.setInteractionTypeWriter(interactionTypeWriter);
+                                modelledWriter2.setConfidenceWriter(confidenceWriters[1]);
+                                modelledWriter2.setInferredInteractionWriter(inferredInteractionWriter);
+                                modelledWriter2.setParticipantWriter(participantWriters[1]);
+                                modelledWriter2.setChecksumWriter(checksumWriter);
+                                modelledWriter2.setExperimentWriter(experimentWriter);
+                                modelledWriter2.setParameterWriter(parameterWriters[1]);
+                                switch (interactionCategory){
+                                    case modelled:
+                                        return new PsiXmlInteractionWriter[]{modelledWriter2, modelledWriter2};
+                                    case complex:
+                                        return new PsiXmlInteractionWriter[]{modelledWriter2, modelledWriter2};
+                                    case basic:
+                                        psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.xml254.XmlBasicInteractionWriter writer3 =
+                                                new psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.xml254.XmlBasicInteractionWriter(streamWriter, objectIndex);
+                                        writer3.setAttributeWriter(attributeWriter);
+                                        writer3.setXrefWriter(primaryRefWriter);
+                                        writer3.setInteractionTypeWriter(interactionTypeWriter);
+                                        writer3.setInferredInteractionWriter(inferredInteractionWriter);
+                                        writer3.setParticipantWriter(participantWriters[0]);
+                                        writer3.setChecksumWriter(checksumWriter);
+                                        writer3.setExperimentWriter(experimentWriter);
+
+                                        return new PsiXmlInteractionWriter[]{writer3, modelledWriter2};
+                                    default:
+                                        uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml254.XmlIntactInteractionEvidenceWriter writer2 =
+                                                new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml254.XmlIntactInteractionEvidenceWriter(streamWriter, objectIndex);
+                                        writer2.setAttributeWriter(attributeWriter);
+                                        writer2.setXrefWriter(primaryRefWriter);
+                                        writer2.setInteractionTypeWriter(interactionTypeWriter);
+                                        writer2.setConfidenceWriter(confidenceWriters[0]);
+                                        writer2.setInferredInteractionWriter(inferredInteractionWriter);
+                                        writer2.setParticipantWriter(participantWriters[0]);
+                                        writer2.setChecksumWriter(checksumWriter);
+                                        writer2.setExperimentWriter(experimentWriter);
+                                        writer2.setParameterWriter(parameterWriters[0]);
+                                        writer2.setAvailabilityWriter(availabilityWriter);
+
+                                        return new PsiXmlInteractionWriter[]{writer2, modelledWriter2};
+                                }
+                        }
+
+                    default:
+
+                        switch (complexType){
+                            case binary:
+                                return elementWriterFactory.createDefaultPsiXmlInteractionWriters(streamWriter, objectIndex, version, xmlType, interactionCategory,
+                                        complexType, aliasWriter, attributeWriter, primaryRefWriter, confidenceWriters, checksumWriter,
+                                        interactionTypeWriter, experimentWriter, availabilityWriter, parameterWriters, participantWriters,
+                                        inferredInteractionWriter, publicationWriter, openCvWriter);
+                            default:
+                                uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml254.XmlIntactComplexWriter modelledWriter3 =
+                                        new uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml254.XmlIntactComplexWriter(streamWriter, objectIndex);
+                                modelledWriter3.setAliasWriter(aliasWriter);
+                                modelledWriter3.setAttributeWriter(attributeWriter);
+                                modelledWriter3.setXrefWriter(primaryRefWriter);
+                                modelledWriter3.setInteractionTypeWriter(interactionTypeWriter);
+                                modelledWriter3.setConfidenceWriter(confidenceWriters[1]);
+                                modelledWriter3.setInferredInteractionWriter(inferredInteractionWriter);
+                                modelledWriter3.setParticipantWriter(participantWriters[1]);
+                                modelledWriter3.setChecksumWriter(checksumWriter);
+                                modelledWriter3.setExperimentWriter(experimentWriter);
+                                modelledWriter3.setParameterWriter(parameterWriters[1]);
+                                switch (interactionCategory){
+                                    case modelled:
+                                        return new PsiXmlInteractionWriter[]{modelledWriter3, modelledWriter3};
+                                    case complex:
+                                        return new PsiXmlInteractionWriter[]{modelledWriter3, modelledWriter3};
+                                    case basic:
+                                        psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml254.XmlBasicInteractionWriter writer3 =
+                                                new psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml254.XmlBasicInteractionWriter(streamWriter, objectIndex);
+                                        writer3.setAttributeWriter(attributeWriter);
+                                        writer3.setXrefWriter(primaryRefWriter);
+                                        writer3.setInteractionTypeWriter(interactionTypeWriter);
+                                        writer3.setInferredInteractionWriter(inferredInteractionWriter);
+                                        writer3.setParticipantWriter(participantWriters[0]);
+                                        writer3.setChecksumWriter(checksumWriter);
+                                        writer3.setExperimentWriter(experimentWriter);
+
+                                        return new PsiXmlInteractionWriter[]{writer3, modelledWriter3};
+                                    default:
+                                        psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml254.XmlInteractionEvidenceWriter writer2 =
+                                                new psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml254.XmlInteractionEvidenceWriter(streamWriter, objectIndex);
                                         writer2.setAttributeWriter(attributeWriter);
                                         writer2.setXrefWriter(primaryRefWriter);
                                         writer2.setInteractionTypeWriter(interactionTypeWriter);

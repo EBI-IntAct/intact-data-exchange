@@ -1,11 +1,11 @@
-package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.compact.xml25;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.compact.xml25.xml253;
 
 import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Checksum;
 import psidev.psi.mi.jami.model.InteractionEvidence;
 import psidev.psi.mi.jami.utils.AnnotationUtils;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
-import psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.XmlInteractionEvidenceWriter;
+import psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.xml253.XmlInteractionEvidenceWriter;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;

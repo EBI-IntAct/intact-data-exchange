@@ -1,4 +1,4 @@
-package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml254;
 
 import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Checksum;
@@ -7,7 +7,7 @@ import psidev.psi.mi.jami.model.Experiment;
 import psidev.psi.mi.jami.utils.AnnotationUtils;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.elements.ExpandedPsiXmlElementWriter;
-import psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.XmlComplexWriter;
+import psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml254.XmlComplexWriter;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 
 import javax.xml.stream.XMLStreamException;
