@@ -60,7 +60,7 @@ public class BioSourceEnricherTest extends EnricherBasicTestCase {
         enricher.enrich(organism);
 
         Assert.assertEquals("arcfu", organism.getCommonName());
-        Assert.assertEquals("Archaeoglobus fulgidus (strain ATCC 49558 / VC-16 / DSM 4304 / JCM 9628 / NBRC 100126)", organism.getScientificName());
+        Assert.assertEquals("Archaeoglobus fulgidus (strain ATCC 49558 / DSM 4304 / JCM 9628 / NBRC 100126 / VC-16)", organism.getScientificName());
     }
 
     @Test

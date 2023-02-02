@@ -5,6 +5,7 @@ import psidev.psi.mi.jami.model.Checksum;
 import psidev.psi.mi.jami.model.Complex;
 import psidev.psi.mi.jami.model.Experiment;
 import psidev.psi.mi.jami.utils.AnnotationUtils;
+import psidev.psi.mi.jami.xml.PsiXmlVersion;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.XmlComplexWriter;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
@@ -25,8 +26,8 @@ import java.util.Collection;
 
 public class XmlIntactComplexWriter extends XmlComplexWriter {
 
-    public XmlIntactComplexWriter(XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
-        super(writer, objectIndex);
+    public XmlIntactComplexWriter(PsiXmlVersion version, XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
+        super(version, writer, objectIndex);
     }
 
     @Override
