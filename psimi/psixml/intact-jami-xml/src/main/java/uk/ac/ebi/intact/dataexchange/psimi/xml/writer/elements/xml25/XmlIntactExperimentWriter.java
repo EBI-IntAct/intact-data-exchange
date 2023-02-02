@@ -5,6 +5,7 @@ import psidev.psi.mi.jami.model.Experiment;
 import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.jami.utils.AnnotationUtils;
 import psidev.psi.mi.jami.utils.XrefUtils;
+import psidev.psi.mi.jami.xml.PsiXmlVersion;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.elements.impl.xml25.XmlExperimentWriter;
 import psidev.psi.mi.jami.xml.utils.PsiXmlUtils;
@@ -29,8 +30,8 @@ import java.util.Iterator;
 
 public class XmlIntactExperimentWriter extends XmlExperimentWriter {
 
-    public XmlIntactExperimentWriter(XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
-        super(writer, objectIndex);
+    public XmlIntactExperimentWriter(PsiXmlVersion version, XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
+        super(version, writer, objectIndex);
     }
 
     @Override

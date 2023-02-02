@@ -1,13 +1,13 @@
-package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.expanded.xml25.xml254;
+package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.compact.xml25;
 
 import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Checksum;
 import psidev.psi.mi.jami.model.Complex;
 import psidev.psi.mi.jami.model.Experiment;
 import psidev.psi.mi.jami.utils.AnnotationUtils;
+import psidev.psi.mi.jami.xml.PsiXmlVersion;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
-import psidev.psi.mi.jami.xml.io.writer.elements.ExpandedPsiXmlElementWriter;
-import psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.xml254.XmlComplexWriter;
+import psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.XmlComplexWriter;
 import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
 
 import javax.xml.stream.XMLStreamException;
@@ -16,19 +16,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Expanded XML 2.5 writer for a biological complex (ignore experimental details).
+ * Compact XML 2.5 writer for a biological complex (ignore experimental details).
  * It will write cooperative effects as attributes
  *
  * @author Marine Dumousseau (marine@ebi.ac.uk)
  * @version $Id$
- * @since <pre>18/11/13</pre>
+ * @since <pre>15/11/13</pre>
  */
 
-public class XmlIntactComplexWriter extends XmlComplexWriter
-        implements ExpandedPsiXmlElementWriter<Complex> {
+public class XmlIntactComplexWriter extends XmlComplexWriter {
 
-    public XmlIntactComplexWriter(XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
-        super(writer, objectIndex);
+    public XmlIntactComplexWriter(PsiXmlVersion version, XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
+        super(version, writer, objectIndex);
     }
 
     @Override

@@ -66,30 +66,30 @@ public class IntactPsiXmlWriterFactory {
                 case compact:
                     switch (interactionCategory){
                         case evidence:
-                            return new IntactCompactXmlEvidenceWriter();
+                            return new IntactCompactXmlEvidenceWriter(version);
                         case modelled:
-                            return new CompactXmlModelledWriter();
+                            return new CompactXmlModelledWriter(version);
                         case basic:
-                            return new LightCompactXmlWriter();
+                            return new LightCompactXmlWriter(version);
                         case complex:
-                            return new IntactCompactXmlComplexWriter();
+                            return new IntactCompactXmlComplexWriter(version);
                         case mixed:
-                            return new IntactCompactXmlEvidenceWriter();
+                            return new IntactCompactXmlEvidenceWriter(version);
                         default:
                             throw new IllegalArgumentException("Cannot find a XML writer for interaction category: "+interactionCategory);
                     }
                 default:
                     switch (interactionCategory){
                         case evidence:
-                            return new IntactExpandedXmlEvidenceWriter();
+                            return new IntactExpandedXmlEvidenceWriter(version);
                         case modelled:
-                            return new ExpandedXmlModelledWriter();
+                            return new ExpandedXmlModelledWriter(version);
                         case basic:
-                            return new LightExpandedXmlWriter();
+                            return new LightExpandedXmlWriter(version);
                         case complex:
-                            return new IntactExpandedXmlComplexWriter();
+                            return new IntactExpandedXmlComplexWriter(version);
                         case mixed:
-                            return new IntactExpandedXmlEvidenceWriter();
+                            return new IntactExpandedXmlEvidenceWriter(version);
                         default:
                             throw new IllegalArgumentException("Cannot find a XML writer for interaction category: "+interactionCategory);
                     }
