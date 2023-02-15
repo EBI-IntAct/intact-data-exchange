@@ -33,12 +33,12 @@
         <uniprot.japi.version>1.1.2</uniprot.japi.version>
         <chebiws.client.version>2.4</chebiws.client.version>
 
-        <micluster.version>1.8.0</micluster.version>
+        <micluster.version>1.8.1-SNAPSHOT</micluster.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>4.13.2</junit.version>
 
         <psicquic.version>1.5.0</psicquic.version>
-        <psimi.version>1.9.0</psimi.version>
+        <psimi.version>1.10.0-SNAPSHOT</psimi.version>
         <calimocho.version>2.6.0</calimocho.version>
     </properties>
 
