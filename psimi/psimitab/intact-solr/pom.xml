@@ -104,7 +104,7 @@
         <dependency>
             <groupId>org.hupo.psi.mi.psicquic</groupId>
             <artifactId>psicquic-simple-client</artifactId>
-            <version>${psicquic.version}</version>
+            <version>${psicquic.simple.client.version}</version>
         </dependency>
 
         <!-- intact solr home -->
