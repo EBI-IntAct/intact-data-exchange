@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.maven</groupId>
         <artifactId>intact-hibernate-master</artifactId>
-        <version>46</version>
+        <version>46.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -19,7 +19,7 @@
     <url>http://www.ebi.ac.uk/~intact/devsite/dataexchange</url>
 
     <properties>
-        <core.version>2.7.0</core.version>
+        <core.version>2.7.1-SNAPSHOT</core.version>
         <bridges.version>2.2.0</bridges.version>
         <commons.version>2.1.10</commons.version>
         <intact.tools.version>1.1.1-SNAPSHOT</intact.tools.version>
@@ -218,6 +218,10 @@
     </dependencies>
 
     <repositories>
+        <repository>
+            <id>nexus</id>
+            <url>https://www.ebi.ac.uk/intact/maven/nexus/content/groups/public/</url>
+        </repository>
         <repository>
             <id>nexus-ebi-repo-old</id>
             <url>https://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
