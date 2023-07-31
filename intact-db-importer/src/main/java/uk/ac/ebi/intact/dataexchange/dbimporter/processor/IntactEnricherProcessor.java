@@ -51,10 +51,6 @@ public class IntactEnricherProcessor<I> implements ItemProcessor<I, I>, ItemStre
             }
             errorWriter.write("Cannot enrich object " + source);
         }
-        catch (Exception e) {
-            System.out.println("\n\nCannot enrich object " + item.toString() + "\n\n");
-            throw e;
-        }
 
         return item;
     }

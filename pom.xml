@@ -23,7 +23,7 @@
         <bridges.version>2.2.1</bridges.version>
         <commons.version>2.1.10</commons.version>
         <intact.tools.version>1.2.1</intact.tools.version>
-        <intact.jami.version>2.2.4-SNAPSHOT</intact.jami.version>
+        <intact.jami.version>2.2.3</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
         <psi.jami.version>3.3.1</psi.jami.version>
         <spring.version>4.3.30.RELEASE</spring.version>
