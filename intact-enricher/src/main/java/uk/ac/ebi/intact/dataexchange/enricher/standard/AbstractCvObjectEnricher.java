@@ -15,7 +15,6 @@
  */
 package uk.ac.ebi.intact.dataexchange.enricher.standard;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
@@ -125,24 +124,7 @@ public abstract class AbstractCvObjectEnricher<T extends CvTerm> extends FullCvT
 
     @Override
     protected void processMinimalUpdates(T cvTermToEnrich, T termFetched) throws EnricherException {
-        try {
-            super.processMinimalUpdates(cvTermToEnrich, termFetched);
-        } catch (Exception e) {
-            System.out.println("cvTermToEnrich: " + cvTermToEnrich.toString());
-            System.out.println("termFetched: " + termFetched.toString());
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                System.out.println("cvTermToEnrich JSON: " + mapper.writeValueAsString(cvTermToEnrich));
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-            try {
-            System.out.println("cvTermToEnrich JSON: " + mapper.writeValueAsString(termFetched));
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-            throw e;
-        }
+        super.processMinimalUpdates(cvTermToEnrich, termFetched);
 
         // process shortlabel
         processShortName(cvTermToEnrich, termFetched);
