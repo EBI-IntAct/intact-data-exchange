@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.compact;
 
 import psidev.psi.mi.jami.model.*;
 import psidev.psi.mi.jami.xml.PsiXmlType;
+import psidev.psi.mi.jami.xml.PsiXmlVersion;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.compact.CompactXmlEvidenceWriter;
 import psidev.psi.mi.jami.xml.io.writer.elements.*;
@@ -24,24 +25,24 @@ import java.io.Writer;
 
 public class IntactCompactXmlEvidenceWriter extends CompactXmlEvidenceWriter {
 
-    public IntactCompactXmlEvidenceWriter() {
-        super();
+    public IntactCompactXmlEvidenceWriter(PsiXmlVersion version) {
+        super(version);
     }
 
-    public IntactCompactXmlEvidenceWriter(File file) throws IOException, XMLStreamException {
-        super(file);
+    public IntactCompactXmlEvidenceWriter(PsiXmlVersion version, File file) throws IOException, XMLStreamException {
+        super(version, file);
     }
 
-    public IntactCompactXmlEvidenceWriter(OutputStream output) throws XMLStreamException {
-        super(output);
+    public IntactCompactXmlEvidenceWriter(PsiXmlVersion version, OutputStream output) throws XMLStreamException {
+        super(version, output);
     }
 
-    public IntactCompactXmlEvidenceWriter(Writer writer) throws XMLStreamException {
-        super(writer);
+    public IntactCompactXmlEvidenceWriter(PsiXmlVersion version, Writer writer) throws XMLStreamException {
+        super(version, writer);
     }
 
-    public IntactCompactXmlEvidenceWriter(XMLStreamWriter streamWriter, PsiXmlObjectCache cache) {
-        super(streamWriter, cache);
+    public IntactCompactXmlEvidenceWriter(PsiXmlVersion version, XMLStreamWriter streamWriter, PsiXmlObjectCache cache) {
+        super(version, streamWriter, cache);
     }
 
     @Override
@@ -72,8 +73,8 @@ public class IntactCompactXmlEvidenceWriter extends CompactXmlEvidenceWriter {
         // checksum writer
         PsiXmlElementWriter<Checksum> checksumWriter = getSubWritersFactory().createChecksumWriter(getStreamWriter());
         // interactor writer
-        PsiXmlElementWriter<Interactor> interactorWriter = intactFactory.createInteractorWriter(getStreamWriter(), false, getElementCache(),
-                aliasWriter, attributeWriter, xrefWriter, cvWriter, organismWriter, checksumWriter);
+        PsiXmlElementWriter<Interactor> interactorWriter = intactFactory.createInteractorWriter(getVersion(), getStreamWriter(),
+                false, getElementCache(), aliasWriter, attributeWriter, xrefWriter, cvWriter, organismWriter, checksumWriter);
         // experiment Writer
         PsiXmlExperimentWriter experimentWriter = intactFactory.createExperimentWriter(getStreamWriter(), false, getElementCache(),
                 getVersion(), false, aliasWriter, attributeWriter, xrefWriter, publicationWriter, organismWriter, cvWriter,

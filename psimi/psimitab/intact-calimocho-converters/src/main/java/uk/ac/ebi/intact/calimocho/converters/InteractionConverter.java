@@ -8,6 +8,7 @@ import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.DefaultRow;
 import org.hupo.psi.calimocho.model.Field;
 import org.hupo.psi.calimocho.model.Row;
+import psidev.psi.mi.tab.model.BinaryInteraction;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.InstitutionUtils;
@@ -98,7 +99,7 @@ public class InteractionConverter {
             return Collections.EMPTY_LIST;
         }
 
-        Collection<Interaction> interactions = expansionStrategy.expand(interaction);
+        Collection<BinaryInteraction> interactions = expansionStrategy.expand(interaction);
 
         boolean expanded = false;
 
@@ -118,12 +119,13 @@ public class InteractionConverter {
             }
         }
 
-        for (Interaction binary : interactions){
+        for (BinaryInteraction binary : interactions) {
+            Interaction binaryInteraction = (Interaction) binary;
 
-            Row row = processBinaryInteraction(binary, expanded);
+            Row row = processBinaryInteraction(binaryInteraction, expanded);
 
             if (row != null){
-                final Collection<Component> components = binary.getComponents();
+                final Collection<Component> components = binaryInteraction.getComponents();
                 Iterator<Component> iterator = components.iterator();
                 final Component componentA = iterator.next();
                 final Component componentB = iterator.next();

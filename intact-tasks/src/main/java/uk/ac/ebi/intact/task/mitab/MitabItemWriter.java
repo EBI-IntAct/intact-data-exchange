@@ -47,7 +47,7 @@ public class MitabItemWriter extends FlatFileItemWriter<BinaryInteraction> imple
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
 
-        if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
+        if (executionContext.containsKey(RESTART_DATA_NAME)) {
             setLineAggregator(new MitabLineAggregator(mitabVersion, true));
         }
         else {

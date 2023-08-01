@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.56-SNAPSHOT</version>
+        <version>3.2.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>uk.ac.ebi.intact.core</groupId>
             <artifactId>intact-core</artifactId>
-            <version>2.4.1</version>
+            <version>${core.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -112,9 +112,9 @@
 
         <!-- Oracle -->
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>oracle-thin</artifactId>
-            <version>10.2.0.4</version>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc10</artifactId>
+            <version>19.16.0.0</version>
         </dependency>
 
     </dependencies>

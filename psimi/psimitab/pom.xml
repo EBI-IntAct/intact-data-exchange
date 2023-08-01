@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>intact-psimi-master</artifactId>
-        <version>3.0.56-SNAPSHOT</version>
+        <version>3.2.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -16,7 +16,6 @@
 
     <properties>
         <currentVersion>${project.version}</currentVersion>
-        <psimi.version>1.8.5</psimi.version>
     </properties>
 
     <modules>

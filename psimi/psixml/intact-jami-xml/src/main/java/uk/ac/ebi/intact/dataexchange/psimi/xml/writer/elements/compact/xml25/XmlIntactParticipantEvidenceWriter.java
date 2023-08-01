@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.writer.elements.compact.xml25;
 
 import psidev.psi.mi.jami.model.*;
 import psidev.psi.mi.jami.utils.AnnotationUtils;
+import psidev.psi.mi.jami.xml.PsiXmlVersion;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.elements.CompactPsiXmlElementWriter;
 import psidev.psi.mi.jami.xml.io.writer.elements.impl.compact.xml25.XmlParticipantEvidenceWriter;
@@ -25,8 +26,8 @@ import java.util.Iterator;
  */
 
 public class XmlIntactParticipantEvidenceWriter extends XmlParticipantEvidenceWriter implements CompactPsiXmlElementWriter<ParticipantEvidence> {
-    public XmlIntactParticipantEvidenceWriter(XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
-        super(writer, objectIndex);
+    public XmlIntactParticipantEvidenceWriter(PsiXmlVersion version, XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
+        super(version, writer, objectIndex);
     }
 
     @Override

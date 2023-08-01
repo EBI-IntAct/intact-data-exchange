@@ -35,13 +35,12 @@ import java.util.Set;
  */
 public class LazyLoadedOntologyTermTest {
 
-    private static IntactSolrJettyRunner solrJettyRunner;
+    private IntactSolrJettyRunner solrJettyRunner;
+    private OntologySearcher searcher;
+    private HttpSolrServer solrServer;
 
-    private static OntologySearcher searcher;
-    private static HttpSolrServer solrServer;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+    @Before
+    public void beforeClass() throws Exception {
         solrJettyRunner = new IntactSolrJettyRunner();
         solrJettyRunner.start();
 
@@ -51,9 +50,8 @@ public class LazyLoadedOntologyTermTest {
         createIndex();
     }
 
-    @AfterClass
-    public static void afterClass() throws Exception {
-        //solrJettyRunner.join();
+    @After
+    public void afterClass() throws Exception {
         solrJettyRunner.stop();
         solrJettyRunner = null;
 
@@ -61,22 +59,11 @@ public class LazyLoadedOntologyTermTest {
         searcher = null;
     }
 
-    @Before
-    public void before() throws Exception {
-
-    }
-
-    @After
-    public void after() throws Exception {
-
-    }
-
-    private static void createIndex() throws Exception {
+    private void createIndex() {
         final URL goSlimUrl = LazyLoadedOntologyTermTest.class.getResource("/META-INF/goslim_generic.obo");
 
         OntologyIndexer ontologyIndexer = new OntologyIndexer(solrServer);
         ontologyIndexer.indexObo("go", goSlimUrl);
-
     }
 
     @Test

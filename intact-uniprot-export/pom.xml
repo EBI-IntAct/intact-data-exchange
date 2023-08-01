@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.0.56-SNAPSHOT</version>
+        <version>3.2.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>uk.ac.ebi.enfin.mi.cluster.score</groupId>
             <artifactId>miClusterScore</artifactId>
-            <version>1.6.2</version>
+            <version>${micluster.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>

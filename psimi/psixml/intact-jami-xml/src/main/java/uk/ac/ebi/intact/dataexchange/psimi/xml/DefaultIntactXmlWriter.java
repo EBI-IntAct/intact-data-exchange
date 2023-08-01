@@ -72,7 +72,7 @@ public class DefaultIntactXmlWriter extends DefaultXmlWriter {
             }
         }
 
-        setDelegate(factory.createPsiXmlWriter(category, type, xmlType, extended, named));
+        setDelegate(factory.createPsiXmlWriter(category, version, type, xmlType, extended, named));
         getDelegate().initialiseContext(options);
     }
 }
