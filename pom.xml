@@ -19,10 +19,10 @@
     <url>http://www.ebi.ac.uk/~intact/devsite/dataexchange</url>
 
     <properties>
-        <core.version>2.8.1-SNAPSHOT</core.version>
+        <core.version>2.8.1</core.version>
         <bridges.version>2.2.1</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.tools.version>1.2.2-SNAPSHOT</intact.tools.version>
+        <intact.tools.version>1.2.2</intact.tools.version>
         <intact.jami.version>2.2.3</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
         <psi.jami.version>3.3.1</psi.jami.version>
