@@ -23,39 +23,40 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import psidev.psi.mi.jami.bridges.fetcher.GeneFetcher;
 import psidev.psi.mi.jami.enricher.CvTermEnricher;
 import psidev.psi.mi.jami.enricher.OrganismEnricher;
 import psidev.psi.mi.jami.enricher.exception.EnricherException;
-import psidev.psi.mi.jami.enricher.impl.full.FullGeneEnricher;
+import psidev.psi.mi.jami.enricher.impl.full.FullNucleicAcidEnricher;
+import psidev.psi.mi.jami.enricher.listener.NucleicAcidEnricherListener;
 import psidev.psi.mi.jami.enricher.util.EnricherUtils;
 import psidev.psi.mi.jami.model.*;
 import uk.ac.ebi.intact.dataexchange.enricher.EnricherContext;
-import uk.ac.ebi.intact.dataexchange.enricher.fetch.EnsemblGeneFetcher;
+import uk.ac.ebi.intact.dataexchange.enricher.fetch.EnsemblNucleicAcidFetcher;
+import uk.ac.ebi.intact.dataexchange.enricher.fetch.NucleicAcidFetcher;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 
 /**
  *
  */
-@Component(value = "intactGeneEnricher")
+@Component(value = "intactNucleicAcidEnricher")
 @Lazy
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public class GeneEnricher extends FullGeneEnricher {
+public class NucleicAcidEnricher extends FullNucleicAcidEnricher {
 
-    private static final Log log = LogFactory.getLog(GeneEnricher.class);
+    private static final Log log = LogFactory.getLog(NucleicAcidEnricher.class);
 
     @Autowired
     private EnricherContext enricherContext;
 
     @Autowired
-    public GeneEnricher(@Qualifier("intactGeneFetcher") GeneFetcher proteinFetcher,
-                        @Qualifier("intactEnsemblGeneFetcher") EnsemblGeneFetcher ensemblGeneFetcher) {
-        super(proteinFetcher);
-        this.setEnsemblFetcher(ensemblGeneFetcher);
+    public NucleicAcidEnricher(@Qualifier("intactNucleicAcidFetcher") NucleicAcidFetcher fetcher,
+                               @Qualifier("intactEnsemblNucleicAcidFetcher") EnsemblNucleicAcidFetcher ensemblNucleicAcidFetcherFetcher) {
+        super(fetcher);
+        this.setEnsemblFetcher(ensemblNucleicAcidFetcherFetcher);
     }
 
     @Override
-    protected void onEnrichedVersionNotFound(Gene objectToEnrich) throws EnricherException {
+    protected void onEnrichedVersionNotFound(NucleicAcid objectToEnrich) throws EnricherException {
 
         objectToEnrich.setShortName(replaceLabelInvalidChars(objectToEnrich.getShortName()));
 
@@ -70,7 +71,7 @@ public class GeneEnricher extends FullGeneEnricher {
     }
 
     @Override
-    protected void processOrganism(Gene entityToEnrich) throws EnricherException {
+    protected void processOrganism(NucleicAcid entityToEnrich) throws EnricherException {
         if (enricherContext.getConfig().isUpdateOrganisms()
                 && entityToEnrich.getOrganism() != null
                 && getOrganismEnricher() != null) {
@@ -79,7 +80,7 @@ public class GeneEnricher extends FullGeneEnricher {
     }
 
     @Override
-    protected void processInteractorType(Gene entityToEnrich) throws EnricherException {
+    protected void processInteractorType(NucleicAcid entityToEnrich) throws EnricherException {
         if (enricherContext.getConfig().isUpdateCvTerms()
                 && getCvTermEnricher() != null
                 && entityToEnrich.getInteractorType() != null)
@@ -87,7 +88,7 @@ public class GeneEnricher extends FullGeneEnricher {
     }
 
     @Override
-    protected void processAnnotations(Gene objectToEnrich, Gene objectSource) throws EnricherException {
+    protected void processAnnotations(NucleicAcid objectToEnrich, NucleicAcid objectSource) throws EnricherException {
         if (objectSource != null) {
             super.processAnnotations(objectToEnrich, objectSource);
         }
@@ -101,7 +102,7 @@ public class GeneEnricher extends FullGeneEnricher {
     }
 
     @Override
-    protected void processShortLabel(Gene objectToEnrich, Gene fetched) {
+    protected void processShortLabel(NucleicAcid objectToEnrich, NucleicAcid fetched) {
         if (!fetched.getShortName().equalsIgnoreCase(objectToEnrich.getShortName())) {
             String oldValue = objectToEnrich.getShortName();
             objectToEnrich.setShortName(fetched.getShortName());
@@ -113,7 +114,7 @@ public class GeneEnricher extends FullGeneEnricher {
     }
 
     @Override
-    public void processAliases(Gene objectToEnrich, Gene objectSource) throws EnricherException {
+    public void processAliases(NucleicAcid objectToEnrich, NucleicAcid objectSource) throws EnricherException {
         if (objectSource != null) {
             EnricherUtils.mergeAliases(objectToEnrich, objectToEnrich.getAliases(), objectSource.getAliases(), true,
                     getListener());
@@ -129,7 +130,7 @@ public class GeneEnricher extends FullGeneEnricher {
     }
 
     @Override
-    protected void processIdentifiers(Gene objectToEnrich, Gene objectSource) throws EnricherException {
+    protected void processIdentifiers(NucleicAcid objectToEnrich, NucleicAcid objectSource) throws EnricherException {
         if (objectSource != null) {
             EnricherUtils.mergeXrefs(objectToEnrich, objectToEnrich.getIdentifiers(), objectSource.getIdentifiers(), true, true,
                     getListener(), getListener());
@@ -147,7 +148,7 @@ public class GeneEnricher extends FullGeneEnricher {
     }
 
     @Override
-    public void processFullName(Gene bioactiveEntityToEnrich, Gene fetched) throws EnricherException {
+    public void processFullName(NucleicAcid bioactiveEntityToEnrich, NucleicAcid fetched) throws EnricherException {
         if ((fetched.getFullName() != null && !fetched.getFullName().equalsIgnoreCase(bioactiveEntityToEnrich.getFullName())
                 || (fetched.getFullName() == null && bioactiveEntityToEnrich.getFullName() != null))) {
             String oldValue = bioactiveEntityToEnrich.getFullName();
@@ -158,12 +159,26 @@ public class GeneEnricher extends FullGeneEnricher {
     }
 
     @Override
-    protected void processChecksums(Gene bioactiveEntityToEnrich, Gene fetched) throws EnricherException {
+    protected void processOtherProperties(NucleicAcid toEnrich, NucleicAcid fetched) {
+        // sequence
+        if ((fetched.getSequence() != null && !fetched.getSequence().equalsIgnoreCase(toEnrich.getSequence())
+                || (fetched.getSequence() == null && toEnrich.getSequence() != null))) {
+            String oldSeq = toEnrich.getSequence();
+            toEnrich.setSequence(fetched.getSequence());
+            if (getListener() instanceof NucleicAcidEnricherListener) {
+                ((NucleicAcidEnricherListener) getListener()).onSequenceUpdate(toEnrich, oldSeq);
+            }
+        }
+    }
+
+
+    @Override
+    protected void processChecksums(NucleicAcid bioactiveEntityToEnrich, NucleicAcid fetched) throws EnricherException {
         // nothing to do here
     }
 
     @Override
-    protected void processXrefs(Gene objectToEnrich, Gene objectSource) throws EnricherException {
+    protected void processXrefs(NucleicAcid objectToEnrich, NucleicAcid objectSource) throws EnricherException {
         if (objectSource != null) {
             EnricherUtils.mergeXrefs(objectToEnrich, objectToEnrich.getXrefs(), objectSource.getXrefs(), true, false,
                     getListener(), getListener());
