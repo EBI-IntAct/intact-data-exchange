@@ -12,18 +12,18 @@
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>3.2.1</version>
+    <version>3.2.2</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
     <url>http://www.ebi.ac.uk/~intact/devsite/dataexchange</url>
 
     <properties>
-        <core.version>2.8.0</core.version>
+        <core.version>2.8.1</core.version>
         <bridges.version>2.2.1</bridges.version>
         <commons.version>2.1.10</commons.version>
-        <intact.tools.version>1.2.1</intact.tools.version>
-        <intact.jami.version>2.2.0</intact.jami.version>
+        <intact.tools.version>1.2.2</intact.tools.version>
+        <intact.jami.version>2.2.3</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
         <psi.jami.version>3.3.1</psi.jami.version>
         <spring.version>4.3.30.RELEASE</spring.version>
