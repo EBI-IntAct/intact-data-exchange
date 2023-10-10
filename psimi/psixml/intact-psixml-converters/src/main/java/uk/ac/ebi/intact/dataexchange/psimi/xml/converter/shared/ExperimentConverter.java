@@ -20,9 +20,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.xml.model.*;
 import psidev.psi.mi.xml.model.Xref;
+import uk.ac.ebi.intact.core.config.SequenceCreationException;
 import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.ConverterContext;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.MessageLevel;
+import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.config.AnnotationConverterConfig;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.ConversionCache;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util.IntactConverterUtils;
@@ -284,7 +286,11 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         }
         // we need to create a unassigned publication
         else {
-            publication = createUnassignedPublication(bibref, experiment);
+            try {
+                publication = createUnassignedPublication(bibref, experiment);
+            } catch (SequenceCreationException e) {
+                throw new PsiConversionException(e);
+            }
         }
 
         publication.setFullName(experiment.getFullName());
@@ -500,7 +506,7 @@ public class ExperimentConverter extends AbstractAnnotatedObjectConverter<Experi
         return publication;
     }
 
-    private Publication createUnassignedPublication(Bibref bibRef, Experiment exp) {
+    private Publication createUnassignedPublication(Bibref bibRef, Experiment exp) throws SequenceCreationException {
 
         String pubId = PublicationUtils.nextUnassignedId(IntactContext.getCurrentInstance());
 

@@ -5,6 +5,7 @@ import psidev.psi.mi.jami.model.ModelledParticipant;
 import psidev.psi.mi.jami.model.Stoichiometry;
 import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.jami.utils.AnnotationUtils;
+import psidev.psi.mi.jami.xml.PsiXmlVersion;
 import psidev.psi.mi.jami.xml.cache.PsiXmlObjectCache;
 import psidev.psi.mi.jami.xml.io.writer.elements.impl.expanded.xml25.XmlModelledParticipantWriter;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
@@ -26,8 +27,8 @@ import java.util.Iterator;
  */
 
 public class XmlIntactModelledParticipantWriter extends XmlModelledParticipantWriter {
-    public XmlIntactModelledParticipantWriter(XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
-        super(writer, objectIndex);
+    public XmlIntactModelledParticipantWriter(PsiXmlVersion version, XMLStreamWriter writer, PsiXmlObjectCache objectIndex) {
+        super(version, writer, objectIndex);
     }
 
     @Override

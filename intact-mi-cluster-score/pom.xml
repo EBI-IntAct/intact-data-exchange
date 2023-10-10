@@ -4,7 +4,7 @@
     <parent>
         <artifactId>intact-dataexchange-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-        <version>3.0.57-SNAPSHOT</version>
+        <version>3.2.2</version>
     </parent>
 
     <artifactId>intact-mi-cluster-score</artifactId>
@@ -356,18 +356,12 @@
             <version>8.2-504.jdbc3</version>
         </dependency>
 
-        <!-- Oracle -->
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3</version>
-        </dependency>
-
         <!-- H2 -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.200</version>
+            <version>${h2.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Other -->
@@ -402,7 +396,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.13.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

@@ -59,8 +59,7 @@ public class ImportPdbXmlFiles {
     public static void main( String[] args ) throws Exception {
 
         // Setup database access
-        File dbConfigFile = new File( ImportPdbXmlFiles.class.getResource( "/zdev-hibernate.cfg.xml" ).getFile() );
-        IntactContext.initStandaloneContext( dbConfigFile );
+        IntactContext.initContext(new String[]{ ImportPdbXmlFiles.class.getResource( "/zdev-hibernate.cfg.xml" ).getPath() });
 
         // Initialise institution
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
