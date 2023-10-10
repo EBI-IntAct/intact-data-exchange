@@ -1131,7 +1131,7 @@ public abstract class UniprotExportBase extends IntactBasicTestCase {
         boolean isEqual = true;
 
         while (line1 != null && line2 != null && isEqual){
-            isEqual = line1.equals(line2);
+            isEqual = (line1.contains("date-generated") && line2.contains("date-generated"))|| line1.equals(line2);
             line1 = reader1.readLine();
             line2 = reader2.readLine();
         }

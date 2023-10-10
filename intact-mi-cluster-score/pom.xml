@@ -195,7 +195,7 @@
                                 <!-- The name of the log file containing excluded interactions-->
                                 <argument>${fileExcluded}</argument>
                                 <!-- The version of CC export  -->
-                                <argument>${version}</argument>
+                                <argument>${project.version}</argument>
                             </arguments>
                         </configuration>
                     </plugin>
