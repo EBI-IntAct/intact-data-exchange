@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.logging.Logger;
 
 /**
  * Spring batch processor that enriches for IntAct
@@ -25,9 +26,12 @@ import java.io.Writer;
 
 public class IntactEnricherProcessor<I> implements ItemProcessor<I, I>, ItemStream{
 
+    private Logger log = Logger.getLogger(IntactEnricherProcessor.class.getName());
+
     private Resource errorResource;
     private Writer errorWriter;
     private MIEnricher<I> enricher;
+    private int interactionCount = 0;
 
     public I process(I item) throws Exception {
         if (this.enricher == null){
@@ -51,6 +55,9 @@ public class IntactEnricherProcessor<I> implements ItemProcessor<I, I>, ItemStre
             }
             errorWriter.write("Cannot enrich object " + source);
         }
+
+        interactionCount++;
+        log.info("\tTESTING - Interaction number " + interactionCount + " ENRICHED");
 
         return item;
     }

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Abstract class for MI file readers
@@ -28,6 +29,8 @@ import java.util.Map;
  */
 
 public abstract class AbstractMIFileReader<I extends Interaction> implements MIFileReader<I> {
+
+    private Logger log = Logger.getLogger(AbstractMIFileReader.class.getName());
 
     private InteractionStream<I> interactionDataSource;
     private int interactionCount = 0;
@@ -44,6 +47,9 @@ public abstract class AbstractMIFileReader<I extends Interaction> implements MIF
 
         I nextObject = interactionIterator.hasNext() ? interactionIterator.next() : null;
         this.interactionCount++;
+
+        log.info("\tTESTING - Interaction number " + interactionCount + " READ");
+
         return nextObject;
     }
 
