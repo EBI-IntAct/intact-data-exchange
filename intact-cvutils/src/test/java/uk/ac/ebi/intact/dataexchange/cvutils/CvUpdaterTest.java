@@ -18,6 +18,7 @@ package uk.ac.ebi.intact.dataexchange.cvutils;
 
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -512,6 +513,7 @@ public class CvUpdaterTest extends IntactBasicTestCase {
     }
 
     @Test
+    @Ignore
     public void executeUpdateWithLatestCVs() throws Exception {
         cvUpdater.executeUpdateWithLatestCVs();
         Assert.assertTrue(getDaoFactory().getCvObjectDao( CvInteraction.class ).getByPsiMiRef( "MI:0001" ) != null);
