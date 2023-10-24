@@ -42,8 +42,6 @@ public class IntactDbImporter<I> extends AbstractIntactDbImporter<I>{
         }
 
         this.intactService.saveOrUpdate(is);
-
-        log.info("\tTESTING - " + is.size() + " interactions WRITTEN");
     }
 
     public IntactService<I> getIntactService() {
