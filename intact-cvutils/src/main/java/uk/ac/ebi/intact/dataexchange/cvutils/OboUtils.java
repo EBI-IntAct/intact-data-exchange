@@ -42,9 +42,9 @@ public class OboUtils {
     //file location for OBO file pointing directly to psi cvs (not working! redirect to the intact web page)
     //public static final String PSI_MI_OBO_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
     //TODO make it point to github and fix the test
-    public static final String PSI_MI_OBO_LOCATION = "https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo";
+    //public static final String PSI_MI_OBO_LOCATION = "https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo";
 
-//    public static final String PSI_MI_OBO_LOCATION = "https://www.ebi.ac.uk/~intact/psi/mi/rel25/data/psi-mi25.obo";
+    public static final String PSI_MI_OBO_LOCATION = "https://www.ebi.ac.uk/~intact/psi/mi/rel25/data/psi-mi25.obo";
 
     private OboUtils() {}
 
