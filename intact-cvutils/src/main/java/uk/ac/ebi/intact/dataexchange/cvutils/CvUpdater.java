@@ -129,25 +129,6 @@ public class CvUpdater {
         return createOrUpdateCVs( allCvs, new AnnotationInfoDataset() );
     }
 
-     /**
-     * Starts the creation and update of CVs by using the latest available CVs from internet
-     *
-     * @return An object containing some statistics about the update
-     */
-    @Transactional
-    @IntactFlushMode(FlushModeType.COMMIT)
-    public CvUpdaterStatistics executeUpdateWithLatestCVs() throws IOException{
-         OBOSession oboSession = null;
-         try {
-             oboSession = OboUtils.createOBOSessionFromLatestMi();
-         } catch (OBOParseException e) {
-             throw new IOException("Problem creating OBO session from latest MI: "+e.getMessage());
-         }
-
-         AnnotationInfoDataset annotationInfoDataset = OboUtils.createAnnotationInfoDatasetFromLatestResource();
-         return executeUpdate(oboSession, annotationInfoDataset);
-     }
-
     @Transactional
     @IntactFlushMode(FlushModeType.COMMIT)
     public CvUpdaterStatistics executeUpdate(OBOSession oboSession, AnnotationInfoDataset annotationInfoDataset) throws IOException{
