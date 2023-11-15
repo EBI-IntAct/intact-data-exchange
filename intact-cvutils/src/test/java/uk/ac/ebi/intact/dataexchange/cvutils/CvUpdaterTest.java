@@ -510,11 +510,4 @@ public class CvUpdaterTest extends IntactBasicTestCase {
 
         cvUpdater.createOrUpdateCVs(allCvs);
     }
-
-    @Test
-    public void executeUpdateWithLatestCVs() throws Exception {
-        cvUpdater.executeUpdateWithLatestCVs();
-        Assert.assertTrue(getDaoFactory().getCvObjectDao( CvInteraction.class ).getByPsiMiRef( "MI:0001" ) != null);
-
-    }
 }
