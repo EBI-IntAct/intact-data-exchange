@@ -29,7 +29,7 @@
         <spring.version>4.3.30.RELEASE</spring.version>
 
         <!--Properties for psixml-exchange: keep them in sync with jami-bridges until the module is updated-->
-        <ols.client.version>2.14-SNAPSHOT</ols.client.version>
+        <ols.client.version>2.15-SNAPSHOT</ols.client.version>
         <uniprot.japi.version>1.1.2</uniprot.japi.version>
         <chebiws.client.version>2.4</chebiws.client.version>
 
@@ -37,7 +37,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>4.13.2</junit.version>
 
-        <psicquic.simple.client.version>1.5.0</psicquic.simple.client.version>
+        <psicquic.simple.client.version>1.5.2-SNAPSHOT</psicquic.simple.client.version>
         <psimi.version>1.10.0</psimi.version>
         <calimocho.version>2.6.0</calimocho.version>
     </properties>

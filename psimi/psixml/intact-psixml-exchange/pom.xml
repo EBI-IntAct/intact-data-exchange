@@ -90,6 +90,10 @@
                     <groupId>com.hp.hpl.jena</groupId>
                     <artifactId>jena</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>uk.ac.ebi.pride.utilities</groupId>
+                    <artifactId>ols-client</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
