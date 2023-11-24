@@ -34,17 +34,8 @@ public class OboUtils {
 
     private static final Log log = LogFactory.getLog( OboUtils.class );
 
-    //private static final String PSI_MI_OBO_LOCATION_OLD = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
-    private static final String PSI_MI_OBO_LOCATION_OLD = "http://github.com/EBI-IntAct/intact-google-import/blob/master/repo/utils/data/controlledVocab/psi-mi25-4intact.obo";
-    //private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://intact.svn.sourceforge.net/viewvc/*checkout*/intact/repo/utils/data/controlledVocab/additional-annotations.csv";
     private static final String PSI_MI_LOCAL_ANNOTATIONS = "http://raw.githubusercontent.com/EBI-IntAct/intact-google-import/master/repo/utils/data/controlledVocab/additional-annotations.csvv";
-
-    //file location for OBO file pointing directly to psi cvs (not working! redirect to the intact web page)
-    //public static final String PSI_MI_OBO_LOCATION = "http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/mi/rel25/data/psi-mi25.obo";
-    //TODO make it point to github and fix the test
-    //public static final String PSI_MI_OBO_LOCATION = "https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo";
-
-    public static final String PSI_MI_OBO_LOCATION = "https://www.ebi.ac.uk/~intact/psi/mi/rel25/data/psi-mi25.obo";
+    public static final String PSI_MI_OBO_LOCATION = "https://raw.githubusercontent.com/HUPO-PSI/psi-mi-CV/master/psi-mi.obo";
 
     private OboUtils() {}
 
