@@ -4,7 +4,7 @@
     <parent>
         <artifactId>intact-dataexchange-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-        <version>3.2.2</version>
+        <version>3.3.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -46,6 +46,16 @@
         </dependency>
 
         <!-- JAMI bridges -->
+        <dependency>
+            <groupId>psidev.psi.mi.jami.bridges</groupId>
+            <artifactId>jami-ensembl</artifactId>
+            <version>${psi.jami.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>psidev.psi.mi.jami.bridges</groupId>
+            <artifactId>jami-rna-central</artifactId>
+            <version>${psi.jami.version}</version>
+        </dependency>
         <dependency>
             <groupId>psidev.psi.mi.jami.bridges</groupId>
             <artifactId>jami-obo</artifactId>
@@ -111,4 +121,11 @@
         </dependency>
 
     </dependencies>
+    <repositories>
+        <repository>
+            <id>ebi-repo</id>
+            <name>ebi-repo</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+        </repository>
+    </repositories>
 </project>

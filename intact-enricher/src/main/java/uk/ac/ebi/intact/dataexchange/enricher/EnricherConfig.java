@@ -29,6 +29,7 @@ public class EnricherConfig {
     private boolean updateComplexes = true;
     private boolean updateInteractorPool = true;
     private boolean updateGenes = true;
+    private boolean updateNucleicAcids = true;
     private boolean updateExperiments = true;
     private boolean updateInteractionShortLabels = true;
     //TODO: Just temporary... OLS!!!!!!
@@ -110,6 +111,14 @@ public class EnricherConfig {
 
     public void setUpdateGenes(boolean updateGenes) {
         this.updateGenes = updateGenes;
+    }
+
+    public boolean isUpdateNucleicAcids() {
+        return updateNucleicAcids;
+    }
+
+    public void setUpdateNucleicAcids(boolean updateNucleicAcids) {
+        this.updateNucleicAcids = updateNucleicAcids;
     }
 
     public boolean isUpdateCvInXrefsAliasesAnnotations() {
