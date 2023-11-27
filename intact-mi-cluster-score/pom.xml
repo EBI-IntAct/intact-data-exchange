@@ -4,7 +4,7 @@
     <parent>
         <artifactId>intact-dataexchange-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-        <version>3.2.4-SNAPSHOT</version>
+        <version>3.3.0</version>
     </parent>
 
     <artifactId>intact-mi-cluster-score</artifactId>
@@ -195,7 +195,7 @@
                                 <!-- The name of the log file containing excluded interactions-->
                                 <argument>${fileExcluded}</argument>
                                 <!-- The version of CC export  -->
-                                <argument>${project.version}</argument>
+                                <argument>${version}</argument>
                             </arguments>
                         </configuration>
                     </plugin>

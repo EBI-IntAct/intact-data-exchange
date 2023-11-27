@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.2.4-SNAPSHOT</version>
+        <version>3.3.0</version>
     </parent>
 
     <artifactId>structured-abstract</artifactId>

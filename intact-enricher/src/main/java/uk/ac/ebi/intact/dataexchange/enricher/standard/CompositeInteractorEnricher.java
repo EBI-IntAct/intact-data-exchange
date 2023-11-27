@@ -73,6 +73,14 @@ public class CompositeInteractorEnricher extends psidev.psi.mi.jami.enricher.imp
         return super.getGeneEnricher();
     }
 
+    public InteractorEnricher<NucleicAcid> getNucleicAcidEnricher() {
+        if (super.getGeneEnricher() == null){
+            super.setNucleicAcidEnricher((InteractorEnricher<NucleicAcid>)
+                    ApplicationContextProvider.getBean("intactNucleicAcidEnricher"));
+        }
+        return super.getNucleicAcidEnricher();
+    }
+
     public ComplexEnricher getComplexEnricher() {
         if (super.getComplexEnricher() == null){
             super.setComplexEnricher((ComplexEnricher)
@@ -89,6 +97,11 @@ public class CompositeInteractorEnricher extends psidev.psi.mi.jami.enricher.imp
                     && enricherContext.getConfig().isUpdateProteins()
                     && getProteinEnricher() != null){
                getProteinEnricher().enrich((Protein)object);
+            }
+            else if (object instanceof NucleicAcid
+                    && enricherContext.getConfig().isUpdateNucleicAcids()
+                    && getNucleicAcidEnricher() != null){
+                getNucleicAcidEnricher().enrich((NucleicAcid) object);
             }
             else if (getPolymerBaseEnricher() != null){
                getPolymerBaseEnricher().enrich((Polymer)object);
