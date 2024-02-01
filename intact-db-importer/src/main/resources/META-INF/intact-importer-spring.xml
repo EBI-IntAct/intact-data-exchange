@@ -266,13 +266,13 @@
             <batch:chunk reader="interactionEvidenceReader"
                          processor="interactionEvidenceProcessor"
                          writer="interactionEvidenceImporter"
-                         commit-interval="50"
-                         retry-limit="10">
+                         commit-interval="50">
+<!--                         retry-limit="10">-->
 
-                <batch:retryable-exception-classes>
-                    <batch:include class="org.springframework.web.client.ResourceAccessException"/>
-                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>
-                </batch:retryable-exception-classes>
+<!--                <batch:retryable-exception-classes>-->
+<!--                    <batch:include class="org.springframework.web.client.ResourceAccessException"/>-->
+<!--                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>-->
+<!--                </batch:retryable-exception-classes>-->
 
                 <batch:streams>
                     <batch:stream ref="interactionEvidenceReader"/>
@@ -292,13 +292,13 @@
             <batch:chunk reader="modelledInteractionReader"
                          processor="modelledInteractionProcessor"
                          writer="modelledInteractionImporter"
-                         commit-interval="50"
-                         retry-limit="10">
+                         commit-interval="50">
+<!--                         retry-limit="10">-->
 
-                <batch:retryable-exception-classes>
-                    <batch:include class="org.springframework.web.client.ResourceAccessException"/>
-                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>
-                </batch:retryable-exception-classes>
+<!--                <batch:retryable-exception-classes>-->
+<!--                    <batch:include class="org.springframework.web.client.ResourceAccessException"/>-->
+<!--                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>-->
+<!--                </batch:retryable-exception-classes>-->
 
                 <batch:streams>
                     <batch:stream ref="modelledInteractionReader"/>
@@ -318,13 +318,13 @@
             <batch:chunk reader="complexReader"
                          processor="intactComplexEnricherCompositeProcessor"
                          writer="complexImporter"
-                         commit-interval="50"
-                         retry-limit="10">
+                         commit-interval="50">
+<!--                         retry-limit="10">-->
 
-                <batch:retryable-exception-classes>
-                    <batch:include class="org.springframework.web.client.ResourceAccessException"/>
-                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>
-                </batch:retryable-exception-classes>
+<!--                <batch:retryable-exception-classes>-->
+<!--                    <batch:include class="org.springframework.web.client.ResourceAccessException"/>-->
+<!--                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>-->
+<!--                </batch:retryable-exception-classes>-->
 
                 <batch:streams>
                     <batch:stream ref="complexReader"/>
@@ -346,13 +346,13 @@
             <batch:chunk reader="interactionReader"
                          processor="interactionMixProcessor"
                          writer="interactionMixImporter"
-                         commit-interval="50"
-                         retry-limit="10">
+                         commit-interval="50">
+<!--                         retry-limit="10">-->
 
-                <batch:retryable-exception-classes>
-                    <batch:include class="org.springframework.web.client.ResourceAccessException"/>
-                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>
-                </batch:retryable-exception-classes>
+<!--                <batch:retryable-exception-classes>-->
+<!--                    <batch:include class="org.springframework.web.client.ResourceAccessException"/>-->
+<!--                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>-->
+<!--                </batch:retryable-exception-classes>-->
 
                 <batch:streams>
                     <batch:stream ref="interactionReader"/>
