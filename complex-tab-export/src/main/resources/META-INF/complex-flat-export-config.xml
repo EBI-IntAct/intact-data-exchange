@@ -73,6 +73,7 @@
                 <prop key="hibernate.hbm2ddl.auto">none</prop>
                 <prop key="hibernate.connection.release_mode">after_transaction</prop>
                 <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+                <prop key="hibernate.default_schema">intact</prop>
             </props>
         </property>
         <property name="jpaVendorAdapter">
