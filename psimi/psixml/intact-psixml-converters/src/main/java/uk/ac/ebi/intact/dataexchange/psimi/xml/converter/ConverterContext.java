@@ -88,11 +88,11 @@ public class ConverterContext {
         // in order to avoid connection to the database, we list here all the MIs of DNA and RNA related terms
         rnaTypeMis = new HashSet( Arrays.asList( "MI:0320", "MI:0321", "MI:0322", "MI:0323", "MI:0324",
                 "MI:0325", "MI:0607", "MI:0608", "MI:0609", "MI:0610",
-                "MI:0611", "MI:0679", "MI:0679" ) );
+                "MI:0611", "MI:0679", "MI:0679", "MI:2204" ) );
 
         rnaTypeLabels = new HashSet( Arrays.asList( "ribonucleic acid", "catalytic rna", "guide rna", "heterogeneous nuclear rna", "messenger rna", "poly adenine", "transfer rna",
                 "small nuclear rna", "ribosomal rna", "small nucleolar rna", "small interfering rna", "signal recognition particle rna",
-                "poly adenine") );
+                "poly adenine", "micro rna") );
 
         dnaTypeMis = new HashSet( Arrays.asList( "MI:0319", "MI:0680", "MI:0681", "MI:0250" ) );
 

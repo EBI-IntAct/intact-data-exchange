@@ -74,7 +74,7 @@ public class CompositeInteractorEnricher extends psidev.psi.mi.jami.enricher.imp
     }
 
     public InteractorEnricher<NucleicAcid> getNucleicAcidEnricher() {
-        if (super.getGeneEnricher() == null){
+        if (super.getNucleicAcidEnricher() == null){
             super.setNucleicAcidEnricher((InteractorEnricher<NucleicAcid>)
                     ApplicationContextProvider.getBean("intactNucleicAcidEnricher"));
         }
