@@ -46,4 +46,9 @@ public class AbstractShortlabelGeneratorListener implements ShortlabelGeneratorL
     public void onObjectTypeError(TypeErrorEvent event) {
 
     }
+
+    @Override
+    public void onOtherErrorEvent(OtherErrorEvent event) {
+
+    }
 }
