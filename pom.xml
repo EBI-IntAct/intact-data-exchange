@@ -25,7 +25,7 @@
         <intact.tools.version>2.0.0-SNAPSHOT</intact.tools.version>
         <intact.jami.version>3.0.0-SNAPSHOT</intact.jami.version>
         <!--The version needs to be the same than in intact-jami to avoid problems-->
-        <psi.jami.version>3.5.0</psi.jami.version>
+        <psi.jami.version>3.5.1-SNAPSHOT</psi.jami.version>
         <spring.version>4.3.30.RELEASE</spring.version>
 
         <!--Properties for psixml-exchange: keep them in sync with jami-bridges until the module is updated-->
