@@ -54,5 +54,6 @@ public interface ComplexFieldNames {
     //final static String ECO_XREF                   = "eco_xref";
     final static String PUBLICATION_ID               = "pubid";
     final static String TEXT                         = "text";
+    final static String SERIALISED_INTERACTION       = "serialised_interactor";
 
 }

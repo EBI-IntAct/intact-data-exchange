@@ -6,6 +6,7 @@ import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexFieldNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.TreeComplexComponents;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.ComplexSolrEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.util.ComplexUtils;
 import uk.ac.ebi.intact.model.*;
 import uk.ac.ebi.intact.model.util.XrefUtils;
 
@@ -51,7 +52,7 @@ public class ComplexSolrConverter {
 
     protected void indexComplexAC(InteractionImpl complex,
                                   SolrInputDocument solrDocument) throws Exception {
-        Xref  complexPrimaryXref=getComplexPrimaryXref(complex);
+        Xref complexPrimaryXref = ComplexUtils.getComplexPrimaryXref(complex);
         // stored field
         solrDocument.addField(ComplexFieldNames.AC, complex.getAc()); // for old ac
         if(complexPrimaryXref!=null){
@@ -66,22 +67,6 @@ public class ComplexSolrConverter {
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getOwner ( ).getShortLabel() ) ;
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getOwner ( ).getShortLabel() + ":" + complex.getAc ( ) ) ;
         }
-    }
-
-    protected Xref getComplexPrimaryXref(InteractionImpl complex){
-        Collection<InteractorXref> currentComplexXrefs = complex.getXrefs();
-        Xref  complexPrimaryXref=null;
-        for (Xref xref : currentComplexXrefs) {
-            if (xref.getCvXrefQualifier()!=null&&xref.getCvXrefQualifier().getIdentifier()!=null&&
-                    xref.getCvXrefQualifier().getIdentifier().equals("MI:2282")&&
-                    xref.getCvXrefQualifier().getShortLabel()!=null&&
-                    xref.getCvXrefQualifier().getShortLabel().equals("complex-primary")) {
-                complexPrimaryXref = xref;
-                break;
-            }
-        }
-
-        return complexPrimaryXref;
     }
 
     protected void indexComplexNames(InteractionImpl complex,
@@ -112,7 +97,7 @@ public class ComplexSolrConverter {
                     else if (firstSystematic == null && COMPLEX_SYSTEMATIC_NAME_MI.equals(type.getIdentifier())){
                         firstSystematic = alias.getName();
                     }
-                    else if (firstComplexSynonym == null && COMPLEX_SYNONYM.equals(type.getIdentifier())){
+                    else if (firstComplexSynonym == null && COMPLEX_SYNONYM_MI.equals(type.getIdentifier())){
                         firstComplexSynonym = alias.getName();
                     }
                 }
@@ -243,6 +228,11 @@ public class ComplexSolrConverter {
         // It will do by the enricher
         // add info to number_participants field:
         solrDocument.addField ( ComplexFieldNames.NUMBER_PARTICIPANTS, tree.getNumberOfParticipants() ) ;
+
+        // store serialised participants
+        for (Component participant : ComplexUtils.mergeParticipants(complex.getComponents())) {
+            complexSolrEnricher.enrichSerialisedParticipant(participant, solrDocument);
+        }
 
         // add info to interactor_type_ontology field:
         // It will do by the enricher

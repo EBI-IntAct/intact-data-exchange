@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -10,7 +11,9 @@ import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexFieldNames;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexInteractor;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.util.ComplexUtils;
 import uk.ac.ebi.intact.model.*;
 
 import java.io.FileInputStream;
@@ -31,8 +34,9 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     /********************************/
     private static final Log log = LogFactory.getLog ( ComplexSolrEnricher.class );
     private Map<String, PsicquicSimpleClient> mapOfPsicquicClients;
-    private String complexProperties=null;
+    private String complexProperties = null;
     private PsimiTabReader reader;
+    private final ObjectMapper mapper;
 
     private final static String EXP_EVIDENCE="exp-evidence";
     private final static String INTACT_SECONDARY="intact-secondary";
@@ -42,6 +46,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     /*************************/
     public ComplexSolrEnricher ( OntologySearcher ontologySearcher_ ) {
         super ( ontologySearcher_) ;
+        this.mapper = new ObjectMapper();
     }
 
     /*******************************/
@@ -182,12 +187,25 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     // is for enrich complex_xref* fields and return a SolrDocument
     public void enrichInteractionXref(Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument) throws SolrServerException {
         enrichXrefs(ComplexFieldNames.COMPLEX_XREF, ComplexFieldNames.COMPLEX_XREF_EXACT, ComplexFieldNames.COMPLEX_ID, interactorXrefs, solrDocument, true);
-
     }
 
     public void enrichInteractorXref(Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument) throws SolrServerException {
         enrichXrefs(ComplexFieldNames.INTERACTOR_XREF, ComplexFieldNames.INTERACTOR_XREF_EXACT, ComplexFieldNames.INTERACTOR_ID, interactorXrefs, solrDocument, false);
+    }
 
+    public void enrichSerialisedParticipant(Component participant, SolrInputDocument solrDocument) throws JsonProcessingException {
+        Interactor interactor = participant.getInteractor();
+        String identifier = ComplexUtils.getParticipantIdentifier(participant);
+
+        ComplexInteractor complexInteractor = new ComplexInteractor(
+                identifier,
+                ComplexUtils.getParticipantIdentifierLink(participant, identifier),
+                ComplexUtils.getParticipantName(participant),
+                interactor.getFullName(),
+                ComplexUtils.getParticipantStoichiometry(participant),
+                interactor.getCvInteractorType().getFullName());
+        String serialisedInteractor = mapper.writeValueAsString(complexInteractor);
+        solrDocument.addField(ComplexFieldNames.SERIALISED_INTERACTION, serialisedInteractor);
     }
 
     protected void enrichXrefs(String xrefFieldName, String xrefFieldExact, String idFieldName, Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument, boolean checkExpEvidence) throws SolrServerException {
