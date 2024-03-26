@@ -1,8 +1,15 @@
 package uk.ac.ebi.intact.psimitab.converters.enrichers;
 
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.jami.model.Alias;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.tab.model.AliasImpl;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactAlias;
+import uk.ac.ebi.intact.jami.model.extension.IntactGene;
+import uk.ac.ebi.intact.jami.model.extension.ParticipantEvidenceXref;
 import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
@@ -17,16 +24,16 @@ import java.util.Collection;
  * @since <pre>09/08/12</pre>
  */
 
-public class GeneConverter extends AbstractEnricher{
+public class GeneConverter extends AbstractEnricher<IntactGene> {
 
     private static final String ENSEMBL_GENOME_MI = "MI:1013";
     private boolean hasFoundDisplayShort = false;
 
-    public GeneConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
+    public GeneConverter(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv){
         super(xrefConv, alisConv);
     }
 
-    public GeneConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
+    public GeneConverter(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
         super(xrefConv, alisConv, defaultInstitution);
     }
 
@@ -36,12 +43,12 @@ public class GeneConverter extends AbstractEnricher{
      * @param mitabInteractor
      * @return the standard InchiKey for the small molecule. Can be null if no standard inchi key available
      */
-    public void enrichGeneFromIntact(uk.ac.ebi.intact.model.Interactor gene, Interactor mitabInteractor){
+    public void enrichGeneFromIntact(IntactGene gene, Interactor mitabInteractor){
         hasFoundDisplayShort = false;
 
         if (gene != null && mitabInteractor != null){
-            Collection<InteractorXref> interactorXrefs = gene.getXrefs();
-            Collection<InteractorAlias> aliases = gene.getAliases();
+            Collection<Xref> interactorXrefs = gene.getXrefs();
+            Collection<Alias> aliases = gene.getAliases();
 
             // xrefs
             boolean hasFoundENSEMBLIdentity = processXrefs(mitabInteractor, interactorXrefs);
@@ -54,23 +61,14 @@ public class GeneConverter extends AbstractEnricher{
 
             // ac and display long
             processAccessionAndDisplay(gene, mitabInteractor, hasFoundENSEMBLIdentity);
-
-            // uses crc64 for checksum
-            if (gene instanceof Polymer){
-                Polymer polymer = (Polymer) gene;
-                if (polymer.getCrc64() != null){
-                    Checksum checksum = new ChecksumImpl(InteractorConverter.CRC64, polymer.getCrc64());
-                    mitabInteractor.getChecksums().add(checksum);
-                }
-            }
         }
     }
 
     @Override
-    protected void processAccessionAndDisplay(uk.ac.ebi.intact.model.Interactor mol, Interactor mitabInteractor, boolean hasFoundEMBLIdentity) {
+    protected void processAccessionAndDisplay(IntactGene mol, Interactor mitabInteractor, boolean hasFoundEMBLIdentity) {
         // do display short has been found so far, we need to add the shortlabel as display short
         if (!hasFoundDisplayShort){
-            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT  );
+            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_SHORT  );
             mitabInteractor.getAliases().add(displayLong);
         }
 
@@ -81,12 +79,12 @@ public class GeneConverter extends AbstractEnricher{
             // we have a display short so the current shortlabel has not been exported as display_short
             if (hasFoundDisplayShort){
                 // the shortlabel is a ENSEMBL shortlabel as well
-                psidev.psi.mi.tab.model.Alias shortLabel = new AliasImpl( CvDatabase.ENSEMBL, mol.getShortLabel(), InteractorConverter.SHORTLABEL );
+                psidev.psi.mi.tab.model.Alias shortLabel = new AliasImpl( Xref.ENSEMBL, mol.getShortName(), InteractorConverter.SHORTLABEL );
                 mitabInteractor.getAliases().add(shortLabel);
             }
 
             // the interactor unique id is the display long
-            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, identifier, InteractorConverter.DISPLAY_LONG  );
+            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, identifier, InteractorConverter.DISPLAY_LONG  );
             mitabInteractor.getAliases().add(displayLong);
 
             // convert ac as identity or secondary identifier
@@ -104,7 +102,7 @@ public class GeneConverter extends AbstractEnricher{
             if(mol.getAc() != null){
                 // add shortlabel as intact alias only if the display_short is not the shortlabel to not duplicate aliases
                 if (hasFoundDisplayShort){
-                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( defaultInstitution, mol.getShortLabel(), InteractorConverter.SHORTLABEL  );
+                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( defaultInstitution, mol.getShortName(), InteractorConverter.SHORTLABEL  );
                     mitabInteractor.getAliases().add(altId);
                 }
 
@@ -113,16 +111,16 @@ public class GeneConverter extends AbstractEnricher{
                 mitabInteractor.getIdentifiers().add(acField);
 
                 // add ac as psi display_long alias
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getAc(), InteractorConverter.DISPLAY_LONG  );
+                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mol.getAc(), InteractorConverter.DISPLAY_LONG  );
                 mitabInteractor.getAliases().add(displayLong);
             }
             // the shortlabel will be identifier because we need an identifier and will be displayLong as well
             else {
-                CrossReference id = new CrossReferenceImpl( defaultInstitution, mol.getShortLabel());
+                CrossReference id = new CrossReferenceImpl( defaultInstitution, mol.getShortName());
                 mitabInteractor.getIdentifiers().add(id);
 
                 // add shortlabel as display long as well
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_LONG  );
+                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_LONG  );
                 mitabInteractor.getAliases().add(displayLong);
 
             }
@@ -130,22 +128,22 @@ public class GeneConverter extends AbstractEnricher{
     }
 
     @Override
-    protected boolean processXrefs(Interactor mitabInteractor, Collection<InteractorXref> interactorXrefs) {
+    protected boolean processXrefs(Interactor mitabInteractor, Collection<Xref> interactorXrefs) {
         boolean hasFoundIdentity = false;
 
         if (!interactorXrefs.isEmpty()){
 
             // convert xrefs, and identity
-            for (InteractorXref ref : interactorXrefs){
+            for (Xref ref : interactorXrefs){
 
                 // identity xrefs
-                if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
+                if (ref.getQualifier() != null && Xref.IDENTITY_MI.equals(ref.getQualifier().getMIIdentifier())){
                     // first ddbj/embl/genbank identity
-                    if (!hasFoundIdentity && ref.getCvDatabase() != null && (
-                            CvDatabase.ENSEMBL_MI_REF.equals(ref.getCvDatabase().getIdentifier()) || CvDatabase.ENTREZ_GENE_MI_REF.equals(ref.getCvDatabase().getIdentifier())
-                    || ENSEMBL_GENOME_MI.equals(ref.getCvDatabase().getIdentifier()))){
+                    if (!hasFoundIdentity && ref.getDatabase() != null && (
+                            Xref.ENSEMBL_MI.equals(ref.getDatabase().getMIIdentifier()) || Xref.ENTREZ_GENE_MI.equals(ref.getDatabase().getMIIdentifier())
+                    || ENSEMBL_GENOME_MI.equals(ref.getDatabase().getMIIdentifier()))){
 
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
                             hasFoundIdentity = true;
 
@@ -154,23 +152,23 @@ public class GeneConverter extends AbstractEnricher{
                     }
                     // other identifiers
                     else {
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
                             mitabInteractor.getAlternativeIdentifiers().add(identity);
                         }
                     }
                 }
                 // secondary acs are alternative identifiers
-                else if (ref.getCvXrefQualifier() != null && (CvXrefQualifier.SECONDARY_AC_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())
-                        || intactSecondary.equals(ref.getCvXrefQualifier().getShortLabel()))){
-                    CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                else if (ref.getQualifier() != null && (Xref.SECONDARY_MI.equals(ref.getQualifier().getMIIdentifier())
+                        || intactSecondary.equals(ref.getQualifier().getShortName()))){
+                    CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                     if (identity != null){
                         mitabInteractor.getAlternativeIdentifiers().add(identity);
                     }
                 }
                 // other xrefs
                 else {
-                    CrossReference xref = xRefConverter.createCrossReference(ref, true);
+                    CrossReference xref = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, true);
                     if (xref != null){
                         mitabInteractor.getXrefs().add(xref);
                     }
@@ -181,17 +179,17 @@ public class GeneConverter extends AbstractEnricher{
     }
 
     @Override
-    protected void processAliases(Interactor mitabInteractor, Collection<InteractorAlias> aliases) {
-        for (InteractorAlias alias : aliases){
-            psidev.psi.mi.tab.model.Alias aliasField = aliasConverter.intactToMitab(alias);
+    protected void processAliases(Interactor mitabInteractor, Collection<Alias> aliases) {
+        for (Alias alias : aliases){
+            psidev.psi.mi.tab.model.Alias aliasField = aliasConverter.intactToMitab((AbstractIntactAlias) alias);
 
             if (aliasField != null){
                 mitabInteractor.getAliases().add(aliasField);
 
                 // create display short which should be gene name or gene name synonym
-                if (CvAliasType.GENE_NAME.equals(aliasField.getAliasType())){
+                if (Alias.GENE_NAME.equals(aliasField.getAliasType())){
                     hasFoundDisplayShort = true;
-                    psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, aliasField.getName(),InteractorConverter.DISPLAY_SHORT );
+                    psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvTerm.PSI_MI, aliasField.getName(),InteractorConverter.DISPLAY_SHORT );
                     mitabInteractor.getAliases().add(displayShort);
                 }
             }

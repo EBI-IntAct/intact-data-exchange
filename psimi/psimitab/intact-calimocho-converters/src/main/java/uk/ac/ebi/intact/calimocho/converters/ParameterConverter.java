@@ -3,7 +3,7 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import uk.ac.ebi.intact.model.Parameter;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactParameter;
 
 /**
  * Parameter converter : converts interaction parameters
@@ -20,29 +20,29 @@ public class ParameterConverter {
      * @param param : the intact parameter
      * @return a calimocho field tha represents the interaction parameter
      */
-    public Field intactToCalimocho(Parameter param){
+    public Field intactToCalimocho(AbstractIntactParameter param){
         if (param != null){
             Field field = new DefaultField();
 
             String db = CrossReferenceConverter.DATABASE_UNKNOWN;
-            if (param.getCvParameterType() != null && param.getCvParameterType().getShortLabel() != null){
-                db= param.getCvParameterType().getShortLabel();
+            if (param.getType() != null && param.getType().getShortName() != null){
+                db= param.getType().getShortName();
             }
 
             field.set( CalimochoKeys.KEY, db);
             field.set( CalimochoKeys.DB, db);
             
             StringBuffer value = new StringBuffer();
-            if (param.getFactor() != null && param.getFactor() != 0){
+            if (param.getFactor() != 0){
                 value.append(param.getFactor()).append("x");
             }
-            if (param.getBase() != null && param.getBase() != 0){
+            if (param.getBase() != 0){
                 value.append(param.getBase());
             }
-            if (param.getExponent() != null && param.getExponent() != 0){
+            if (param.getExponent() != 0){
                 value.append("^").append(param.getExponent());
             }
-            if (param.getUncertainty() != null && param.getUncertainty() != 0){
+            if (param.getUncertainty() != null && param.getUncertainty().intValue() != 0){
                 value.append(" ~").append(param.getUncertainty());
             }
 
@@ -52,8 +52,8 @@ public class ParameterConverter {
 
             field.set( CalimochoKeys.VALUE, value.toString());
 
-            if (param.getCvParameterUnit() != null && param.getCvParameterUnit().getShortLabel() != null){
-                field.set( CalimochoKeys.TEXT, param.getCvParameterUnit().getShortLabel());
+            if (param.getUnit() != null && param.getUnit().getShortName() != null){
+                field.set( CalimochoKeys.TEXT, param.getUnit().getShortName());
             }
 
             return field;

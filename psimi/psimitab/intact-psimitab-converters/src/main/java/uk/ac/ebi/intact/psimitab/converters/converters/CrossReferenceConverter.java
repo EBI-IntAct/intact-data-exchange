@@ -17,10 +17,10 @@ package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.Xref;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactXref;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +33,7 @@ import java.util.List;
  * @version $Id$
  * @since 2.0.0
  */
-public class CrossReferenceConverter<T extends Xref> {
+public class CrossReferenceConverter<T extends AbstractIntactXref> {
 
     public static final Log logger = LogFactory.getLog( CrossReferenceConverter.class );
     public static String DATABASE_UNKNOWN = "unknown";
@@ -53,15 +53,15 @@ public class CrossReferenceConverter<T extends Xref> {
 
         List<CrossReference> crossReferences = new ArrayList<CrossReference>(xrefs.size());
 
-        for (Xref xref : xrefs) {
+        for (T xref : xrefs) {
 
                 if (onlyIdentity) {
-                    if (xref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                    if (xref.getQualifier() != null && Xref.IDENTITY_MI.equals(xref.getQualifier().getMIIdentifier())) {
                         CrossReference ref = createCrossReference(xref, withText);
                         if (ref != null) crossReferences.add(ref);
                     }
                 } else {
-                    if (xref.getCvXrefQualifier() == null || !CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                    if (xref.getQualifier() == null || !Xref.IDENTITY_MI.equals(xref.getQualifier().getMIIdentifier())) {
                         CrossReference ref = createCrossReference(xref, withText);
                         if (ref != null) crossReferences.add(ref);
                     }
@@ -89,16 +89,16 @@ public class CrossReferenceConverter<T extends Xref> {
 
         List<CrossReference> crossReferences = new ArrayList<CrossReference>(xrefs.size());
 
-        for (Xref xref : xrefs) {
+        for (T xref : xrefs) {
 
-            if (xref.getCvDatabase() != null && databaseFilterMiRef.equals(xref.getCvDatabase().getIdentifier())) {
+            if (xref.getDatabase() != null && databaseFilterMiRef.equals(xref.getDatabase().getMIIdentifier())) {
                 if (onlyIdentity) {
-                    if (xref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                    if (xref.getQualifier() != null && Xref.IDENTITY_MI.equals(xref.getQualifier().getMIIdentifier())) {
                         CrossReference ref = createCrossReference(xref, withText);
                         if (ref != null) crossReferences.add(ref);
                     }
                 } else {
-                    if (xref.getCvXrefQualifier() == null || !CvXrefQualifier.IDENTITY_MI_REF.equals(xref.getCvXrefQualifier().getIdentifier())) {
+                    if (xref.getQualifier() == null || !Xref.IDENTITY_MI.equals(xref.getQualifier().getMIIdentifier())) {
                         CrossReference ref = createCrossReference(xref, withText);
                         if (ref != null) crossReferences.add(ref);
                     }
@@ -122,21 +122,21 @@ public class CrossReferenceConverter<T extends Xref> {
 
         List<CrossReference> crossReferences = new ArrayList<CrossReference>(xrefs.size());
 
-        for (Xref xref : xrefs) {
+        for (T xref : xrefs) {
             CrossReference ref = createCrossReference(xref, withText);
             if (ref != null) crossReferences.add(ref);
         }
         return crossReferences;
     }
 
-    public CrossReference createCrossReference(Xref xref, boolean withText) {
+    public CrossReference createCrossReference(T xref, boolean withText) {
         CrossReference ref = null;
-        String db = xref.getCvDatabase() != null ? xref.getCvDatabase().getShortLabel() : DATABASE_UNKNOWN;
-        String id = xref.getPrimaryId();
+        String db = xref.getDatabase() != null ? xref.getDatabase().getShortName() : DATABASE_UNKNOWN;
+        String id = xref.getId();
 
         if (id != null && db != null) {
             String secondaryId = (withText && xref.getSecondaryId() != null) ? xref.getSecondaryId() : null;
-            String cvXrefQualifier = (withText && xref.getCvXrefQualifier() != null) ? xref.getCvXrefQualifier().getShortLabel() : null;
+            String cvXrefQualifier = (withText && xref.getQualifier() != null) ? xref.getQualifier().getShortName() : null;
 
             if (secondaryId != null) {
                 ref = new CrossReferenceImpl(db, id, secondaryId);

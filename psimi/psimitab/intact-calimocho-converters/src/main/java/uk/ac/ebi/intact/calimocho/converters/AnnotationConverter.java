@@ -3,8 +3,8 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import uk.ac.ebi.intact.model.Annotation;
-import uk.ac.ebi.intact.model.CvTopic;
+import psidev.psi.mi.jami.model.Annotation;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactAnnotation;
 
 /**
  * Annotation converter
@@ -16,42 +16,23 @@ import uk.ac.ebi.intact.model.CvTopic;
 
 public class AnnotationConverter {
 
-    public Field intactToCalimocho(Annotation annot){
-        if (annot != null && annot.getCvTopic() != null){
+    public Field intactToCalimocho(AbstractIntactAnnotation annot){
+        if (annot != null && annot.getTopic() != null){
             Field field = new DefaultField();
 
-            String topic = CvTopic.COMMENT;
+            String topic = Annotation.COMMENT;
 
-            if (annot.getCvTopic().getShortLabel() != null){
-                topic = annot.getCvTopic().getShortLabel();
+            if (annot.getTopic().getShortName() != null){
+                topic = annot.getTopic().getShortName();
             }
 
             field.set( CalimochoKeys.KEY, topic);
             field.set( CalimochoKeys.NAME, topic);
-            field.set( CalimochoKeys.VALUE, annot.getAnnotationText());
+            field.set( CalimochoKeys.VALUE, annot.getValue());
 
             return field;
         }
 
-        return null;
-    }
-
-    /**
-     * 
-     * @param field
-     * @return the converted annotation
-     */
-    public Annotation calimochoToIntact(Field field){
-        if (field != null && field.get(CalimochoKeys.NAME) != null){
-            
-            String topic = field.get(CalimochoKeys.NAME);
-            CvTopic cvTopic = new CvTopic(topic);
-            
-            Annotation annot = new Annotation(cvTopic, field.get(CalimochoKeys.VALUE));
-
-            return annot;
-        }
-        
         return null;
     }
 }

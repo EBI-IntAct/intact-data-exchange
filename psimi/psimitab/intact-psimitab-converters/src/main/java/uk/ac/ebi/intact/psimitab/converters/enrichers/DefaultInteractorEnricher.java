@@ -1,10 +1,18 @@
 package uk.ac.ebi.intact.psimitab.converters.enrichers;
 
-import psidev.psi.mi.tab.model.*;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.InteractorAlias;
-import uk.ac.ebi.intact.model.InteractorXref;
-import uk.ac.ebi.intact.model.Polymer;
+import psidev.psi.mi.jami.model.Alias;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.utils.ChecksumUtils;
+import psidev.psi.mi.tab.model.AliasImpl;
+import psidev.psi.mi.tab.model.Checksum;
+import psidev.psi.mi.tab.model.ChecksumImpl;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
+import psidev.psi.mi.tab.model.Interactor;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractor;
+import uk.ac.ebi.intact.jami.model.extension.IntactPolymer;
+import uk.ac.ebi.intact.jami.model.extension.ParticipantEvidenceXref;
 import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
@@ -19,13 +27,13 @@ import java.util.Collection;
  * @since <pre>09/08/12</pre>
  */
 
-public class DefaultInteractorEnricher extends AbstractEnricher{
+public class DefaultInteractorEnricher extends AbstractEnricher<IntactInteractor> {
 
-    public DefaultInteractorEnricher(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv) {
+    public DefaultInteractorEnricher(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv) {
         super(xrefConv, alisConv);
     }
 
-    public DefaultInteractorEnricher(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
+    public DefaultInteractorEnricher(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
         super(xrefConv, alisConv, defaultInstitution);
     }
 
@@ -35,11 +43,11 @@ public class DefaultInteractorEnricher extends AbstractEnricher{
      * @param mitabInteractor
      * @return the standard InchiKey for the small molecule. Can be null if no standard inchi key available
      */
-    public void enrichInteractorFromIntact(uk.ac.ebi.intact.model.Interactor interactor, Interactor mitabInteractor){
+    public void enrichInteractorFromIntact(IntactInteractor interactor, Interactor mitabInteractor){
 
         if (interactor != null && mitabInteractor != null){
-            Collection<InteractorXref> interactorXrefs = interactor.getXrefs();
-            Collection<InteractorAlias> aliases = interactor.getAliases();
+            Collection<Xref> interactorXrefs = interactor.getXrefs();
+            Collection<Alias> aliases = interactor.getAliases();
 
             // xrefs
             boolean hasFoundIdentity = processXrefs(mitabInteractor, interactorXrefs);
@@ -54,10 +62,11 @@ public class DefaultInteractorEnricher extends AbstractEnricher{
             }
 
             // uses crc64 for checksum
-            if (interactor instanceof Polymer){
-                Polymer polymer = (Polymer) interactor;
-                if (polymer.getCrc64() != null){
-                    Checksum checksum = new ChecksumImpl(InteractorConverter.CRC64, polymer.getCrc64());
+            if (interactor instanceof IntactPolymer){
+                IntactPolymer polymer = (IntactPolymer) interactor;
+                psidev.psi.mi.jami.model.Checksum crc64 = ChecksumUtils.collectFirstChecksumWithMethod(polymer.getChecksums(), null, "crc64");
+                if (crc64 != null) {
+                    Checksum checksum = new ChecksumImpl(InteractorConverter.CRC64, crc64.getValue());
                     mitabInteractor.getChecksums().add(checksum);
                 }
             }
@@ -65,10 +74,10 @@ public class DefaultInteractorEnricher extends AbstractEnricher{
     }
 
     @Override
-    protected void processAccessionAndDisplay(uk.ac.ebi.intact.model.Interactor mol, Interactor mitabInteractor, boolean hasFoundIdentity) {
+    protected void processAccessionAndDisplay(IntactInteractor mol, Interactor mitabInteractor, boolean hasFoundIdentity) {
 
         // the shortlabel is the display short
-        psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT );
+        psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_SHORT );
         mitabInteractor.getAliases().add(displayShort);
 
         // aliases
@@ -76,7 +85,7 @@ public class DefaultInteractorEnricher extends AbstractEnricher{
             String identifier = mitabInteractor.getIdentifiers().iterator().next().getIdentifier();
 
             // the interactor unique id is the display long
-            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, identifier, InteractorConverter.DISPLAY_LONG  );
+            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, identifier, InteractorConverter.DISPLAY_LONG  );
             mitabInteractor.getAliases().add(displayLong);
             // convert ac as identity or secondary identifier
             if (mol.getAc() != null){
@@ -97,16 +106,16 @@ public class DefaultInteractorEnricher extends AbstractEnricher{
                 mitabInteractor.getIdentifiers().add(acField);
 
                 // add ac as psi display_long alias
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getAc(), InteractorConverter.DISPLAY_LONG  );
+                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mol.getAc(), InteractorConverter.DISPLAY_LONG  );
                 mitabInteractor.getAliases().add(displayLong);
             }
             // the shortlabel will be identifier because we need an identifier and will be displayLong as well
             else {
-                CrossReference id = new CrossReferenceImpl( this.defaultInstitution, mol.getShortLabel());
+                CrossReference id = new CrossReferenceImpl( this.defaultInstitution, mol.getShortName());
                 mitabInteractor.getIdentifiers().add(id);
 
                 // add shortlabel as display long as well
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_LONG  );
+                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_LONG  );
                 mitabInteractor.getAliases().add(displayLong);
 
             }

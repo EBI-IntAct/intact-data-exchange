@@ -2,12 +2,19 @@ package uk.ac.ebi.intact.dataexchange.psimi.solr.converter;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.common.SolrInputDocument;
+import psidev.psi.mi.jami.model.Alias;
+import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.ModelledParticipant;
+import psidev.psi.mi.jami.model.Source;
+import psidev.psi.mi.jami.model.Xref;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexFieldNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.TreeComplexComponents;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.ComplexSolrEnricher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.XrefUtils;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.util.ComplexUtils;
+import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
+import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -49,46 +56,30 @@ public class ComplexSolrConverter {
     /*      Protected methods to convert      */
     /******************************************/
 
-    protected void indexComplexAC(InteractionImpl complex,
+    protected void indexComplexAC(IntactComplex complex,
                                   SolrInputDocument solrDocument) throws Exception {
-        Xref  complexPrimaryXref=getComplexPrimaryXref(complex);
+        Xref complexPrimaryXref = complex.getComplexAcXref();
         // stored field
         solrDocument.addField(ComplexFieldNames.AC, complex.getAc()); // for old ac
         if(complexPrimaryXref!=null){
-            solrDocument.addField(ComplexFieldNames.COMPLEX_AC,complexPrimaryXref.getPrimaryId());
-            solrDocument.addField(ComplexFieldNames.COMPLEX_VERSION,complexPrimaryXref.getDbRelease());
-            solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complexPrimaryXref.getPrimaryId() ) ;
+            solrDocument.addField(ComplexFieldNames.COMPLEX_AC,complexPrimaryXref.getId());
+            solrDocument.addField(ComplexFieldNames.COMPLEX_VERSION,complexPrimaryXref.getVersion());
+            solrDocument.addField(ComplexFieldNames.COMPLEX_ID, complexPrimaryXref.getId());
         }
         // search fields
         solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getAc ( ) ) ;
         // index source of complex id
-        if ( complex.getOwner ( ) != null ) {
-            solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getOwner ( ).getShortLabel() ) ;
-            solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getOwner ( ).getShortLabel() + ":" + complex.getAc ( ) ) ;
+        if ( complex.getSource ( ) != null ) {
+            solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getSource ( ).getShortName() ) ;
+            solrDocument.addField ( ComplexFieldNames.COMPLEX_ID, complex.getSource ( ).getShortName() + ":" + complex.getAc ( ) ) ;
         }
     }
 
-    protected Xref getComplexPrimaryXref(InteractionImpl complex){
-        Collection<InteractorXref> currentComplexXrefs = complex.getXrefs();
-        Xref  complexPrimaryXref=null;
-        for (Xref xref : currentComplexXrefs) {
-            if (xref.getCvXrefQualifier()!=null&&xref.getCvXrefQualifier().getIdentifier()!=null&&
-                    xref.getCvXrefQualifier().getIdentifier().equals("MI:2282")&&
-                    xref.getCvXrefQualifier().getShortLabel()!=null&&
-                    xref.getCvXrefQualifier().getShortLabel().equals("complex-primary")) {
-                complexPrimaryXref = xref;
-                break;
-            }
-        }
-
-        return complexPrimaryXref;
-    }
-
-    protected void indexComplexNames(InteractionImpl complex,
+    protected void indexComplexNames(IntactComplex complex,
                                      SolrInputDocument solrDocument) throws Exception {
 
         // shortname
-        solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, complex.getShortLabel ( ) ) ;
+        solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, complex.getShortName ( ) ) ;
         // fullname
         if (complex.getFullName() != null){
             solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, complex.getFullName ( ) ) ;
@@ -101,18 +92,18 @@ public class ComplexSolrConverter {
 
         for ( Alias alias : complex.getAliases ( ) ) {
             if (alias.getName() != null){
-                if (alias.getCvAliasType() != null){
-                    CvAliasType type = alias.getCvAliasType();
+                if (alias.getType() != null){
+                    CvTerm type = alias.getType();
 //                    solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, type.getShortLabel() ) ;
                     solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, alias.getName() ) ;
 //                    solrDocument.addField ( ComplexFieldNames.COMPLEX_ALIAS, type.getShortLabel()+":"+alias.getName()) ;
-                    if (firstRecommended == null && COMPLEX_RECOMMENDED_NAME_MI.equals(type.getIdentifier())){
+                    if (firstRecommended == null && COMPLEX_RECOMMENDED_NAME_MI.equals(type.getMIIdentifier())){
                         firstRecommended = alias.getName();
                     }
-                    else if (firstSystematic == null && COMPLEX_SYSTEMATIC_NAME_MI.equals(type.getIdentifier())){
+                    else if (firstSystematic == null && COMPLEX_SYSTEMATIC_NAME_MI.equals(type.getMIIdentifier())){
                         firstSystematic = alias.getName();
                     }
-                    else if (firstComplexSynonym == null && COMPLEX_SYNONYM.equals(type.getIdentifier())){
+                    else if (firstComplexSynonym == null && COMPLEX_SYNONYM_MI.equals(type.getMIIdentifier())){
                         firstComplexSynonym = alias.getName();
                     }
                 }
@@ -140,25 +131,25 @@ public class ComplexSolrConverter {
             solrDocument.addField(ComplexFieldNames.COMPLEX_NAME, firstAlias);
         }
         else{
-            solrDocument.addField(ComplexFieldNames.COMPLEX_NAME, complex.getShortLabel());
+            solrDocument.addField(ComplexFieldNames.COMPLEX_NAME, complex.getShortName());
         }
     }
 
-    protected void indexComplexSource(InteractionImpl complex,
-                                                   SolrInputDocument solrDocument) throws Exception {
-        if (complex.getOwner() != null){
-            Institution owner = complex.getOwner();
+    protected void indexComplexSource(IntactComplex complex,
+                                      SolrInputDocument solrDocument) throws Exception {
+        if (complex.getSource() != null){
+            Source owner = complex.getSource();
             // short name
-            solrDocument.addField ( ComplexFieldNames.SOURCE, owner.getShortLabel ( ) ) ;
+            solrDocument.addField ( ComplexFieldNames.SOURCE, owner.getShortName ( ) ) ;
             // facet field
-            solrDocument.addField ( ComplexFieldNames.SOURCE_F, owner.getShortLabel() ) ;
+            solrDocument.addField ( ComplexFieldNames.SOURCE_F, owner.getShortName() ) ;
             // full name
             solrDocument.addField ( ComplexFieldNames.SOURCE, owner.getFullName ( ) ) ;
         }
     }
 
-    protected void indexUpdateDate(InteractionImpl complex,
-                                      SolrInputDocument solrDocument) throws Exception {
+    protected void indexUpdateDate(IntactComplex complex,
+                                   SolrInputDocument solrDocument) throws Exception {
         if (complex.getUpdated() != null){
             SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy/MM/dd");
             String formattedDate = simpleFormat.format(complex.getUpdated());
@@ -170,7 +161,7 @@ public class ComplexSolrConverter {
     /*      Convert Methods      */
     /*****************************/
     protected void toSolrDocument(
-            InteractionImpl complex,
+            IntactComplex complex,
             SolrInputDocument solrDocument)
             throws Exception {
 
@@ -194,12 +185,12 @@ public class ComplexSolrConverter {
         // add info to complex_organism_ontology field:
         // It will do by the enricher
         // add info to interaction_type field:
-        if (complex.getCvInteractionType() != null){
-            this.complexSolrEnricher.enrichInteractionType(complex.getCvInteractionType(), solrDocument);
+        if (complex.getInteractionType() != null){
+            this.complexSolrEnricher.enrichInteractionType((IntactCvTerm) complex.getInteractionType(), solrDocument);
         }
 
-        if (complex.getCvInteractorType() != null){
-            this.complexSolrEnricher.enrichComplexType(complex.getCvInteractorType(), solrDocument);
+        if (complex.getInteractorType() != null){
+            this.complexSolrEnricher.enrichComplexType((IntactCvTerm) complex.getInteractorType(), solrDocument);
         }
 
         // add info to interaction_type_ontology field:
@@ -210,21 +201,22 @@ public class ComplexSolrConverter {
         // Enrich Complex Organism fields
         this.complexSolrEnricher.enrichOrganism(complex, solrDocument) ;
 
-        // Enrich Complex Xref fields
+        // Enrich Complex Identifier and Xref fields
+        this.complexSolrEnricher.enrichInteractionXref(complex.getIdentifiers(), solrDocument) ;
         this.complexSolrEnricher.enrichInteractionXref(complex.getXrefs(), solrDocument) ;
 
         // add info to description field:
-        CvTopic cvTopic = null ;
+        CvTerm cvTopic = null ;
         for ( Annotation annotation : complex.getAnnotations ( ) ) {
-            cvTopic = annotation != null ? annotation.getCvTopic ( ) : null ;
-            if ( cvTopic != null && cvTopic.getShortLabel ( ) .equalsIgnoreCase( CURATED_COMPLEX ) && annotation.getAnnotationText() != null) {
-                solrDocument.addField ( ComplexFieldNames.DESCRIPTION, annotation.getAnnotationText ( ) ) ;
+            cvTopic = annotation != null ? annotation.getTopic ( ) : null ;
+            if ( cvTopic != null && cvTopic.getShortName ( ) .equalsIgnoreCase( CURATED_COMPLEX ) && annotation.getValue() != null) {
+                solrDocument.addField ( ComplexFieldNames.DESCRIPTION, annotation.getValue ( ) ) ;
                 break ; // We only want the first one
             }
         }
 
         // add info to param field:
-        solrDocument.addField ( ComplexFieldNames.PARAM, !complex.getParameters ( ).isEmpty ( ) ) ;
+        solrDocument.addField ( ComplexFieldNames.PARAM, !complex.getModelledParameters ( ).isEmpty ( ) ) ;
 
         /////////////////////////////
         ///   INTERACTOR FIELDS   ///
@@ -244,6 +236,11 @@ public class ComplexSolrConverter {
         // add info to number_participants field:
         solrDocument.addField ( ComplexFieldNames.NUMBER_PARTICIPANTS, tree.getNumberOfParticipants() ) ;
 
+        // store serialised participants
+        for (ModelledParticipant participant : ComplexUtils.mergeParticipants(complex.getParticipants())) {
+            complexSolrEnricher.enrichSerialisedParticipant(participant, solrDocument);
+        }
+
         // add info to interactor_type_ontology field:
         // It will do by the enricher
 
@@ -259,7 +256,7 @@ public class ComplexSolrConverter {
 
     }
 
-    public SolrInputDocument toSolrDocument(InteractionImpl complex) throws Exception {
+    public SolrInputDocument toSolrDocument(IntactComplex complex) throws Exception {
         SolrInputDocument doc = new SolrInputDocument();
         toSolrDocument(complex, doc) ;
         return doc;

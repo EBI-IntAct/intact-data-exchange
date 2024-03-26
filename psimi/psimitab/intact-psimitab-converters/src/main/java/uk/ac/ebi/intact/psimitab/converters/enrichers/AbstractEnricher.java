@@ -1,12 +1,13 @@
 package uk.ac.ebi.intact.psimitab.converters.enrichers;
 
+import psidev.psi.mi.jami.model.Alias;
+import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.InteractorAlias;
-import uk.ac.ebi.intact.model.InteractorXref;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactAlias;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractor;
+import uk.ac.ebi.intact.jami.model.extension.ParticipantEvidenceXref;
 import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
 
@@ -20,27 +21,27 @@ import java.util.Collection;
  * @since <pre>09/08/12</pre>
  */
 
-public abstract class AbstractEnricher {
+public abstract class AbstractEnricher<T extends IntactInteractor> {
 
-    protected CrossReferenceConverter<InteractorXref> xRefConverter;
+    protected CrossReferenceConverter<ParticipantEvidenceXref> xRefConverter;
     protected AliasConverter aliasConverter;
-    protected String defaultInstitution = CvDatabase.INTACT;
+    protected String defaultInstitution = "intact";
     protected String intactSecondary = "intact-secondary";
 
-    public AbstractEnricher(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
-        xRefConverter = xrefConv != null ? xrefConv : new CrossReferenceConverter<InteractorXref>();
+    public AbstractEnricher(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv){
+        xRefConverter = xrefConv != null ? xrefConv : new CrossReferenceConverter<>();
         aliasConverter = alisConv != null ? alisConv : new AliasConverter();
     }
 
-    public AbstractEnricher(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution){
-        xRefConverter = xrefConv != null ? xrefConv : new CrossReferenceConverter<InteractorXref>();
+    public AbstractEnricher(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv, String defaultInstitution){
+        xRefConverter = xrefConv != null ? xrefConv : new CrossReferenceConverter<>();
         aliasConverter = alisConv != null ? alisConv : new AliasConverter();
         if (defaultInstitution != null){
             this.defaultInstitution = defaultInstitution;
         }
     }
 
-    protected CrossReference createCrossReferenceFromAc(uk.ac.ebi.intact.model.Interactor mol) {
+    protected CrossReference createCrossReferenceFromAc(T mol) {
         CrossReference acField = new CrossReferenceImpl();
 
         String db = defaultInstitution;
@@ -51,9 +52,9 @@ public abstract class AbstractEnricher {
         return acField;
     }
 
-    protected void processAliases(Interactor mitabInteractor, Collection<InteractorAlias> aliases) {
-        for (InteractorAlias alias : aliases){
-            psidev.psi.mi.tab.model.Alias aliasField = aliasConverter.intactToMitab(alias);
+    protected void processAliases(Interactor mitabInteractor, Collection<Alias> aliases) {
+        for (Alias alias : aliases){
+            psidev.psi.mi.tab.model.Alias aliasField = aliasConverter.intactToMitab((AbstractIntactAlias) alias);
 
             if (aliasField != null){
                 mitabInteractor.getAliases().add(aliasField);
@@ -61,20 +62,20 @@ public abstract class AbstractEnricher {
         }
     }
 
-    protected boolean processXrefs(Interactor mitabInteractor, Collection<InteractorXref> interactorXrefs) {
+    protected boolean processXrefs(Interactor mitabInteractor, Collection<Xref> interactorXrefs) {
         boolean hasFoundIdentity = false;
 
         if (!interactorXrefs.isEmpty()){
 
             // convert xrefs, and identity
-            for (InteractorXref ref : interactorXrefs){
+            for (Xref ref : interactorXrefs){
 
                 // identity xrefs
-                if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
+                if (ref.getQualifier() != null && Xref.IDENTITY_MI.equals(ref.getQualifier().getMIIdentifier())){
                     // first ddbj/embl/genbank identity
                     if (!hasFoundIdentity){
 
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
                             hasFoundIdentity = true;
 
@@ -83,23 +84,23 @@ public abstract class AbstractEnricher {
                     }
                     // other identifiers
                     else {
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
                             mitabInteractor.getAlternativeIdentifiers().add(identity);
                         }
                     }
                 }
                 // secondary acs are alternative identifiers
-                else if (ref.getCvXrefQualifier() != null && (CvXrefQualifier.SECONDARY_AC_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())
-                || intactSecondary.equals(ref.getCvXrefQualifier().getShortLabel()))){
-                    CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                else if (ref.getQualifier() != null && (Xref.SECONDARY_MI.equals(ref.getQualifier().getMIIdentifier())
+                || intactSecondary.equals(ref.getQualifier().getShortName()))){
+                    CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                     if (identity != null){
                         mitabInteractor.getAlternativeIdentifiers().add(identity);
                     }
                 }
                 // other xrefs
                 else {
-                    CrossReference xref = xRefConverter.createCrossReference(ref, true);
+                    CrossReference xref = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, true);
                     if (xref != null){
                         mitabInteractor.getXrefs().add(xref);
                     }
@@ -109,5 +110,5 @@ public abstract class AbstractEnricher {
         return hasFoundIdentity;
     }
 
-    protected abstract void processAccessionAndDisplay(uk.ac.ebi.intact.model.Interactor mol, Interactor mitabInteractor, boolean hasFoundIdentity);
+    protected abstract void processAccessionAndDisplay(T mol, Interactor mitabInteractor, boolean hasFoundIdentity);
 }

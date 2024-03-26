@@ -16,7 +16,7 @@
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -43,7 +43,7 @@ public class NoExpansion extends BinaryExpansionStrategy{
         super(processExperimentDetails, processPublicationDetails, defaultInstitution);
     }
 
-    public Collection<BinaryInteraction> expand(Interaction interaction) throws NotExpandableInteractionException {
+    public Collection<BinaryInteraction> expand(IntactInteractionEvidence interaction) throws NotExpandableInteractionException {
 
         BinaryInteraction binaryInteraction = interactionConverter.toBinaryInteraction(interaction);
 
@@ -62,8 +62,8 @@ public class NoExpansion extends BinaryExpansionStrategy{
         return "none";
     }
 
-    public boolean isExpandable(Interaction interaction) {
-        if ( interaction.getComponents().size() > 2 || interaction.getComponents().size() == 0 ) {
+    public boolean isExpandable(IntactInteractionEvidence interaction) {
+        if ( interaction.getParticipants().size() > 2 || interaction.getParticipants().size() == 0 ) {
             return false;
         }
         return true;

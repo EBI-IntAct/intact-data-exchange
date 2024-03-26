@@ -1,10 +1,15 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class is for manage the complex results of a search
@@ -14,20 +19,25 @@ import java.util.*;
  * @since 02/08/13
  */
 public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ComplexResultIterator.class);
+
     /********************************/
     /*      Private attributes      */
     /********************************/
-    private Iterator < SolrDocument > iterator              = null ;
-    private Map<String,List<FacetField.Count>> facetFields  = null ;
+    private final Iterator <SolrDocument> iterator;
+    private Map<String,List<FacetField.Count>> facetFields = null ;
     // we have been prepared the next value
-    private ComplexSearchResults nextResult                 = null ;
-    private long numberOfResults                            = 0L   ;
-    private long totalNumberOfResults                       = 0L   ;
+    private ComplexSearchResults nextResult;
+    private final long numberOfResults;
+    private long totalNumberOfResults = 0L;
+    private final ObjectMapper mapper;
 
     /*************************/
     /*      Constructor      */
     /*************************/
     public ComplexResultIterator ( SolrDocumentList results ) {
+        this.mapper = new ObjectMapper();
         if ( results != null ) {
             numberOfResults = results.size ( ) ;
             iterator = results.iterator ( ) ;
@@ -79,6 +89,19 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
         return result .toString ( ) .trim ( ) ;
     }
 
+    protected List<String> getListOfFieldValues(SolrDocument solrDocument, String field) {
+        List<String> result = new ArrayList<>();
+        Collection<Object> fieldValues = solrDocument.getFieldValues(field);
+        // If the SolrDocument has data for this field
+        if (fieldValues != null && ! fieldValues.isEmpty()) {
+            // We iterate through the data and append to the result String
+            for (Object fieldValue : fieldValues) {
+                result.add(String.valueOf(fieldValue));
+            }
+        }
+        return result;
+    }
+
     // This method was only used for testing
     protected String getAllFieldsValues ( SolrDocument solrDocument ) {
         StringBuilder result = new StringBuilder ( ) ;
@@ -95,12 +118,30 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
         SolrDocument solrDocument = iterator.next ( ) ;
 
         // Get field values for this specific fields
-        result.setComplexAC      ( getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_AC    ) ) ;
-        result.setComplexName    ( getFieldValues ( solrDocument, ComplexFieldNames.COMPLEX_NAME  ) ) ;
-        result.setOrganismName   ( getFieldValues ( solrDocument, ComplexFieldNames.ORGANISM_NAME ) ) ;
-        result.setDescription    ( getFieldValues ( solrDocument, ComplexFieldNames.DESCRIPTION   ) ) ;
+        result.setComplexAC(getFieldValues(solrDocument, ComplexFieldNames.COMPLEX_AC));
+        result.setComplexName(getFieldValues(solrDocument, ComplexFieldNames.COMPLEX_NAME));
+        result.setOrganismName(getFieldValues(solrDocument, ComplexFieldNames.ORGANISM_NAME));
+        result.setDescription(getFieldValues(solrDocument, ComplexFieldNames.DESCRIPTION));
+        result.setInteractors(getInteractors(solrDocument));
 
         return result ;
+    }
+
+    /*******************************/
+    /*      Private Methods        */
+    /*******************************/
+    private List<ComplexInteractor> getInteractors(SolrDocument solrDocument) {
+        return getListOfFieldValues(solrDocument, ComplexFieldNames.SERIALISED_INTERACTION).stream()
+                .map(serialisedInteractor -> {
+                    try {
+                        return mapper.readValue(serialisedInteractor, ComplexInteractor.class);
+                    } catch (JsonProcessingException e) {
+                        LOG.error("Failed to deserialise interactor", e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /******************************/

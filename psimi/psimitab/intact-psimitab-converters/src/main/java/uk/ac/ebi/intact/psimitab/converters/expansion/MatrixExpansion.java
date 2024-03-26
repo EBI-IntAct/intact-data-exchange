@@ -17,13 +17,14 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.jami.model.ParticipantEvidence;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Checksum;
 import psidev.psi.mi.tab.model.ChecksumImpl;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
 
 import java.util.*;
@@ -68,7 +69,7 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
      * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
      *         collection.
      */
-    public Collection<BinaryInteraction> expand( Interaction interaction ) throws NotExpandableInteractionException {
+    public Collection<BinaryInteraction> expand( IntactInteractionEvidence interaction ) throws NotExpandableInteractionException {
         if (interaction == null){
             throw new NotExpandableInteractionException("Interaction is not expandable because is null ");
         }
@@ -102,8 +103,12 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
             if (binaryTemplateSelf == null){
                 return Collections.EMPTY_LIST;
             }
-            Component uniqueComponent = interaction.getComponents().iterator().next();
-            MitabExpandedInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent, false );
+            ParticipantEvidence uniqueComponent = interaction.getParticipants().iterator().next();
+            MitabExpandedInteraction newInteraction = buildInteraction(
+                    binaryTemplateSelf,
+                    (IntactParticipantEvidence) uniqueComponent,
+                    (IntactParticipantEvidence) uniqueComponent,
+                    false );
 
             BinaryInteraction expandedBinary = newInteraction.getBinaryInteraction();
 
@@ -137,7 +142,7 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
         }
         else{
             logger.debug( "Interaction was n-ary, will be expanded" );
-            Component[] components = interaction.getComponents().toArray(new Component[]{});
+            ParticipantEvidence[] components = interaction.getParticipants().toArray(new ParticipantEvidence[]{});
             logger.debug( components.length + " participant(s) found." );
 
             BinaryInteraction binaryTemplate = this.interactionConverter.processInteractionDetailsWithoutInteractors(interaction);
@@ -151,11 +156,15 @@ public class MatrixExpansion extends BinaryExpansionStrategy {
             boolean onlyProtein = true;
 
             for ( int i = 0; i < components.length; i++ ) {
-                Component c1 = components[i];
+                ParticipantEvidence c1 = components[i];
                 for ( int j = ( i + 1 ); j < components.length; j++ ) {
-                    Component c2 = components[j];
+                    ParticipantEvidence c2 = components[j];
                     // build a new interaction
-                    MitabExpandedInteraction newInteraction2 = buildInteraction( binaryTemplate, c1, c2, true );
+                    MitabExpandedInteraction newInteraction2 = buildInteraction(
+                            binaryTemplate,
+                            (IntactParticipantEvidence) c1,
+                            (IntactParticipantEvidence) c2,
+                            true );
 
                     // process participant detection methods after setting the interactors if not done at the level of interactiors
                     if (newInteraction2.getMitabInteractorA().getInteractor().getParticipantIdentificationMethods().isEmpty()){

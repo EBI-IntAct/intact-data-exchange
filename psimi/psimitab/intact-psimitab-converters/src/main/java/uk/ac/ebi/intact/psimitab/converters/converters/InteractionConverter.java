@@ -17,17 +17,22 @@ package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.jami.model.ParticipantEvidence;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.utils.ChecksumUtils;
 import psidev.psi.mi.tab.model.*;
 import psidev.psi.mi.tab.model.Confidence;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
 import uk.ac.ebi.intact.irefindex.seguid.RigidGenerator;
 import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
-import uk.ac.ebi.intact.model.Annotation;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.Parameter;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactConfidence;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactParameter;
+import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
+import uk.ac.ebi.intact.jami.model.extension.IntactExperiment;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
+import uk.ac.ebi.intact.jami.model.extension.InteractionXref;
 import uk.ac.ebi.intact.psimitab.converters.util.PsimitabTools;
 
 import java.util.Arrays;
@@ -51,7 +56,7 @@ public class InteractionConverter {
 
     private CvObjectConverter cvObjectConverter;
 
-    private CrossReferenceConverter xConverter;
+    private CrossReferenceConverter<InteractionXref> xConverter;
 
     private ConfidenceConverter confidenceConverter;
     private ParameterConverter parameterConverter;
@@ -62,7 +67,7 @@ public class InteractionConverter {
     private boolean processExperimentDetails=true;
     private boolean processPublicationDetails = true;
 
-    private String defaultInstitution = CvDatabase.INTACT;
+    private String defaultInstitution = "intact";
 
     public static String CRC = "intact-crc";
     public static String RIGID = "rigid";
@@ -70,7 +75,7 @@ public class InteractionConverter {
     public InteractionConverter(){
         this.confidenceConverter = new ConfidenceConverter();
         cvObjectConverter = new CvObjectConverter();
-        xConverter = new CrossReferenceConverter();
+        xConverter = new CrossReferenceConverter<>();
         parameterConverter = new ParameterConverter();
         annotationConverter = new AnnotationConverter();
         experimentConverter = new ExperimentConverter();
@@ -80,7 +85,7 @@ public class InteractionConverter {
     public InteractionConverter(boolean processExperimentDetails, boolean processPublicationsDetails){
         this.confidenceConverter = new ConfidenceConverter();
         cvObjectConverter = new CvObjectConverter();
-        xConverter = new CrossReferenceConverter();
+        xConverter = new CrossReferenceConverter<>();
         parameterConverter = new ParameterConverter();
         annotationConverter = new AnnotationConverter();
         experimentConverter = new ExperimentConverter();
@@ -93,7 +98,7 @@ public class InteractionConverter {
     public InteractionConverter(String defaultInstitution){
         this.confidenceConverter = new ConfidenceConverter();
         cvObjectConverter = new CvObjectConverter();
-        xConverter = new CrossReferenceConverter();
+        xConverter = new CrossReferenceConverter<>();
         parameterConverter = new ParameterConverter();
         annotationConverter = new AnnotationConverter();
         experimentConverter = new ExperimentConverter();
@@ -107,7 +112,7 @@ public class InteractionConverter {
     public InteractionConverter(boolean processExperimentDetails, boolean processPublicationsDetails, String defaultInstitution){
         this.confidenceConverter = new ConfidenceConverter();
         cvObjectConverter = new CvObjectConverter();
-        xConverter = new CrossReferenceConverter();
+        xConverter = new CrossReferenceConverter<>();
         parameterConverter = new ParameterConverter();
         annotationConverter = new AnnotationConverter();
         experimentConverter = new ExperimentConverter();
@@ -124,26 +129,26 @@ public class InteractionConverter {
     ///////////////////////////
     // Getters & Setters
 
-    public BinaryInteraction toBinaryInteraction( Interaction interaction) {
+    public BinaryInteraction toBinaryInteraction( IntactInteractionEvidence interaction) {
 
         if ( interaction == null ) {
             throw new IllegalArgumentException( "Interaction must not be null" );
         }
 
-        final Collection<Component> components = interaction.getComponents();
+        final Collection<ParticipantEvidence> components = interaction.getParticipants();
         if ( components.size() > 2 || components.size() == 0 ) {
             throw new IllegalArgumentException( "We only convert interaction composed of 2 components or only one" );
         }
 
-        Iterator<Component> iterator = components.iterator();
-        Component componentA = iterator.next();
-        Component componentB = null;
+        Iterator<ParticipantEvidence> iterator = components.iterator();
+        ParticipantEvidence componentA = iterator.next();
+        ParticipantEvidence componentB = null;
         if (iterator.hasNext()){
             componentB = iterator.next();
         }
 
-        MitabInteractor convertedInteractorA = interactorConverter.intactToMitab(componentA);
-        MitabInteractor convertedInteractorB = interactorConverter.intactToMitab(componentB);
+        MitabInteractor convertedInteractorA = interactorConverter.intactToMitab((IntactParticipantEvidence) componentA);
+        MitabInteractor convertedInteractorB = interactorConverter.intactToMitab((IntactParticipantEvidence) componentB);
         psidev.psi.mi.tab.model.Interactor interactorA = convertedInteractorA != null ? convertedInteractorA.getInteractor() : null;
         psidev.psi.mi.tab.model.Interactor interactorB = convertedInteractorB != null ? convertedInteractorB.getInteractor() : null;
 
@@ -176,13 +181,10 @@ public class InteractionConverter {
         return bi;
     }
 
-    public void processExperimentParticipantIdentificationMethods(Interaction interaction, Interactor interactor){
+    public void processExperimentParticipantIdentificationMethods(IntactInteractionEvidence interaction, Interactor interactor){
 
-        if (interaction != null){
-            for (Experiment exp : interaction.getExperiments()){
-
-                this.experimentConverter.addParticipantDetectionMethodForInteractor(exp, interactor);
-            }
+        if (interaction != null && interaction.getExperiment() != null) {
+            this.experimentConverter.addParticipantDetectionMethodForInteractor((IntactExperiment) interaction.getExperiment(), interactor);
         }
     }
 
@@ -238,7 +240,7 @@ public class InteractionConverter {
     }
 
 
-    public BinaryInteraction processInteractionDetailsWithoutInteractors(Interaction interaction){
+    public BinaryInteraction processInteractionDetailsWithoutInteractors(IntactInteractionEvidence interaction){
 
         if ( interaction == null ) {
             throw new IllegalArgumentException( "Interaction must not be null" );
@@ -246,8 +248,8 @@ public class InteractionConverter {
 
         BinaryInteraction binary = new BinaryInteractionImpl(null, null);
         // process interaction type
-        if (interaction.getCvInteractionType() != null){
-            CrossReference type = cvObjectConverter.toCrossReference(interaction.getCvInteractionType());
+        if (interaction.getInteractionType() != null){
+            CrossReference type = cvObjectConverter.toCrossReference((IntactCvTerm) interaction.getInteractionType());
 
             if (type != null){
                 binary.getInteractionTypes().add(type);
@@ -257,8 +259,8 @@ public class InteractionConverter {
         // convert confidences
         if (!interaction.getConfidences().isEmpty()){
 
-            for (uk.ac.ebi.intact.model.Confidence conf : interaction.getConfidences()){
-                Confidence confField = confidenceConverter.intactToCalimocho(conf);
+            for (psidev.psi.mi.jami.model.Confidence conf : interaction.getConfidences()){
+                Confidence confField = confidenceConverter.intactToCalimocho((AbstractIntactConfidence) conf);
 
                 if (confField != null){
                     binary.getConfidenceValues().add(confField);
@@ -278,26 +280,26 @@ public class InteractionConverter {
 
         // process experiments
         if (processExperimentDetails){
-            for (Experiment exp : interaction.getExperiments()){
-                experimentConverter.intactToMitab(exp, binary, false, processPublicationDetails);
+            if (interaction.getExperiment() != null) {
+                experimentConverter.intactToMitab((IntactExperiment) interaction.getExperiment(), binary, false, processPublicationDetails);
             }
         }
 
         //process xrefs
-        Collection<InteractorXref> interactionRefs = interaction.getXrefs();
+        Collection<Xref> interactionRefs = interaction.getXrefs();
 
         if (!interactionRefs.isEmpty()){
 
             // convert xrefs
-            for (InteractorXref ref : interactionRefs){
+            for (Xref ref : interactionRefs){
 
-                CrossReference refField = xConverter.createCrossReference(ref, true);
-                if (refField != null && CvDatabase.IMEX.equalsIgnoreCase(refField.getDatabase()) && CvXrefQualifier.IMEX_PRIMARY.equalsIgnoreCase(refField.getText())){
+                CrossReference refField = xConverter.createCrossReference((InteractionXref) ref, true);
+                if (refField != null && Xref.IMEX.equalsIgnoreCase(refField.getDatabase()) && Xref.IMEX_PRIMARY.equalsIgnoreCase(refField.getText())){
                     refField.setText(null);
                     binary.getInteractionAcs().add(refField);
                 }
                 // identity
-                else if (refField != null && CvXrefQualifier.IDENTITY.equalsIgnoreCase(refField.getText())){
+                else if (refField != null && Xref.IDENTITY.equalsIgnoreCase(refField.getText())){
                     refField.setText(null);
                     binary.getInteractionAcs().add(refField);
                 }
@@ -308,10 +310,10 @@ public class InteractionConverter {
         }
 
         //process annotations (could have been processed with experiments)
-        Collection<Annotation>  annotations = AnnotatedObjectUtils.getPublicAnnotations(interaction);
+        Collection<psidev.psi.mi.jami.model.Annotation> annotations = PsimitabTools.getPublicAnnotations(interaction.getAnnotations());
         if (!annotations.isEmpty()){
 
-            for (Annotation annots : annotations){
+            for (psidev.psi.mi.jami.model.Annotation annots : annotations){
                 psidev.psi.mi.tab.model.Annotation annotField = annotationConverter.intactToMitab(annots);
 
                 if (annotField != null){
@@ -323,8 +325,8 @@ public class InteractionConverter {
         //process parameters
         if (!interaction.getParameters().isEmpty()){
 
-            for (Parameter param : interaction.getParameters()){
-                psidev.psi.mi.tab.model.Parameter paramField = parameterConverter.intactToMitab(param);
+            for (psidev.psi.mi.jami.model.Parameter param : interaction.getParameters()){
+                psidev.psi.mi.tab.model.Parameter paramField = parameterConverter.intactToMitab((AbstractIntactParameter) param);
 
                 if (paramField != null){
                     binary.getParameters().add(paramField);
@@ -333,13 +335,14 @@ public class InteractionConverter {
         }
 
         //process checksum
-        if (interaction.getCrc() != null){
-            Checksum crc = new ChecksumImpl(CRC, interaction.getCrc());
+        psidev.psi.mi.jami.model.Checksum crc64 = ChecksumUtils.collectFirstChecksumWithMethod(interaction.getChecksums(), null, "crc64");
+        if (crc64 != null) {
+            Checksum crc = new ChecksumImpl(CRC, crc64.getValue());
             binary.getChecksums().add(crc);
         }
 
         //process negative
-        if (InteractionUtils.isNegative(interaction)){
+        if (interaction.isNegative()){
             binary.setNegativeInteraction(true);
         }
 

@@ -1,8 +1,17 @@
 package uk.ac.ebi.intact.psimitab.converters.enrichers;
 
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.jami.model.Alias;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.utils.ChecksumUtils;
+import psidev.psi.mi.tab.model.AliasImpl;
+import psidev.psi.mi.tab.model.Checksum;
+import psidev.psi.mi.tab.model.ChecksumImpl;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.jami.model.extension.IntactNucleicAcid;
+import uk.ac.ebi.intact.jami.model.extension.ParticipantEvidenceXref;
 import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
@@ -17,13 +26,13 @@ import java.util.Collection;
  * @since <pre>09/08/12</pre>
  */
 
-public class NucleicAcidConverter extends AbstractEnricher{
+public class NucleicAcidConverter extends AbstractEnricher<IntactNucleicAcid> {
 
-    public NucleicAcidConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
+    public NucleicAcidConverter(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv){
         super(xrefConv, alisConv);
     }
 
-    public NucleicAcidConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
+    public NucleicAcidConverter(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
         super(xrefConv, alisConv, defaultInstitution);
     }
 
@@ -33,11 +42,11 @@ public class NucleicAcidConverter extends AbstractEnricher{
      * @param mitabInteractor
      * @return the standard InchiKey for the small molecule. Can be null if no standard inchi key available
      */
-    public void enrichNucleicAcidFromIntact(NucleicAcid nucleicAcid, Interactor mitabInteractor){
+    public void enrichNucleicAcidFromIntact(IntactNucleicAcid nucleicAcid, Interactor mitabInteractor){
 
         if (nucleicAcid != null && mitabInteractor != null){
-            Collection<InteractorXref> interactorXrefs = nucleicAcid.getXrefs();
-            Collection<InteractorAlias> aliases = nucleicAcid.getAliases();
+            Collection<Xref> interactorXrefs = nucleicAcid.getXrefs();
+            Collection<Alias> aliases = nucleicAcid.getAliases();
 
             // xrefs
             boolean hasFoundEMBLdentity = processXrefs(mitabInteractor, interactorXrefs);
@@ -52,24 +61,25 @@ public class NucleicAcidConverter extends AbstractEnricher{
             }
 
             // uses crc64 for checksum
-            if (nucleicAcid.getCrc64() != null){
-                Checksum checksum = new ChecksumImpl(InteractorConverter.CRC64, nucleicAcid.getCrc64());
+            psidev.psi.mi.jami.model.Checksum crc64 = ChecksumUtils.collectFirstChecksumWithMethod(nucleicAcid.getChecksums(), null, "crc64");
+            if (crc64 != null) {
+                Checksum checksum = new ChecksumImpl(InteractorConverter.CRC64, crc64.getValue());
                 mitabInteractor.getChecksums().add(checksum);
             }
         }
     }
 
     @Override
-    protected void processAccessionAndDisplay(uk.ac.ebi.intact.model.Interactor mol, Interactor mitabInteractor, boolean hasFoundEMBLIdentity) {
+    protected void processAccessionAndDisplay(IntactNucleicAcid mol, Interactor mitabInteractor, boolean hasFoundEMBLIdentity) {
         // the shortlabel is the display short
-        psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT );
+        psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_SHORT );
         mitabInteractor.getAliases().add(displayShort);
         // aliases
         if (hasFoundEMBLIdentity){
             String identifier = mitabInteractor.getIdentifiers().iterator().next().getIdentifier();
 
             // the interactor unique id is the display long
-            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, identifier, InteractorConverter.DISPLAY_LONG  );
+            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, identifier, InteractorConverter.DISPLAY_LONG  );
             mitabInteractor.getAliases().add(displayLong);
 
             // convert ac as identity or secondary identifier
@@ -91,16 +101,16 @@ public class NucleicAcidConverter extends AbstractEnricher{
                 mitabInteractor.getIdentifiers().add(acField);
 
                 // add ac as psi display_long alias
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getAc(), InteractorConverter.DISPLAY_LONG  );
+                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mol.getAc(), InteractorConverter.DISPLAY_LONG  );
                 mitabInteractor.getAliases().add(displayLong);
             }
             // the shortlabel will be identifier because we need an identifier and will be displayLong as well
             else {
-                CrossReference id = new CrossReferenceImpl( defaultInstitution, mol.getShortLabel());
+                CrossReference id = new CrossReferenceImpl( defaultInstitution, mol.getShortName());
                 mitabInteractor.getIdentifiers().add(id);
 
                 // add shortlabel as display long as well
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_LONG  );
+                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_LONG  );
                 mitabInteractor.getAliases().add(displayLong);
 
             }
@@ -108,20 +118,20 @@ public class NucleicAcidConverter extends AbstractEnricher{
     }
 
     @Override
-    protected boolean processXrefs(Interactor mitabInteractor, Collection<InteractorXref> interactorXrefs) {
+    protected boolean processXrefs(Interactor mitabInteractor, Collection<Xref> interactorXrefs) {
         boolean hasFoundIdentity = false;
 
         if (!interactorXrefs.isEmpty()){
 
             // convert xrefs, and identity
-            for (InteractorXref ref : interactorXrefs){
+            for (Xref ref : interactorXrefs){
 
                 // identity xrefs
-                if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
+                if (ref.getQualifier() != null && Xref.IDENTITY_MI.equals(ref.getQualifier().getMIIdentifier())){
                     // first ddbj/embl/genbank identity
-                    if (!hasFoundIdentity && ref.getCvDatabase() != null && CvDatabase.DDBG_MI_REF.equals(ref.getCvDatabase().getIdentifier())){
+                    if (!hasFoundIdentity && ref.getDatabase() != null && Xref.DDBJ_EMBL_GENBANK_MI.equals(ref.getDatabase().getMIIdentifier())){
 
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
                             hasFoundIdentity = true;
 
@@ -130,23 +140,23 @@ public class NucleicAcidConverter extends AbstractEnricher{
                     }
                     // other identifiers
                     else {
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
                             mitabInteractor.getAlternativeIdentifiers().add(identity);
                         }
                     }
                 }
                 // secondary acs are alternative identifiers
-                else if (ref.getCvXrefQualifier() != null && (CvXrefQualifier.SECONDARY_AC_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())
-                        || intactSecondary.equals(ref.getCvXrefQualifier().getShortLabel()))){
-                    CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                else if (ref.getQualifier() != null && (Xref.SECONDARY_MI.equals(ref.getQualifier().getMIIdentifier())
+                        || intactSecondary.equals(ref.getQualifier().getShortName()))){
+                    CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                     if (identity != null){
                         mitabInteractor.getAlternativeIdentifiers().add(identity);
                     }
                 }
                 // other xrefs
                 else {
-                    CrossReference xref = xRefConverter.createCrossReference(ref, true);
+                    CrossReference xref = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, true);
                     if (xref != null){
                         mitabInteractor.getXrefs().add(xref);
                     }

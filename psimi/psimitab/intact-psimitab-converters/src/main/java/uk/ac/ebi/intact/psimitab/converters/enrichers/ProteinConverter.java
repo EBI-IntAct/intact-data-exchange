@@ -1,11 +1,19 @@
 package uk.ac.ebi.intact.psimitab.converters.enrichers;
 
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.jami.model.Alias;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.tab.model.AliasImpl;
+import psidev.psi.mi.tab.model.ChecksumImpl;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
 import uk.ac.ebi.intact.irefindex.seguid.RogidGenerator;
 import uk.ac.ebi.intact.irefindex.seguid.SeguidException;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactAlias;
+import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
+import uk.ac.ebi.intact.jami.model.extension.ParticipantEvidenceXref;
 import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
@@ -20,19 +28,19 @@ import java.util.Collection;
  * @since <pre>09/08/12</pre>
  */
 
-public class ProteinConverter extends AbstractEnricher{
+public class ProteinConverter extends AbstractEnricher<IntactProtein> {
 
     protected RogidGenerator rogidGenerator;
     public static final String UNKNOWN_TAXID = "-3";
     public final static String ROGID = "rogid";
     private boolean hasFoundDisplayShort;
 
-    public ProteinConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
+    public ProteinConverter(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv){
         super(xrefConv, alisConv);
         this.rogidGenerator = new RogidGenerator();
     }
 
-    public ProteinConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
+    public ProteinConverter(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
         super(xrefConv, alisConv, defaultInstitution);
         this.rogidGenerator = new RogidGenerator();
     }
@@ -43,12 +51,12 @@ public class ProteinConverter extends AbstractEnricher{
      * @param mitabInteractor
      * @return the RigDataModel for the protein rogid. Can be null if no sequence available
      */
-    public RigDataModel enrichProteinFromIntact(Polymer polymer, Interactor mitabInteractor){
+    public RigDataModel enrichProteinFromIntact(IntactProtein polymer, Interactor mitabInteractor){
         hasFoundDisplayShort = false;
 
         if (polymer != null && mitabInteractor != null){
-            Collection<InteractorXref> interactorXrefs = polymer.getXrefs();
-            Collection<InteractorAlias> aliases = polymer.getAliases();
+            Collection<Xref> interactorXrefs = polymer.getXrefs();
+            Collection<Alias> aliases = polymer.getAliases();
 
             // xrefs
             boolean hasFoundUniprotIdentity = processXrefs(mitabInteractor, interactorXrefs);
@@ -85,12 +93,12 @@ public class ProteinConverter extends AbstractEnricher{
     }
 
     @Override
-    protected void processAccessionAndDisplay(uk.ac.ebi.intact.model.Interactor polymer, Interactor mitabInteractor, boolean hasFoundUniprotIdentity) {
+    protected void processAccessionAndDisplay(IntactProtein polymer, Interactor mitabInteractor, boolean hasFoundUniprotIdentity) {
         // if it is a protein from uniprot (found uniprot/refseq identity. If we have refseq, we should have uniprot), assume the short label is the uniprot ID and add it to the
         // aliases
         if (hasFoundUniprotIdentity){
             // the shortlabel is the uniprot ID
-            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, polymer.getShortLabel(), InteractorConverter.DISPLAY_LONG );
+            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, polymer.getShortName(), InteractorConverter.DISPLAY_LONG );
             mitabInteractor.getAliases().add(displayLong);
 
 
@@ -109,7 +117,7 @@ public class ProteinConverter extends AbstractEnricher{
             if(polymer.getAc() != null){
                 if (!hasFoundDisplayShort){
                     // add shortlabel as intact alias
-                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.PSI_MI, polymer.getShortLabel(),InteractorConverter.DISPLAY_SHORT );
+                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvTerm.PSI_MI, polymer.getShortName(),InteractorConverter.DISPLAY_SHORT );
                     mitabInteractor.getAliases().add(altId);
                 }
 
@@ -118,21 +126,21 @@ public class ProteinConverter extends AbstractEnricher{
                 mitabInteractor.getIdentifiers().add(acField);
 
                 // add ac as psi display_long alias
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, polymer.getAc(),InteractorConverter.DISPLAY_LONG );
+                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, polymer.getAc(),InteractorConverter.DISPLAY_LONG );
                 mitabInteractor.getAliases().add(displayLong);
             }
             // the shortlabel will be identifier because we need an identifier and will be displayLong as well
             else {
-                CrossReference id = new CrossReferenceImpl( defaultInstitution, polymer.getShortLabel());
+                CrossReference id = new CrossReferenceImpl( defaultInstitution, polymer.getShortName());
                 mitabInteractor.getIdentifiers().add(id);
 
                 if (!hasFoundDisplayShort){
                     // add shortlabel as intact alias
-                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvDatabase.PSI_MI, polymer.getShortLabel(),InteractorConverter.DISPLAY_SHORT );
+                    psidev.psi.mi.tab.model.Alias altId = new AliasImpl( CvTerm.PSI_MI, polymer.getShortName(),InteractorConverter.DISPLAY_SHORT );
                     mitabInteractor.getAliases().add(altId);
                 }
                 else {
-                    psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, polymer.getShortLabel(),InteractorConverter.DISPLAY_LONG );
+                    psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, polymer.getShortName(),InteractorConverter.DISPLAY_LONG );
                     mitabInteractor.getAliases().add(displayLong);
                 }
             }
@@ -140,21 +148,21 @@ public class ProteinConverter extends AbstractEnricher{
     }
 
     @Override
-    protected boolean processXrefs(Interactor mitabInteractor, Collection<InteractorXref> interactorXrefs) {
+    protected boolean processXrefs(Interactor mitabInteractor, Collection<Xref> interactorXrefs) {
         boolean hasFoundIdentity = false;
 
         if (!interactorXrefs.isEmpty()){
 
             // convert xrefs, and identity
-            for (InteractorXref ref : interactorXrefs){
+            for (Xref ref : interactorXrefs){
 
                 // identity xrefs
-                if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
+                if (ref.getQualifier() != null && Xref.IDENTITY_MI.equals(ref.getQualifier().getMIIdentifier())){
                     // first uniprot or refseq identity
-                    if (!hasFoundIdentity && ref.getCvDatabase() != null && (CvDatabase.UNIPROT_MI_REF.equals(ref.getCvDatabase().getIdentifier())
-                            || CvDatabase.REFSEQ_MI_REF.equals(ref.getCvDatabase().getIdentifier()))){
+                    if (!hasFoundIdentity && ref.getDatabase() != null && (Xref.UNIPROTKB_MI.equals(ref.getDatabase().getMIIdentifier())
+                            || Xref.REFSEQ_MI.equals(ref.getDatabase().getMIIdentifier()))){
 
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
                             hasFoundIdentity = true;
 
@@ -163,7 +171,7 @@ public class ProteinConverter extends AbstractEnricher{
                     }
                     // other identifiers
                     else {
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
 
                             mitabInteractor.getAlternativeIdentifiers().add(identity);
@@ -171,16 +179,16 @@ public class ProteinConverter extends AbstractEnricher{
                     }
                 }
                 // secondary acs are alternative identifiers
-                else if (ref.getCvXrefQualifier() != null && (CvXrefQualifier.SECONDARY_AC_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())
-                        || intactSecondary.equals(ref.getCvXrefQualifier().getShortLabel()))){
-                    CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                else if (ref.getQualifier() != null && (Xref.SECONDARY_MI.equals(ref.getQualifier().getMIIdentifier())
+                        || intactSecondary.equals(ref.getQualifier().getShortName()))){
+                    CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                     if (identity != null){
                         mitabInteractor.getAlternativeIdentifiers().add(identity);
                     }
                 }
                 // other xrefs
                 else {
-                    CrossReference xref = xRefConverter.createCrossReference(ref, true);
+                    CrossReference xref = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, true);
                     if (xref != null){
 
                         mitabInteractor.getXrefs().add(xref);
@@ -192,16 +200,16 @@ public class ProteinConverter extends AbstractEnricher{
     }
 
     @Override
-    protected void processAliases(Interactor mitabInteractor, Collection<InteractorAlias> aliases) {
-        for (InteractorAlias alias : aliases){
-            psidev.psi.mi.tab.model.Alias aliasField = aliasConverter.intactToMitab(alias);
+    protected void processAliases(Interactor mitabInteractor, Collection<Alias> aliases) {
+        for (Alias alias : aliases){
+            psidev.psi.mi.tab.model.Alias aliasField = aliasConverter.intactToMitab((AbstractIntactAlias) alias);
 
             if (aliasField != null){
                 mitabInteractor.getAliases().add(aliasField);
 
                 // create display short which should be gene name or gene name synonym
-                if (CvAliasType.GENE_NAME.equals(aliasField.getAliasType())){
-                    psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, aliasField.getName(),InteractorConverter.DISPLAY_SHORT );
+                if (Alias.GENE_NAME.equals(aliasField.getAliasType())){
+                    psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvTerm.PSI_MI, aliasField.getName(),InteractorConverter.DISPLAY_SHORT );
                     mitabInteractor.getAliases().add(displayShort);
                     hasFoundDisplayShort = true;
                 }
@@ -209,12 +217,12 @@ public class ProteinConverter extends AbstractEnricher{
         }
     }
 
-    public RigDataModel buildRigDataModel(Polymer interactor) {
+    public RigDataModel buildRigDataModel(IntactProtein interactor) {
 
         String taxid;
 
-        if (interactor.getBioSource() != null) {
-            taxid = interactor.getBioSource().getTaxId();
+        if (interactor.getOrganism() != null) {
+            taxid = String.valueOf(interactor.getOrganism().getTaxId());
         } else {
             taxid = UNKNOWN_TAXID;
         }

@@ -1,6 +1,5 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport;
 
-import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.factory.InteractionExporterFactory;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.ExporterRule;
 import uk.ac.ebi.intact.util.uniprotExport.ClusteredBinaryInteractionProcessor;

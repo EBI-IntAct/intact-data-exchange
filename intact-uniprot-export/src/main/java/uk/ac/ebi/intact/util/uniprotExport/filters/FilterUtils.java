@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.util.uniprotExport.filters;
 
 import psidev.psi.mi.tab.model.*;
 import uk.ac.ebi.enfin.mi.cluster.EncoreInteraction;
-import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
@@ -61,13 +60,13 @@ public class FilterUtils {
         if (!aliases.isEmpty()){
             for (Alias alias : interactor.getAliases()){
                 if (UNIPROT.equalsIgnoreCase(alias.getDbSource())){
-                    if (CvAliasType.GENE_NAME.equalsIgnoreCase(alias.getAliasType())){
+                    if (psidev.psi.mi.jami.model.Alias.GENE_NAME.equalsIgnoreCase(alias.getAliasType())){
                         geneName = alias.getName();
                     }
-                    else if (CvAliasType.LOCUS_NAME.equalsIgnoreCase(alias.getAliasType())){
+                    else if (psidev.psi.mi.jami.model.Alias.LOCUS_NAME.equalsIgnoreCase(alias.getAliasType())){
                         locusName = alias.getName();
                     }
-                    else if (CvAliasType.ORF_NAME.equalsIgnoreCase(alias.getAliasType())){
+                    else if (psidev.psi.mi.jami.model.Alias.ORF_NAME.equalsIgnoreCase(alias.getAliasType())){
                         orf = alias.getName();
                     }
                 }

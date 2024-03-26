@@ -1,20 +1,20 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters.mitab;
 
-import org.apache.log4j.Logger;
-import org.springframework.transaction.TransactionStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Experiment;
+import psidev.psi.mi.jami.model.ParticipantEvidence;
+import psidev.psi.mi.jami.model.Stoichiometry;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
 import psidev.psi.mi.xml.converter.ConverterException;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.core.persistence.dao.InteractionDao;
-import uk.ac.ebi.intact.model.CvInteraction;
-import uk.ac.ebi.intact.model.CvInteractionType;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.InteractionImpl;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
+import uk.ac.ebi.intact.jami.dao.InteractionDao;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
 import uk.ac.ebi.intact.util.uniprotExport.filters.FilterUtils;
@@ -25,6 +25,7 @@ import uk.ac.ebi.intact.util.uniprotExport.results.MiClusterScoreResults;
 import uk.ac.ebi.intact.util.uniprotExport.results.clusters.BinaryClusterScore;
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 
+import javax.persistence.EntityTransaction;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,7 +40,10 @@ import java.util.*;
  */
 
 public class ClusteredMitabFilter extends AbstractMitabFilter {
-    private static final Logger logger = Logger.getLogger(ClusteredMitabFilter.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(ClusteredMitabFilter.class);
+
+    private IntactDao intactDao;
     protected PsimiTabReader mitabReader;
 
     public ClusteredMitabFilter(InteractionExporter exporter, String mitab){
@@ -138,40 +142,41 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
     }
 
     private void processClustering(BinaryClusterScore clusterScore, MiClusterContext context, Integer binaryIdentifier, BinaryInteraction<Interactor> interaction, Set<String> intactAcs, Interactor interactorA, String uniprotA, Interactor interactorB, String uniprotB, boolean excludeSpokeExpanded, boolean isNegative) {
-        TransactionStatus status = IntactContext.getCurrentInstance().getDataContext().beginTransaction();
-        InteractionDao interactionDao = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao();
+        EntityTransaction transaction = intactDao.getEntityManager().getTransaction();
+        InteractionDao interactionDao = intactDao.getInteractionDao();
 
-        List<InteractionImpl> interactionsInIntact = interactionDao.getByAc(intactAcs);
-        List<InteractionImpl> interactionsInIntactPassingExport = new ArrayList(interactionsInIntact);
+        List<IntactInteractionEvidence> interactionsInIntact = new ArrayList<>();
+        for (String intactAc: intactAcs) {
+            interactionsInIntact.add(interactionDao.getByAc(intactAc));
+        }
+        List<IntactInteractionEvidence> interactionsInIntactPassingExport = new ArrayList(interactionsInIntact);
 
         boolean canBeProcessed = false;
 
-        for (InteractionImpl intact : interactionsInIntact){
+        for (IntactInteractionEvidence intact : interactionsInIntact){
             String intactAc = intact.getAc();
 
             if (!this.interactionsToExclude.contains(intactAc)){
-                Collection<Experiment> experiments = intact.getExperiments();
-                if (experiments.size() == 1){
-
-                    Experiment exp = experiments.iterator().next();
-                    CvInteraction detectionMethod = exp.getCvInteraction();
-                    CvInteractionType interactionType = intact.getCvInteractionType();
+                Experiment experiment = intact.getExperiment();
+                if (experiment != null) {
+                    CvTerm detectionMethod = experiment.getInteractionDetectionMethod();
+                    CvTerm interactionType = intact.getInteractionType();
 
                     if (detectionMethod != null && interactionType != null){
                         canBeProcessed = true;
 
-                        String detectionMI = detectionMethod.getIdentifier();
+                        String detectionMI = detectionMethod.getMIIdentifier();
 
-                        String typeMi = interactionType.getIdentifier();
+                        String typeMi = interactionType.getMIIdentifier();
 
                         MethodTypePair entry = new MethodTypePair(detectionMI, typeMi);
                         context.getInteractionToMethod_type().put(intactAc, entry);
 
-                        if (!InteractionUtils.isBinaryInteraction(intact) && !excludeSpokeExpanded){
+                        if (!isBinaryInteraction(intact) && !excludeSpokeExpanded){
 
                             context.getSpokeExpandedInteractions().add(intactAc);
                         }
-                        else if (!InteractionUtils.isBinaryInteraction(intact) && excludeSpokeExpanded){
+                        else if (!isBinaryInteraction(intact) && excludeSpokeExpanded){
                             context.getSpokeExpandedInteractions().add(intactAc);
                             interactionsInIntactPassingExport.remove(intact);
                         }
@@ -214,26 +219,26 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
             }
         }
 
-        IntactContext.getCurrentInstance().getDataContext().commitTransaction(status);
+        transaction.commit();
     }
 
-    protected void removeNotExportedInteractionEvidencesFrom(BinaryInteraction<Interactor> binary, List<InteractionImpl> exportedInteractionEvidences){
+    protected void removeNotExportedInteractionEvidencesFrom(BinaryInteraction<Interactor> binary, List<IntactInteractionEvidence> exportedInteractionEvidences){
         List<CrossReference> publicationsToRemove = new ArrayList(binary.getPublications());
         List<CrossReference> interactionsToRemove = new ArrayList(binary.getInteractionAcs());
         List<CrossReference> methodsToRemove = new ArrayList(binary.getDetectionMethods());
         List<CrossReference> typeToRemove = new ArrayList(binary.getInteractionTypes());
 
-        for (InteractionImpl interaction : exportedInteractionEvidences){
+        for (IntactInteractionEvidence interaction : exportedInteractionEvidences){
 
-            Experiment exp = interaction.getExperiments().iterator().next();
-            CvInteraction detectionMethod = exp.getCvInteraction();
-            CvInteractionType interactionType = interaction.getCvInteractionType();
+            Experiment exp = interaction.getExperiment();
+            CvTerm detectionMethod = exp.getInteractionDetectionMethod();
+            CvTerm interactionType = interaction.getInteractionType();
 
-            String detectionMI = detectionMethod.getIdentifier();
+            String detectionMI = detectionMethod.getMIIdentifier();
 
-            String typeMi = interactionType.getIdentifier();
+            String typeMi = interactionType.getMIIdentifier();
 
-            String pubmedId = exp.getPublication().getPublicationId();
+            String pubmedId = exp.getPublication().getPubmedId();
 
             for (CrossReference ref : binary.getPublications()){
                 if (ref.getIdentifier().equals(pubmedId)){
@@ -303,5 +308,38 @@ public class ClusteredMitabFilter extends AbstractMitabFilter {
     @Override
     public void setInteractionExporter(InteractionExporter exporter) {
         this.exporter = exporter;
+    }
+
+    private static boolean isBinaryInteraction(IntactInteractionEvidence interaction) {
+        Collection<ParticipantEvidence> components = interaction.getParticipants();
+        int componentCount = components.size();
+
+        if (componentCount == 1) {
+            ParticipantEvidence component1 = components.iterator().next();
+            // we consider one participant stoichiometry > 2 as binary even if it forms a complex to avoid duplicated binary
+            if (component1.getStoichiometry() != null && component1.getStoichiometry().getMinValue() >= 2) {
+                logger.debug("Binary interaction " + interaction.getAc() + ". Stoichiometry >= 2, each component with stoichiometry 1");
+                return true;
+            }
+        } else if (componentCount == 2) {
+            Iterator<ParticipantEvidence> iterator1 = components.iterator();
+
+            ParticipantEvidence component1 = iterator1.next();
+            Stoichiometry stochio1 = component1.getStoichiometry();
+            if (stochio1 != null && stochio1.getMinValue() == 1) {
+                ParticipantEvidence component2 = iterator1.next();
+                if (component2.getStoichiometry() != null && component2.getStoichiometry().getMinValue() == 1) {
+                    logger.debug("Binary interaction " + interaction.getAc() + ". Stoichiometry 2, each component with stoichiometry 1");
+                    return true;
+                }
+            } else if (stochio1 != null && stochio1.getMinValue() == 0) {
+                ParticipantEvidence component2 = iterator1.next();
+                if (component2.getStoichiometry() != null && component2.getStoichiometry().getMinValue() == 0) {
+                    logger.debug("Binary interaction " + interaction.getAc() + ". Stoichiometry 0, components 2");
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

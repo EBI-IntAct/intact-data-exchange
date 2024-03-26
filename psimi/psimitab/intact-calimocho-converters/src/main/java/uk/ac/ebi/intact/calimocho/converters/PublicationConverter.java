@@ -5,7 +5,13 @@ import org.hupo.psi.calimocho.key.InteractionKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
 import org.hupo.psi.calimocho.model.Row;
-import uk.ac.ebi.intact.model.*;
+import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.Xref;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactAnnotation;
+import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
+import uk.ac.ebi.intact.jami.model.extension.IntactSource;
+import uk.ac.ebi.intact.jami.model.extension.PublicationXref;
+import uk.ac.ebi.intact.jami.model.extension.SourceXref;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,7 +29,8 @@ import java.util.List;
 
 public class PublicationConverter {
 
-    private CrossReferenceConverter xrefConverter;
+    private CrossReferenceConverter<PublicationXref> publicationXrefConverter;
+    private CrossReferenceConverter<SourceXref> sourceXrefConverter;
     private AnnotationConverter annotConverter;
     private DateFormat dateFormat;
     private DateFormat yearFormat;
@@ -43,7 +50,8 @@ public class PublicationConverter {
     private final static String DATASET_MI = "MI:0875";
 
     public PublicationConverter(){
-        xrefConverter = new CrossReferenceConverter();
+        publicationXrefConverter = new CrossReferenceConverter<>();
+        sourceXrefConverter = new CrossReferenceConverter<>();
         annotConverter = new AnnotationConverter();
         tagsToExport = new ArrayList<String>();
         initializeTagsToExport();
@@ -80,25 +88,25 @@ public class PublicationConverter {
      * @param pub : intact publication to convert
      * @param row : the row to complete with publication details
      */
-    public void intactToCalimocho(Publication pub, Row row){
+    public void intactToCalimocho(IntactPublication pub, Row row){
 
         if (pub != null && row != null){
-            Collection<PublicationXref> pubRefs = pub.getXrefs();
+            Collection<Xref> pubRefs = pub.getXrefs();
             Collection<Annotation> pubAnnotations = pub.getAnnotations();
 
             Collection<Field> pubIds = new ArrayList<Field>(pubRefs.size());
-            for (PublicationXref pubRef : pubRefs){
-                if (pubRef.getCvXrefQualifier() != null && pubRef.getCvDatabase().getShortLabel() != null) {
+            for (Xref pubRef : pubRefs){
+                if (pubRef.getQualifier() != null && pubRef.getDatabase().getShortName() != null) {
                     // publications
-                    if (CvXrefQualifier.PRIMARY_REFERENCE_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
-                        Field primaryRef = xrefConverter.intactToCalimocho(pubRef, false);
+                    if (Xref.PRIMARY_MI.equals(pubRef.getQualifier().getMIIdentifier())) {
+                        Field primaryRef = publicationXrefConverter.intactToCalimocho((PublicationXref) pubRef, false);
                         if (primaryRef != null){
                             pubIds.add(primaryRef);
                         }
                     }
                     // imexId
-                    else if (CvXrefQualifier.IMEX_PRIMARY_MI_REF.equals(pubRef.getCvXrefQualifier().getIdentifier())) {
-                        Field imexRef = xrefConverter.intactToCalimocho(pubRef, false);
+                    else if (Xref.IMEX_PRIMARY_MI.equals(pubRef.getQualifier().getMIIdentifier())) {
+                        Field imexRef = publicationXrefConverter.intactToCalimocho((PublicationXref) pubRef, false);
                         if (imexRef != null){
                             pubIds.add(imexRef);
                         }
@@ -115,21 +123,21 @@ public class PublicationConverter {
             String date = null;
 
             for (Annotation annot : pubAnnotations){
-                if (annot.getCvTopic() != null){
+                if (annot.getTopic() != null){
                     // tag
-                    if (tagsToExport.contains(annot.getCvTopic().getIdentifier())){
-                        Field tag = annotConverter.intactToCalimocho(annot);
+                    if (tagsToExport.contains(annot.getTopic().getMIIdentifier())){
+                        Field tag = annotConverter.intactToCalimocho((AbstractIntactAnnotation) annot);
                         if (tag != null){
                             row.addField(InteractionKeys.KEY_ANNOTATIONS_I, tag);
                         }
                     }
                     // author
-                    else if ( CvTopic.AUTHOR_LIST_MI_REF.equals(annot.getCvTopic().getIdentifier())){
-                        author = annot.getAnnotationText();
+                    else if ( "MI:0636".equals(annot.getTopic().getMIIdentifier())){
+                        author = annot.getValue();
                     }
                     // date
-                    else if ( CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())){
-                        date = annot.getAnnotationText();
+                    else if ( "MI:0886".equals(annot.getTopic().getMIIdentifier())){
+                        date = annot.getValue();
                     }
                 }
             }
@@ -162,20 +170,20 @@ public class PublicationConverter {
             }
 
             // create source database
-            Institution institution = pub.getOwner();
+            IntactSource institution = (IntactSource) pub.getSource();
 
             if (institution != null){
-                Collection<InstitutionXref> ownerRefs = institution.getXrefs();
+                Collection<Xref> ownerRefs = institution.getXrefs();
 
                 Field identityRef = null;
-                for (InstitutionXref ref : ownerRefs){
-                    if (CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())) {
-                        identityRef = xrefConverter.intactToCalimocho(ref, false);
+                for (Xref ref : ownerRefs){
+                    if (Xref.IDENTITY_MI.equals(ref.getQualifier().getMIIdentifier())) {
+                        identityRef = sourceXrefConverter.intactToCalimocho((SourceXref) ref, false);
                         break;
                     }
                 }
 
-                if (identityRef == null && institution.getShortLabel() != null){
+                if (identityRef == null && institution.getShortName() != null){
                     identityRef = new DefaultField();
 
                     String db = CrossReferenceConverter.DATABASE_UNKNOWN;
@@ -183,10 +191,10 @@ public class PublicationConverter {
                     identityRef.set( CalimochoKeys.KEY, db);
                     identityRef.set( CalimochoKeys.DB, db);
                     identityRef.set( CalimochoKeys.VALUE, "-");
-                    identityRef.set( CalimochoKeys.TEXT, institution.getShortLabel());
+                    identityRef.set( CalimochoKeys.TEXT, institution.getShortName());
                 }
-                else if (institution.getShortLabel() != null){
-                    identityRef.set( CalimochoKeys.TEXT, institution.getShortLabel());
+                else if (institution.getShortName() != null){
+                    identityRef.set( CalimochoKeys.TEXT, institution.getShortName());
                 }
 
                 if (identityRef != null){
@@ -205,16 +213,5 @@ public class PublicationConverter {
                 row.addField(InteractionKeys.KEY_CREATION_DATE, created);
             }
         }
-    }
-
-    public Publication calimochoToIntact(Row row){
-
-        if (row != null){
-
-            Collection<Field> pubIds = row.getFields(InteractionKeys.KEY_PUBID);
-            Collection<Field> authorDate = row.getFields(InteractionKeys.KEY_PUBAUTH);
-        }
-
-        return null;
     }
 }

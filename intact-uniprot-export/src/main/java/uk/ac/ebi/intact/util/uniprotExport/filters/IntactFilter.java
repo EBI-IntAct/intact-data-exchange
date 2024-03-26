@@ -1,16 +1,14 @@
 package uk.ac.ebi.intact.util.uniprotExport.filters;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
-import org.springframework.transaction.TransactionStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.enfin.mi.cluster.MethodTypePair;
-import uk.ac.ebi.intact.core.context.DataContext;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;
 import uk.ac.ebi.intact.util.uniprotExport.exporters.InteractionExporter;
@@ -27,6 +25,7 @@ import uk.ac.ebi.intact.util.uniprotExport.results.contexts.IntactTransSplicedPr
 import uk.ac.ebi.intact.util.uniprotExport.results.contexts.MiClusterContext;
 import uk.ac.ebi.intact.util.uniprotExport.writers.WriterUtils;
 
+import javax.persistence.EntityTransaction;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
@@ -42,7 +41,9 @@ import java.util.*;
 
 public class IntactFilter implements InteractionFilter {
 
-    private static final Logger logger = Logger.getLogger(IntactFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(IntactFilter.class);
+
+    protected IntactDao intactDao;
 
     /**
      * the binary interaction converter
@@ -99,11 +100,11 @@ public class IntactFilter implements InteractionFilter {
         this.queryFactory = new QueryBuilder();
 
         if (initialiseListOfInteractionsToExport){
-            this.interactionConverter = new Intact2BinaryInteractionConverter(CvDatabase.INTACT);
+            this.interactionConverter = new Intact2BinaryInteractionConverter("intact");
             negativeInteractions = new HashSet<String>();
-            negativeInteractions.addAll(this.queryFactory.getNegativeInteractionsPassingFilter());
+            negativeInteractions.addAll(this.queryFactory.getNegativeInteractionsPassingFilter(intactDao));
             eligibleInteractionsForUniprotExport = new HashSet<String>();
-            eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters());
+            eligibleInteractionsForUniprotExport.addAll(this.queryFactory.getReleasedInteractionAcsPassingFilters(intactDao));
         }
 
         buildTranscriptsWithDifferentParents();
@@ -111,7 +112,7 @@ public class IntactFilter implements InteractionFilter {
     }
 
     private void buildTranscriptsWithDifferentParents(){
-        List<Object []> proteinsAndParents = this.queryFactory.getTranscriptsWithDifferentParents();
+        List<Object []> proteinsAndParents = this.queryFactory.getTranscriptsWithDifferentParents(intactDao);
 
         for (Object [] proteinAndParent : proteinsAndParents){
             if (proteinAndParent.length == 3){
@@ -137,7 +138,7 @@ public class IntactFilter implements InteractionFilter {
     }
 
     private void buildInteractionGoComponentXrefs(){
-        List<Object []> goXrefs = this.queryFactory.getGoComponentXrefsInIntact();
+        List<Object []> goXrefs = this.queryFactory.getGoComponentXrefsInIntact(intactDao);
 
         for (Object [] goXref : goXrefs){
             if (goXref.length == 2){
@@ -307,15 +308,14 @@ public class IntactFilter implements InteractionFilter {
         // number of converted binary interactions
         int k = 0;
 
-        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
+        EntityTransaction transaction = intactDao.getEntityManager().getTransaction();
 
         // we want to stp when the list of binary interactions exceeds MAX_NUMBER_INTERACTIONS or reaches the end of the list of interactions
         while (k < MAX_NUMBER_INTERACTION && i < interactions.size()){
 
             // get the IntAct interaction object
             String interactionAc = interactions.get(i);
-            Interaction intactInteraction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionAc);
+            IntactInteractionEvidence intactInteraction = intactDao.getInteractionDao().getByAc(interactionAc);
 
             // the interaction must exist in Intact
             if (intactInteraction != null){
@@ -362,12 +362,12 @@ public class IntactFilter implements InteractionFilter {
                         }
 
                     } catch (Exception e) {
-                        logger.error("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.", e);
+                        logger.error("The interaction " + interactionAc + ", " + intactInteraction.getShortName() + " cannot be converted into binary interactions and is excluded.", e);
                     }
                 }
                 // if the interaction cannot be converted into binary interaction, we ignore the interaction.
                 else {
-                    logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions.");
+                    logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortName() + " cannot be converted into binary interactions.");
                     /*if (InteractionUtils.isSelfInteraction(intactInteraction)){
                         IntactCloner cloner = new IntactCloner(true);
 
@@ -389,7 +389,7 @@ public class IntactFilter implements InteractionFilter {
             // we increments the index in the interaction list
             i++;
         }
-        dataContext.rollbackTransaction(transactionStatus);
+        transaction.rollback();
 
         return i;
     }
@@ -404,11 +404,10 @@ public class IntactFilter implements InteractionFilter {
     @Deprecated
     private void convertIntoBinaryInteractions(String interaction, Collection<BinaryInteraction> binaryInteractions, MiClusterContext context) {
 
-        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
+        EntityTransaction transaction = intactDao.getEntityManager().getTransaction();
 
         // get the IntAct interaction object
-        Interaction intactInteraction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interaction);
+        IntactInteractionEvidence intactInteraction = intactDao.getInteractionDao().getByAc(interaction);
 
         // the interaction must exist in Intact
         if (intactInteraction != null){
@@ -452,22 +451,22 @@ public class IntactFilter implements InteractionFilter {
                         binaryInteractions.addAll(toBinary);
                     }
                     else {
-                        logger.info("The interaction " + interaction + ", " + intactInteraction.getShortLabel() + " is not a true binary interaction and is excluded.");
+                        logger.info("The interaction " + interaction + ", " + intactInteraction.getShortName() + " is not a true binary interaction and is excluded.");
                     }
                 } catch (Exception e) {
-                    logger.error("The interaction " + interaction + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.", e);
+                    logger.error("The interaction " + interaction + ", " + intactInteraction.getShortName() + " cannot be converted into binary interactions and is excluded.", e);
                 }
             }
             // if the interaction cannot be converted into binary interaction, we ignore the interaction.
             else {
-                logger.info("The interaction " + interaction + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions.");
+                logger.info("The interaction " + interaction + ", " + intactInteraction.getShortName() + " cannot be converted into binary interactions.");
             }
         }
         else {
             logger.error("The interaction " + interaction + " doesn't exist in the database and is excluded.");
         }
 
-        dataContext.rollbackTransaction(transactionStatus);
+        transaction.rollback();
     }
 
     /**
@@ -487,15 +486,14 @@ public class IntactFilter implements InteractionFilter {
         boolean excludeNonUniprotInteractors = config.excludeNonUniprotInteractors();
         boolean excludeIntraMolecular = config.isExcludeIntraMolecularInteractions();
 
-        final DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
-        TransactionStatus transactionStatus = dataContext.beginTransaction();
+        EntityTransaction transaction = intactDao.getEntityManager().getTransaction();
 
         // we want to stp when the list of binary interactions exceeds MAX_NUMBER_INTERACTIONS or reaches the end of the list of interactions
         while (k < MAX_NUMBER_INTERACTION && i < interactions.size()){
 
             // get the IntAct interaction object
             String interactionAc = interactions.get(i);
-            Interaction intactInteraction = IntactContext.getCurrentInstance().getDaoFactory().getInteractionDao().getByAc(interactionAc);
+            IntactInteractionEvidence intactInteraction = intactDao.getInteractionDao().getByAc(interactionAc);
 
             // the interaction must exist in Intact
             if (intactInteraction != null){
@@ -514,12 +512,12 @@ public class IntactFilter implements InteractionFilter {
                             processClustering(binaryInteractions, context, interactionAc, toBinary, excludeNonUniprotInteractors, excludeIntraMolecular);
                         }
                     } catch (Exception e) {
-                        logger.error("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.", e);
+                        logger.error("The interaction " + interactionAc + ", " + intactInteraction.getShortName() + " cannot be converted into binary interactions and is excluded.", e);
                     }
                 }
                 // if the interaction cannot be converted into binary interaction, we ignore the interaction.
                 else {
-                    logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortLabel() + " cannot be converted into binary interactions and is excluded.");
+                    logger.info("The interaction " + interactionAc + ", " + intactInteraction.getShortName() + " cannot be converted into binary interactions and is excluded.");
                 }
             }
             else {
@@ -531,7 +529,7 @@ public class IntactFilter implements InteractionFilter {
             // we increments the index in the interaction list
             i++;
         }
-        dataContext.rollbackTransaction(transactionStatus);
+        transaction.rollback();
 
         return i;
     }
@@ -748,7 +746,7 @@ public class IntactFilter implements InteractionFilter {
     public UniprotExportResults exportReleasedHighConfidencePPIInteractions(String fileInteractionEligible, String fileTotal, String fileInteractionExported, String fileDataExported, String fileDataNotExported) throws IOException, SQLException, UniprotExportException {
 
         System.out.println("export all interactions from intact which passed the dr export annotation");
-        List<String> eligibleBinaryInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport();
+        List<String> eligibleBinaryInteractions = this.queryFactory.getInteractionAcsFromReleasedExperimentsToBeProcessedForUniprotExport(intactDao);
 
         System.out.println("computes MI score");
         MiClusterScoreResults results = computeMiScoresFor(eligibleBinaryInteractions);

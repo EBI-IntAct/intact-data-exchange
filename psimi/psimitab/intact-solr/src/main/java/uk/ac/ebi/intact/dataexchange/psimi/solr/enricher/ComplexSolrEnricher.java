@@ -1,17 +1,28 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.hupo.psi.mi.psicquic.wsclient.PsicquicSimpleClient;
+import psidev.psi.mi.jami.model.Alias;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Experiment;
+import psidev.psi.mi.jami.model.Interactor;
+import psidev.psi.mi.jami.model.ModelledParticipant;
+import psidev.psi.mi.jami.model.Organism;
+import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexFieldNames;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexInteractor;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
-import uk.ac.ebi.intact.model.*;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.util.ComplexUtils;
+import uk.ac.ebi.intact.jami.model.extension.IntactComplex;
+import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,17 +42,21 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     /********************************/
     private static final Log log = LogFactory.getLog ( ComplexSolrEnricher.class );
     private Map<String, PsicquicSimpleClient> mapOfPsicquicClients;
-    private String complexProperties=null;
+    private String complexProperties = null;
     private PsimiTabReader reader;
+    private final ObjectMapper mapper;
 
-    private final static String EXP_EVIDENCE="exp-evidence";
-    private final static String INTACT_SECONDARY="intact-secondary";
+    private final static String EXP_EVIDENCE = "exp-evidence";
+    private final static String INTACT_SECONDARY = "intact-secondary";
+    private static final String IDENTITY_MI = "MI:0356";
+    private static final String SECONDARY_MI = "MI:0360";
 
     /*************************/
     /*      Constructor      */
     /*************************/
     public ComplexSolrEnricher ( OntologySearcher ontologySearcher_ ) {
         super ( ontologySearcher_) ;
+        this.mapper = new ObjectMapper();
     }
 
     /*******************************/
@@ -68,17 +83,17 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         }
     }
 
-    protected void enrichCvTerm(String fieldName, String facetField, CvDagObject cvDagObject, SolrInputDocument solrDocument) {
+    protected void enrichCvTerm(String fieldName, String facetField, CvTerm cvDagObject, SolrInputDocument solrDocument) {
         // add all alias to interactor_type
-        for ( CvObjectAlias alias : cvDagObject.getAliases ( ) ) {
+        for ( Alias alias : cvDagObject.getSynonyms ( ) ) {
             if (alias.getName() != null){
                 solrDocument.addField(fieldName, alias.getName()) ;
             }
         }
         // add short label, full name and identifier to interactor_type
-        solrDocument.addField ( fieldName,  cvDagObject.getShortLabel ( ) ) ;
-        solrDocument.addField ( fieldName,  cvDagObject.getFullName   ( ) ) ;
-        solrDocument.addField ( fieldName,  cvDagObject.getIdentifier ( ) ) ;
+        solrDocument.addField ( fieldName,  cvDagObject.getShortName    ( ) ) ;
+        solrDocument.addField ( fieldName,  cvDagObject.getFullName     ( ) ) ;
+        solrDocument.addField ( fieldName,  cvDagObject.getMIIdentifier ( ) ) ;
 
         // add facet field
         if (facetField != null){
@@ -87,7 +102,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     }
 
     // is for enrich interactor_type* fields and return a SolrDocument
-    public void enrichInteractorType(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
+    public void enrichInteractorType(IntactCvTerm cvDagObject, SolrInputDocument solrDocument) {
         // enrich Cv term exact
         enrichCvTerm(ComplexFieldNames.INTERACTOR_TYPE_EXACT, null, cvDagObject, solrDocument);
         // enrich normal cv term
@@ -96,17 +111,18 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         enrichCvTermParents(ComplexFieldNames.INTERACTOR_TYPE, null, cvDagObject, solrDocument);
     }
 
-    protected void enrichCvTermParents(String fieldName, String facetName, CvDagObject cvDagObject, SolrInputDocument solrDocument) {
-        for ( CvDagObject parent : cvDagObject.getParents ( ) ) {
+    protected void enrichCvTermParents(String fieldName, String facetName, IntactCvTerm cvDagObject, SolrInputDocument solrDocument) {
+        for ( CvTerm parent : cvDagObject.getParents ( ) ) {
             enrichCvTerm(fieldName, facetName, parent, solrDocument);
-            if (!parent.getParents().isEmpty()){
-                enrichCvTermParents(fieldName, facetName, parent, solrDocument);
+            IntactCvTerm intactParent = (IntactCvTerm) parent;
+            if (!intactParent.getParents().isEmpty()){
+                enrichCvTermParents(fieldName, facetName, intactParent, solrDocument);
             }
         }
     }
 
     // is for enrich complex_type* fields and return a SolrDocument
-    public void enrichComplexType(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
+    public void enrichComplexType(IntactCvTerm cvDagObject, SolrInputDocument solrDocument) {
         // enrich Cv term exact
         enrichCvTerm(ComplexFieldNames.COMPLEX_TYPE_EXACT, null, cvDagObject, solrDocument);
         // enrich normal cv term
@@ -116,7 +132,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
 
     }
 
-    public void enrichBiologicalRole(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
+    public void enrichBiologicalRole(IntactCvTerm cvDagObject, SolrInputDocument solrDocument) {
         // enrich Cv term exact
         enrichCvTerm(ComplexFieldNames.BIOROLE_EXACT, null, cvDagObject, solrDocument);
         // enrich normal cv term
@@ -125,7 +141,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         enrichCvTermParents(ComplexFieldNames.BIOROLE, null, cvDagObject, solrDocument);
     }
 
-    public void enrichFeatureType(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
+    public void enrichFeatureType(IntactCvTerm cvDagObject, SolrInputDocument solrDocument) {
         // enrich Cv term exact
         enrichCvTerm(ComplexFieldNames.FEATURES_EXACT, null, cvDagObject, solrDocument);
         // enrich normal cv term
@@ -134,7 +150,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         enrichCvTermParents(ComplexFieldNames.FEATURES, null, cvDagObject, solrDocument);
     }
 
-    public void enrichInteractionType(CvDagObject cvDagObject, SolrInputDocument solrDocument) {
+    public void enrichInteractionType(IntactCvTerm cvDagObject, SolrInputDocument solrDocument) {
         // enrich Cv term exact
         enrichCvTerm(ComplexFieldNames.INTERACTION_TYPE_EXACT, null, cvDagObject, solrDocument);
         // enrich normal cv term
@@ -144,7 +160,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     }
 
     // is for enrich complex_organism* fields and return a SolrDocument
-    public void enrichOrganism(Interaction interaction, SolrInputDocument solrDocument) throws SolrServerException {
+    public void enrichOrganism(IntactComplex interaction, SolrInputDocument solrDocument) throws SolrServerException {
         // retrieve the ontology term for this interaction (using BioSource)
         final OntologyTerm ontologyTerm = findOrganism(interaction) ;
         // add name, all synonyms and tax id to complex_organism
@@ -180,14 +196,27 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     }
 
     // is for enrich complex_xref* fields and return a SolrDocument
-    public void enrichInteractionXref(Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument) throws SolrServerException {
+    public void enrichInteractionXref(Collection<Xref> interactorXrefs, SolrInputDocument solrDocument) throws SolrServerException {
         enrichXrefs(ComplexFieldNames.COMPLEX_XREF, ComplexFieldNames.COMPLEX_XREF_EXACT, ComplexFieldNames.COMPLEX_ID, interactorXrefs, solrDocument, true);
-
     }
 
-    public void enrichInteractorXref(Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument) throws SolrServerException {
+    public void enrichInteractorXref(Collection<Xref> interactorXrefs, SolrInputDocument solrDocument) throws SolrServerException {
         enrichXrefs(ComplexFieldNames.INTERACTOR_XREF, ComplexFieldNames.INTERACTOR_XREF_EXACT, ComplexFieldNames.INTERACTOR_ID, interactorXrefs, solrDocument, false);
+    }
 
+    public void enrichSerialisedParticipant(ModelledParticipant participant, SolrInputDocument solrDocument) throws JsonProcessingException {
+        Interactor interactor = participant.getInteractor();
+        String identifier = ComplexUtils.getParticipantIdentifier(participant);
+
+        ComplexInteractor complexInteractor = new ComplexInteractor(
+                identifier,
+                ComplexUtils.getParticipantIdentifierLink(participant, identifier),
+                ComplexUtils.getParticipantName(participant),
+                interactor.getFullName(),
+                ComplexUtils.getParticipantStoichiometry(participant),
+                interactor.getInteractorType().getFullName());
+        String serialisedInteractor = mapper.writeValueAsString(complexInteractor);
+        solrDocument.addField(ComplexFieldNames.SERIALISED_INTERACTION, serialisedInteractor);
     }
 
     protected void enrichXrefs(String xrefFieldName, String xrefFieldExact, String idFieldName, Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument, boolean checkExpEvidence) throws SolrServerException {
@@ -207,13 +236,13 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         // we range all xrefs for the interaction
         for ( Xref interactorXref : interactorXrefs ){
             // get short label and primary id from the xref
-            if (interactorXref.getCvDatabase() != null){
-                shortLabel = interactorXref.getCvDatabase( ).getShortLabel() ;
-                ID = interactorXref.getPrimaryId() ;
+            if (interactorXref.getDatabase() != null){
+                shortLabel = interactorXref.getDatabase( ).getShortName() ;
+                ID = interactorXref.getId() ;
                 if ( shortLabel != null && ID != null ){
-                    if (interactorXref.getCvXrefQualifier() != null){
+                    if (interactorXref.getQualifier() != null){
                         // check experimental evidence
-                        if ( interactorXref.getCvXrefQualifier ( ).getShortLabel().equalsIgnoreCase(EXP_EVIDENCE) ){
+                        if ( interactorXref.getQualifier ( ).getShortName().equalsIgnoreCase(EXP_EVIDENCE) ){
                             processXref(xrefFieldName, xrefFieldExact, solrDocument, shortLabel, ID);
 
                             if (checkExpEvidence){
@@ -253,9 +282,9 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
                             }
                         }
                         // we have an identity, secondary or intact-secondary
-                        else if (CvXrefQualifier.IDENTITY_MI_REF.equalsIgnoreCase(interactorXref.getCvXrefQualifier().getIdentifier())
-                                || CvXrefQualifier.SECONDARY_AC_MI_REF.equalsIgnoreCase(interactorXref.getCvXrefQualifier().getIdentifier())
-                                || INTACT_SECONDARY.equalsIgnoreCase(interactorXref.getCvXrefQualifier().getShortLabel())){
+                        else if (IDENTITY_MI.equalsIgnoreCase(interactorXref.getQualifier().getMIIdentifier())
+                                || SECONDARY_MI.equalsIgnoreCase(interactorXref.getQualifier().getMIIdentifier())
+                                || INTACT_SECONDARY.equalsIgnoreCase(interactorXref.getQualifier().getShortName())) {
                             // enrich identity xref
                             solrDocument.addField ( idFieldName, shortLabel ) ;
                             solrDocument.addField ( idFieldName, ID ) ;
@@ -314,24 +343,25 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     /****************************/
     // enrich fields in the SolrDocument passed as parameter
     public void enrich (
-            Interaction interaction,
+            IntactComplex interaction,
             SolrInputDocument solrDocument )
             throws Exception {
         // check parameters and information
         if ( interaction == null ) { return ; }
 
         // Enrich interaction type
-        enrichInteractionType(interaction.getCvInteractionType(), solrDocument) ;
+        enrichInteractionType((IntactCvTerm) interaction.getInteractionType(), solrDocument) ;
 
         // Enrich Complex Organism fields
         enrichOrganism(interaction, solrDocument) ;
 
-        // Enrich Complex Xref fields
+        // Enrich Complex Identifier and Xref fields
+        enrichInteractionXref(interaction.getIdentifiers(), solrDocument) ;
         enrichInteractionXref(interaction.getXrefs(), solrDocument) ;
     }
 
     // enrich fields in an empty SolrDocument
-    public SolrInputDocument enrich ( InteractionImpl interaction ) throws Exception {
+    public SolrInputDocument enrich ( IntactComplex interaction ) throws Exception {
         SolrInputDocument doc = new SolrInputDocument();
         enrich ( interaction, doc) ;
         return doc;
@@ -341,7 +371,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     /*      Find Methods      */
     /**************************/
     // is for find the ontology term for a specific interaction. Needs to take the host organism coming from experiment
-    public OntologyTerm findOrganism(Interaction interaction) throws SolrServerException {
+    public OntologyTerm findOrganism(IntactComplex interaction) throws SolrServerException {
         // get BioSource information from interaction
         Collection<Experiment> exps = interaction.getExperiments();
         if (exps.isEmpty()){
@@ -349,10 +379,10 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         }
         // TODO what do we do when we have several experiments?
         Experiment experiment = exps.iterator().next();
-        BioSource biosource = experiment.getBioSource();
+        Organism biosource = experiment.getHostOrganism();
 
         // return an OntologyTerm using tax id and short label
-        return biosource != null ? findOntologyTerm(biosource.getTaxId(), biosource.getShortLabel()) : null ;
+        return biosource != null ? findOntologyTerm(String.valueOf(biosource.getTaxId()), biosource.getCommonName()) : null ;
     }
 
     public String getComplexProperties() {

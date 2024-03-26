@@ -2,16 +2,10 @@ package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import psidev.psi.mi.tab.model.Alias;
 import psidev.psi.mi.tab.model.AliasImpl;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.Institution;
-import uk.ac.ebi.intact.model.util.InstitutionUtils;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactAlias;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static uk.ac.ebi.intact.model.CvAliasType.*;
 
 /**
  * This class allows to convert a Intact Alias with a MITAB Alias
@@ -29,39 +23,29 @@ public class AliasConverter {
     public static final String UNKNOWN = "unknown";
 
     static {
-        uniprotKeys = new ArrayList<String>( Arrays.asList(GENE_NAME_MI_REF, GENE_NAME_SYNONYM_MI_REF,
-                ISOFORM_SYNONYM_MI_REF, LOCUS_NAME_MI_REF,
-                ORF_NAME_MI_REF) );
+        uniprotKeys = Arrays.asList(
+                psidev.psi.mi.jami.model.Alias.GENE_NAME_MI,
+                psidev.psi.mi.jami.model.Alias.GENE_NAME_SYNONYM_MI,
+                psidev.psi.mi.jami.model.Alias.ISOFORM_SYNONYM_MI,
+                psidev.psi.mi.jami.model.Alias.LOCUS_NAME_MI,
+                psidev.psi.mi.jami.model.Alias.ORF_NAME_MI);
     }
 
-    public Alias intactToMitab(uk.ac.ebi.intact.model.Alias intactAlias){
+    public Alias intactToMitab(AbstractIntactAlias intactAlias){
 
         if (intactAlias != null && intactAlias.getName() != null){
 
             Alias alias = new AliasImpl();
 
-            if (intactAlias.getCvAliasType() != null && intactAlias.getCvAliasType().getShortLabel() != null){
-                String type = intactAlias.getCvAliasType().getShortLabel();
-                String typeMI = intactAlias.getCvAliasType().getIdentifier();
+            if (intactAlias.getType() != null && intactAlias.getType().getShortName() != null){
+                String type = intactAlias.getType().getShortName();
+                String typeMI = intactAlias.getType().getMIIdentifier();
 
                 if (uniprotKeys.contains(typeMI)){
                     alias.setDbSource(UNIPROT);
                 }
                 else {
-                    String institutionName = INTACT;
-                    IntactContext context = IntactContext.getCurrentInstance();
-
-                    if (context.getInstitution() != null){
-                        Institution institution = context.getInstitution();
-
-                        CvDatabase database = InstitutionUtils.retrieveCvDatabase(context, institution);
-
-                        if (database != null && database.getShortLabel() != null){
-                            institutionName = database.getShortLabel();
-                        }
-                    }
-
-                    alias.setDbSource(institutionName);
+                    alias.setDbSource(INTACT);
                 }
 
                 alias.setAliasType(type);

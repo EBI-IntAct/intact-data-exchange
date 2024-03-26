@@ -17,20 +17,29 @@ package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.FeatureEvidence;
+import psidev.psi.mi.jami.model.Participant;
+import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.Organism;
 import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
+import uk.ac.ebi.intact.jami.model.extension.IntactFeatureEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactGene;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractor;
+import uk.ac.ebi.intact.jami.model.extension.IntactMolecule;
+import uk.ac.ebi.intact.jami.model.extension.IntactNucleicAcid;
+import uk.ac.ebi.intact.jami.model.extension.IntactOrganism;
+import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
+import uk.ac.ebi.intact.jami.model.extension.ParticipantEvidenceXref;
 import uk.ac.ebi.intact.psimitab.converters.enrichers.*;
+import uk.ac.ebi.intact.psimitab.converters.util.PsimitabTools;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-
-import static uk.ac.ebi.intact.model.CvAliasType.*;
 
 /**
  * Contains method to convert the IntactInteractor database data model to Intact psimitab data model
@@ -43,14 +52,13 @@ public class InteractorConverter {
 
     private static final Log log = LogFactory.getLog( InteractorConverter.class );
 
-    protected CrossReferenceConverter<InteractorXref> xRefConverter;
+    protected CrossReferenceConverter<ParticipantEvidenceXref> xRefConverter;
     protected AliasConverter aliasConverter;
     protected AnnotationConverter annotationConverter;
     protected BioSourceConverter organismConverter;
-    protected CvObjectConverter<CvObject> cvObjectConverter;
+    protected CvObjectConverter cvObjectConverter;
     protected FeatureConverter featureConverter;
 
-    protected static final List<String> uniprotKeys;
     public static final String CRC64 = "crc64";
     public static final String DISPLAY_SHORT = "display_short";
     public static final String DISPLAY_LONG = "display_long";
@@ -63,18 +71,12 @@ public class InteractorConverter {
     private NucleicAcidConverter nucleicAcidConverter;
     private DefaultInteractorEnricher defaultEnricher;
 
-    static {
-        uniprotKeys = new ArrayList<String>( Arrays.asList( GENE_NAME_MI_REF, GENE_NAME_SYNONYM_MI_REF,
-                                                            ISOFORM_SYNONYM_MI_REF, LOCUS_NAME_MI_REF,
-                                                            ORF_NAME_MI_REF ) );
-    }
-
     public InteractorConverter(){
-        xRefConverter = new CrossReferenceConverter<InteractorXref>();
+        xRefConverter = new CrossReferenceConverter<>();
         aliasConverter = new AliasConverter();
         annotationConverter = new AnnotationConverter();
         organismConverter = new BioSourceConverter();
-        cvObjectConverter = new CvObjectConverter<CvObject>();
+        cvObjectConverter = new CvObjectConverter();
         featureConverter = new FeatureConverter();
 
         nucleicAcidConverter = new NucleicAcidConverter(xRefConverter, aliasConverter);
@@ -85,11 +87,11 @@ public class InteractorConverter {
     }
 
     public InteractorConverter(String defaultInstitution){
-        xRefConverter = new CrossReferenceConverter<InteractorXref>();
+        xRefConverter = new CrossReferenceConverter<>();
         aliasConverter = new AliasConverter();
         annotationConverter = new AnnotationConverter();
         organismConverter = new BioSourceConverter();
-        cvObjectConverter = new CvObjectConverter<CvObject>();
+        cvObjectConverter = new CvObjectConverter();
         featureConverter = new FeatureConverter();
 
         nucleicAcidConverter = new NucleicAcidConverter(xRefConverter, aliasConverter, defaultInstitution);
@@ -105,38 +107,38 @@ public class InteractorConverter {
      * @param participant The component to be converted
      * @return ExtendedInteractor with additional fields specific to Intact
      */
-    public MitabInteractor intactToMitab(uk.ac.ebi.intact.model.Component participant) {
+    public MitabInteractor intactToMitab(IntactParticipantEvidence participant) {
 
         if (participant != null){
             psidev.psi.mi.tab.model.Interactor mitabInteractor = new psidev.psi.mi.tab.model.Interactor();
             MitabInteractor convertedInteractorResult = new MitabInteractor(mitabInteractor);
 
-            Interactor interactor = participant.getInteractor();
+            IntactInteractor interactor = (IntactInteractor) participant.getInteractor();
 
             // converts interactor details
             if (interactor != null){
-                Collection<Annotation>  annotations = AnnotatedObjectUtils.getPublicAnnotations(interactor);
+                Collection<Annotation> annotations = PsimitabTools.getPublicAnnotations(interactor.getAnnotations());
 
-                CvInteractorType interactorType = interactor.getCvInteractorType();
+                CvTerm interactorType = interactor.getInteractorType();
 
                 // enrich proteins following data best practices
-                if (interactor instanceof Protein){
-                    Protein protein = (Protein) interactor;
+                if (interactor instanceof IntactProtein){
+                    IntactProtein protein = (IntactProtein) interactor;
                     RigDataModel rigDataModel = proteinConverter.enrichProteinFromIntact(protein, mitabInteractor);
                     convertedInteractorResult.setRigDataModel(rigDataModel);
                 }
                 // enrich small molecules following data best practices
-                else if (interactor instanceof SmallMolecule){
-                    SmallMolecule smallMolecule = (SmallMolecule) interactor;
+                else if (interactor instanceof IntactMolecule){
+                    IntactMolecule smallMolecule = (IntactMolecule) interactor;
                     smallMoleculeConverter.enrichSmallMoleculeFromIntact(smallMolecule, mitabInteractor);
                 }
                 // enrich genes following data best practices
-                else if (interactorType != null && GENE.equalsIgnoreCase(interactorType.getIdentifier())){
-                    geneConverter.enrichGeneFromIntact(interactor, mitabInteractor);
+                else if (interactorType != null && GENE.equalsIgnoreCase(interactorType.getMIIdentifier())){
+                    geneConverter.enrichGeneFromIntact((IntactGene) interactor, mitabInteractor);
                 }
                 // enrich small molecules following data best practices
-                else if (interactor instanceof NucleicAcid){
-                    NucleicAcid nucleicAcid = (NucleicAcid) interactor;
+                else if (interactor instanceof IntactNucleicAcid){
+                    IntactNucleicAcid nucleicAcid = (IntactNucleicAcid) interactor;
                     nucleicAcidConverter.enrichNucleicAcidFromIntact(nucleicAcid, mitabInteractor);
                 }
                 // default enricher
@@ -156,15 +158,15 @@ public class InteractorConverter {
                 }
 
                 // convert organism(s)
-                if (interactor.getBioSource() != null){
-                    Organism bioSourceField = organismConverter.intactToMitab(interactor.getBioSource());
+                if (interactor.getOrganism() != null){
+                    Organism bioSourceField = organismConverter.intactToMitab((IntactOrganism) interactor.getOrganism());
 
                     mitabInteractor.setOrganism(bioSourceField);
                 }
 
                 // convert interactor type
                 if (interactorType != null){
-                    CrossReference type = cvObjectConverter.toCrossReference(interactorType);
+                    CrossReference type = cvObjectConverter.toCrossReference((IntactCvTerm) interactorType);
                     if (type != null){
                         mitabInteractor.getInteractorTypes().add(type);
                     }
@@ -173,36 +175,34 @@ public class InteractorConverter {
 
             // convert biological role
             CrossReference bioRole = null;
-            if (participant.getCvBiologicalRole() != null){
-                bioRole = cvObjectConverter.toCrossReference(participant.getCvBiologicalRole());
+            if (participant.getBiologicalRole() != null){
+                bioRole = cvObjectConverter.toCrossReference((IntactCvTerm) participant.getBiologicalRole());
             }
 
             if (bioRole == null){
-                bioRole = new CrossReferenceImpl(CvDatabase.PSI_MI, CvBiologicalRole.UNSPECIFIED_PSI_REF, CvBiologicalRole.UNSPECIFIED);
+                bioRole = new CrossReferenceImpl(CvTerm.PSI_MI, Participant.UNSPECIFIED_ROLE_MI, Participant.UNSPECIFIED_ROLE);
             }
 
             mitabInteractor.getBiologicalRoles().add(bioRole);
 
             // convert experimental roles
-            for (CvExperimentalRole expRole : participant.getExperimentalRoles()){
-                CrossReference expRoleField = cvObjectConverter.toCrossReference(expRole);
-                if (expRoleField != null){
-                    mitabInteractor.getExperimentalRoles().add(expRoleField);
-                }
+            CrossReference expRoleField = null;
+            if (participant.getExperimentalRole() != null){
+                expRoleField = cvObjectConverter.toCrossReference((IntactCvTerm) participant.getExperimentalRole());
             }
 
-            if (mitabInteractor.getExperimentalRoles().isEmpty()){
-                CrossReference expRoleField = new CrossReferenceImpl(CvDatabase.PSI_MI, CvExperimentalRole.UNSPECIFIED_PSI_REF, CvExperimentalRole.UNSPECIFIED);
-
-                mitabInteractor.getExperimentalRoles().add(expRoleField);
+            if (expRoleField == null){
+                expRoleField = new CrossReferenceImpl(CvTerm.PSI_MI, Participant.UNSPECIFIED_ROLE_MI, Participant.UNSPECIFIED_ROLE);
             }
+
+            mitabInteractor.getExperimentalRoles().add(expRoleField);
 
             // convert features
             if (!participant.getFeatures().isEmpty()){
-                Collection<Feature> features = participant.getFeatures();
+                Collection<FeatureEvidence> features = participant.getFeatures();
 
-                for (Feature feature : features){
-                    psidev.psi.mi.tab.model.Feature featureField = featureConverter.intactToMitab(feature);
+                for (FeatureEvidence feature : features){
+                    psidev.psi.mi.tab.model.Feature featureField = featureConverter.intactToMitab((IntactFeatureEvidence) feature);
                     if (featureField != null){
                         mitabInteractor.getFeatures().add(featureField);
                     }
@@ -210,17 +210,17 @@ public class InteractorConverter {
             }
 
             // convert stoichiometry
-            if (participant.hasStoichiometry()){
+            if (participant.getStoichiometry() != null) {
 
-                mitabInteractor.getStoichiometry().add((int) participant.getStoichiometry());
+                mitabInteractor.getStoichiometry().add(participant.getStoichiometry().getMinValue());
             }
 
             // convert participant identification methods
-            if (!participant.getParticipantDetectionMethods().isEmpty()){
+            if (!participant.getIdentificationMethods().isEmpty()){
                 mitabInteractor.getParticipantIdentificationMethods().clear();
 
-                for (CvIdentification detMethod : participant.getParticipantDetectionMethods()){
-                    CrossReference methodField = cvObjectConverter.toCrossReference(detMethod);
+                for (CvTerm detMethod : participant.getIdentificationMethods()){
+                    CrossReference methodField = cvObjectConverter.toCrossReference((IntactCvTerm) detMethod);
                     if (methodField != null){
                         mitabInteractor.getParticipantIdentificationMethods().add(methodField);
                     }
@@ -228,7 +228,7 @@ public class InteractorConverter {
             }
 
             // convert annotations at the level of participant
-            Collection<Annotation> annotations = AnnotatedObjectUtils.getPublicAnnotations(participant);
+            Collection<Annotation> annotations = PsimitabTools.getPublicAnnotations(participant.getAnnotations());
             if (!annotations.isEmpty()){
 
                 for (Annotation annots : participant.getAnnotations()){
@@ -243,8 +243,8 @@ public class InteractorConverter {
             // convert xrefs at the level of participant
             if (!participant.getXrefs().isEmpty()){
 
-                for (ComponentXref xrefs : participant.getXrefs()){
-                    CrossReference xrefField = xRefConverter.createCrossReference(xrefs, true);
+                for (Xref xrefs : participant.getXrefs()){
+                    CrossReference xrefField = xRefConverter.createCrossReference((ParticipantEvidenceXref) xrefs, true);
 
                     if (xrefField != null){
                         mitabInteractor.getXrefs().add(xrefField);
@@ -256,10 +256,6 @@ public class InteractorConverter {
         }
 
        return null;
-    }
-
-    public Component fromMitab() {
-        throw new UnsupportedOperationException();
     }
 
     public ProteinConverter getProteinConverter() {

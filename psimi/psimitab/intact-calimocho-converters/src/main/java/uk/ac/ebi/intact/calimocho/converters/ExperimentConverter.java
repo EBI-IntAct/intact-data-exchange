@@ -3,8 +3,11 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.InteractionKeys;
 import org.hupo.psi.calimocho.model.Field;
 import org.hupo.psi.calimocho.model.Row;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.Publication;
+import psidev.psi.mi.jami.model.Publication;
+import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
+import uk.ac.ebi.intact.jami.model.extension.IntactExperiment;
+import uk.ac.ebi.intact.jami.model.extension.IntactOrganism;
+import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
 
 import java.util.Collection;
 
@@ -28,18 +31,18 @@ public class ExperimentConverter {
         this.publicationConverter = new PublicationConverter();
     }
 
-    public void intactToCalimocho(Experiment exp, Row row){
+    public void intactToCalimocho(IntactExperiment exp, Row row){
 
         if (exp != null){
             // process publication
             Publication pub = exp.getPublication();
             if (pub != null){
-                publicationConverter.intactToCalimocho(pub, row);
+                publicationConverter.intactToCalimocho((IntactPublication) pub, row);
             }
 
             // convert interaction detection method
-            if (exp.getCvInteraction() != null){
-                Field detMethod = cvObjectConverter.intactToCalimocho(exp.getCvInteraction());
+            if (exp.getInteractionDetectionMethod() != null){
+                Field detMethod = cvObjectConverter.intactToCalimocho((IntactCvTerm) exp.getInteractionDetectionMethod());
 
                 if (detMethod != null){
                     row.addField(InteractionKeys.KEY_DETMETHOD, detMethod);
@@ -47,8 +50,8 @@ public class ExperimentConverter {
             }
 
             // process organism
-            if (exp.getBioSource() != null){
-                Collection<Field> bioSourceField = biosourceConverter.intactToCalimocho(exp.getBioSource());
+            if (exp.getHostOrganism() != null){
+                Collection<Field> bioSourceField = biosourceConverter.intactToCalimocho((IntactOrganism) exp.getHostOrganism());
 
                 if (!bioSourceField.isEmpty()){
                     row.addFields(InteractionKeys.KEY_HOST_ORGANISM, bioSourceField);
@@ -56,8 +59,8 @@ public class ExperimentConverter {
             }
 
             // process participant detection method
-            if (exp.getCvIdentification() != null){
-                Field detMethod = cvObjectConverter.intactToCalimocho(exp.getCvIdentification());
+            if (exp.getParticipantIdentificationMethod() != null){
+                Field detMethod = cvObjectConverter.intactToCalimocho((IntactCvTerm) exp.getParticipantIdentificationMethod());
 
                 if (detMethod != null){
                     row.addField(InteractionKeys.KEY_PART_IDENT_METHOD_A, detMethod);
@@ -67,16 +70,5 @@ public class ExperimentConverter {
             }
         }
 
-    }
-    
-    public Experiment calimochoToIntact(Row row){
-
-        if (row != null){
-
-
-
-        }
-
-        return null;
     }
 }

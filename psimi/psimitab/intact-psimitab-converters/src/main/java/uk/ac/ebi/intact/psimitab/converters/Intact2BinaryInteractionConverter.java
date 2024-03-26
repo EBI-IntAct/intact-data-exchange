@@ -19,7 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.processor.PostProcessorStrategy;
-import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.NotExpandableInteractionException;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
@@ -90,11 +90,11 @@ public class Intact2BinaryInteractionConverter {
         this.postProcessor = postProssesorStrategy;
     }
 
-    public Collection<BinaryInteraction> convert( Interaction ... interactions ) throws NotExpandableInteractionException {
+    public Collection<BinaryInteraction> convert( IntactInteractionEvidence... interactions ) throws NotExpandableInteractionException {
         return convert(Arrays.asList(interactions));
     }
 
-    public Collection<BinaryInteraction> convert( Collection<Interaction> interactions ) {
+    public Collection<BinaryInteraction> convert( Collection<IntactInteractionEvidence> interactions ) {
         if ( interactions == null ) {
             throw new IllegalArgumentException( "Interactions must not be null" );
         }
@@ -105,7 +105,7 @@ public class Intact2BinaryInteractionConverter {
 
         Collection<BinaryInteraction> result = new ArrayList<BinaryInteraction>(interactions.size());
 
-        for ( Interaction interaction : interactions ) {
+        for ( IntactInteractionEvidence interaction : interactions ) {
 
             Collection<BinaryInteraction> expandedInteractions = null;
             try {

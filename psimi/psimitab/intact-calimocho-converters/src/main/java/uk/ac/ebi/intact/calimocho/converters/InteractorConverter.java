@@ -5,9 +5,23 @@ import org.hupo.psi.calimocho.key.InteractionKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
 import org.hupo.psi.calimocho.model.Row;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.InstitutionUtils;
+import psidev.psi.mi.jami.model.Alias;
+import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.Checksum;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.FeatureEvidence;
+import psidev.psi.mi.jami.model.Participant;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.utils.ChecksumUtils;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactAlias;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactAnnotation;
+import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
+import uk.ac.ebi.intact.jami.model.extension.IntactFeatureEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractor;
+import uk.ac.ebi.intact.jami.model.extension.IntactOrganism;
+import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactPolymer;
+import uk.ac.ebi.intact.jami.model.extension.ParticipantEvidenceXref;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +36,7 @@ import java.util.Collections;
  */
 
 public class InteractorConverter {
-    private CrossReferenceConverter xrefConverter;
+    private CrossReferenceConverter<ParticipantEvidenceXref> xrefConverter;
     private AliasConverter aliasConverter;
     private AnnotationConverter annotationConverter;
     private BioSourceConverter bioSourceConverter;
@@ -32,7 +46,7 @@ public class InteractorConverter {
     public static String CRC64 = "crc64";
 
     public InteractorConverter(){
-        this.xrefConverter = new CrossReferenceConverter();
+        this.xrefConverter = new CrossReferenceConverter<>();
         this.aliasConverter = new AliasConverter();
         this.annotationConverter = new AnnotationConverter();
         this.bioSourceConverter = new BioSourceConverter();
@@ -46,16 +60,16 @@ public class InteractorConverter {
      * @param row : the calimocho row to complete with participant details
      * @param isFirst : boolean value to know if the participant is the first participant or not (idA or idB)
      */
-    public void intactToCalimocho(Component participant, Row row, boolean isFirst){
+    public void intactToCalimocho(IntactParticipantEvidence participant, Row row, boolean isFirst){
 
         if (participant != null){
-            Interactor interactor = participant.getInteractor();
+            IntactInteractor interactor = (IntactInteractor) participant.getInteractor();
 
             // converts interactor details
             if (interactor != null){
-                Collection<InteractorXref> interactorXrefs = interactor.getXrefs();
+                Collection<Xref> interactorXrefs = interactor.getXrefs();
                 Collection<Annotation>  annotations = interactor.getAnnotations();
-                Collection<InteractorAlias> aliases = interactor.getAliases();
+                Collection<Alias> aliases = interactor.getAliases();
 
                 boolean hasFoundIdentity = false;
                 Collection<Field> otherIdentifiers = Collections.EMPTY_LIST;
@@ -66,14 +80,14 @@ public class InteractorConverter {
                     otherXrefs = new ArrayList<Field>(interactorXrefs.size());
 
                     // convert xrefs, and identity
-                    for (InteractorXref ref : interactorXrefs){
+                    for (Xref ref : interactorXrefs){
 
                         // identity xrefs
-                        if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
+                        if (ref.getQualifier() != null && Xref.IDENTITY_MI.equals(ref.getQualifier().getMIIdentifier())){
                             // first identity
                             if (!hasFoundIdentity){
 
-                                Field identity = xrefConverter.intactToCalimocho(ref, false);
+                                Field identity = xrefConverter.intactToCalimocho((ParticipantEvidenceXref) ref, false);
                                 if (identity != null){
                                     hasFoundIdentity = true;
 
@@ -87,7 +101,7 @@ public class InteractorConverter {
                             }
                             // other identifiers
                             else {
-                                Field identity = xrefConverter.intactToCalimocho(ref, false);
+                                Field identity = xrefConverter.intactToCalimocho((ParticipantEvidenceXref) ref, false);
                                 if (identity != null){
                                     otherIdentifiers.add(identity);
                                 }
@@ -95,7 +109,7 @@ public class InteractorConverter {
                         }
                         // other xrefs
                         else {
-                            Field refField = xrefConverter.intactToCalimocho(ref, true);
+                            Field refField = xrefConverter.intactToCalimocho((ParticipantEvidenceXref) ref, true);
                             if (refField != null){
                                 otherXrefs.add(refField);
                             }
@@ -108,22 +122,9 @@ public class InteractorConverter {
                 if (interactor.getAc() != null){
                     Field acField = new DefaultField();
 
-                    String db = CvDatabase.INTACT;
-
-                    acField.set(CalimochoKeys.KEY, db);
-                    acField.set(CalimochoKeys.DB, db);
+                    acField.set(CalimochoKeys.KEY, "intact");
+                    acField.set(CalimochoKeys.DB, "intact");
                     acField.set(CalimochoKeys.VALUE, interactor.getAc());
-                    
-                    if (interactor.getOwner() != null){
-                        Institution institution = interactor.getOwner();
-
-                        CvDatabase database = InstitutionUtils.retrieveCvDatabase(IntactContext.getCurrentInstance(), institution);
-                        
-                        if (database != null && database.getShortLabel() != null){
-                            acField.set(CalimochoKeys.KEY, database.getShortLabel());
-                            acField.set(CalimochoKeys.DB, database.getShortLabel());
-                        }
-                    }
 
                     if (!hasFoundIdentity){
 
@@ -159,8 +160,8 @@ public class InteractorConverter {
                 // convert aliases
                 if (!aliases.isEmpty()){
                     Collection<Field> aliasFields = new ArrayList<Field>(aliases.size());
-                    for (InteractorAlias alias : aliases){
-                        Field aliasField = aliasConverter.intactToCalimocho(alias);
+                    for (Alias alias : aliases){
+                        Field aliasField = aliasConverter.intactToCalimocho((AbstractIntactAlias) alias);
 
                         if (aliasField != null){
                             aliasFields.add(aliasField);
@@ -180,7 +181,7 @@ public class InteractorConverter {
                 if (!annotations.isEmpty()){
                     Collection<Field> annotFields = new ArrayList<Field>(annotations.size());
                     for (Annotation annots : annotations){
-                        Field annotField = annotationConverter.intactToCalimocho(annots);
+                        Field annotField = annotationConverter.intactToCalimocho((AbstractIntactAnnotation) annots);
 
                         if (annotField != null){
                             annotFields.add(annotField);
@@ -197,8 +198,8 @@ public class InteractorConverter {
                 }               
 
                 // convert organism(s)
-                if (interactor.getBioSource() != null){
-                    Collection<Field> bioSourceField = bioSourceConverter.intactToCalimocho(interactor.getBioSource());
+                if (interactor.getOrganism() != null){
+                    Collection<Field> bioSourceField = bioSourceConverter.intactToCalimocho((IntactOrganism) interactor.getOrganism());
 
                     if (!bioSourceField.isEmpty()){
                         if (isFirst){
@@ -211,8 +212,8 @@ public class InteractorConverter {
                 }
                 
                 // convert interactor type
-                if (interactor.getCvInteractorType() != null){
-                    Field type = cvObjectConverter.intactToCalimocho(interactor.getCvInteractorType());
+                if (interactor.getInteractorType() != null){
+                    Field type = cvObjectConverter.intactToCalimocho((IntactCvTerm) interactor.getInteractorType());
                     if (type != null){
                         if (isFirst){
                             row.addField(InteractionKeys.KEY_INTERACTOR_TYPE_A, type);
@@ -224,19 +225,20 @@ public class InteractorConverter {
                 }
                 
                 // convert checksum (crc64 : only if sequence available)
-                if (interactor instanceof Polymer){
-                    Polymer polymer = (Polymer) interactor;
-                    if (polymer.getCrc64() != null){
-                        Field crc64 = new DefaultField();
-                        crc64.set(CalimochoKeys.KEY, CRC64);
-                        crc64.set(CalimochoKeys.DB, CRC64);
-                        crc64.set(CalimochoKeys.VALUE, polymer.getCrc64());
+                if (interactor instanceof IntactPolymer){
+                    IntactPolymer polymer = (IntactPolymer) interactor;
+                    Checksum crc64 = ChecksumUtils.collectFirstChecksumWithMethod(polymer.getChecksums(), null, "crc64");
+                    if (crc64 != null) {
+                        Field crcField = new DefaultField();
+                        crcField.set(CalimochoKeys.KEY, CRC64);
+                        crcField.set(CalimochoKeys.DB, CRC64);
+                        crcField.set(CalimochoKeys.VALUE, crc64.getValue());
 
                         if (isFirst){
-                            row.addField(InteractionKeys.KEY_CHECKSUM_A, crc64);
+                            row.addField(InteractionKeys.KEY_CHECKSUM_A, crcField);
                         }
                         else {
-                            row.addField(InteractionKeys.KEY_CHECKSUM_B, crc64);
+                            row.addField(InteractionKeys.KEY_CHECKSUM_B, crcField);
                         }
                     }
                 }
@@ -244,17 +246,17 @@ public class InteractorConverter {
             
             // convert biological role
             Field bioRole = null;
-            if (participant.getCvBiologicalRole() != null){
-                bioRole = cvObjectConverter.intactToCalimocho(participant.getCvBiologicalRole());
+            if (participant.getBiologicalRole() != null){
+                bioRole = cvObjectConverter.intactToCalimocho((IntactCvTerm) participant.getBiologicalRole());
             }
             
             if (bioRole == null){
                 bioRole = new DefaultField();
 
-                bioRole.set(CalimochoKeys.KEY, CvDatabase.PSI_MI);
-                bioRole.set(CalimochoKeys.DB, CvDatabase.PSI_MI);
-                bioRole.set(CalimochoKeys.VALUE, CvBiologicalRole.UNSPECIFIED_PSI_REF);
-                bioRole.set(CalimochoKeys.TEXT, CvBiologicalRole.UNSPECIFIED);
+                bioRole.set(CalimochoKeys.KEY, CvTerm.PSI_MI);
+                bioRole.set(CalimochoKeys.DB, CvTerm.PSI_MI);
+                bioRole.set(CalimochoKeys.VALUE, Participant.UNSPECIFIED_ROLE_MI);
+                bioRole.set(CalimochoKeys.TEXT, Participant.UNSPECIFIED_ROLE);
             }
             if (isFirst){
                 row.addField(InteractionKeys.KEY_BIOROLE_A, bioRole);
@@ -263,39 +265,31 @@ public class InteractorConverter {
                 row.addField(InteractionKeys.KEY_BIOROLE_B, bioRole);
             }
 
-            // convert experimental roles
-            Collection<Field> roleFields = new ArrayList<Field>(participant.getExperimentalRoles().size());
-            
-            for (CvExperimentalRole expRole : participant.getExperimentalRoles()){
-                Field expRoleField = cvObjectConverter.intactToCalimocho(expRole);
-                if (expRoleField != null){
-                    roleFields.add(expRoleField);
-                }
-            }            
-
-            if (roleFields.isEmpty()){
-                Field expRoleField = new DefaultField();
-
-                expRoleField.set(CalimochoKeys.KEY, CvDatabase.PSI_MI);
-                expRoleField.set(CalimochoKeys.DB, CvDatabase.PSI_MI);
-                expRoleField.set(CalimochoKeys.VALUE, CvExperimentalRole.UNSPECIFIED_PSI_REF);
-                expRoleField.set(CalimochoKeys.TEXT, CvExperimentalRole.UNSPECIFIED);
-                roleFields.add(expRoleField);
+            // convert experimental role
+            Field expRoleField = null;
+            if (participant.getExperimentalRole() != null) {
+                expRoleField = cvObjectConverter.intactToCalimocho((IntactCvTerm) participant.getExperimentalRole());
+            } else {
+                expRoleField = new DefaultField();
+                expRoleField.set(CalimochoKeys.KEY, CvTerm.PSI_MI);
+                expRoleField.set(CalimochoKeys.DB, CvTerm.PSI_MI);
+                expRoleField.set(CalimochoKeys.VALUE, Participant.UNSPECIFIED_ROLE_MI);
+                expRoleField.set(CalimochoKeys.TEXT, Participant.UNSPECIFIED_ROLE);
             }
             if (isFirst){
-                row.addFields(InteractionKeys.KEY_EXPROLE_A, roleFields);
+                row.addField(InteractionKeys.KEY_EXPROLE_A, expRoleField);
             }
             else {
-                row.addFields(InteractionKeys.KEY_EXPROLE_B, roleFields);
+                row.addField(InteractionKeys.KEY_EXPROLE_B, expRoleField);
             }
 
             // convert features
             if (!participant.getFeatures().isEmpty()){
-                Collection<Feature> features = participant.getFeatures();
+                Collection<FeatureEvidence> features = participant.getFeatures();
                 Collection<Field> featFields = new ArrayList<Field>(features.size());
                 
-                for (Feature feature : features){
-                     Field featureField = featureConverter.intactToCalimocho(feature);
+                for (FeatureEvidence feature : features){
+                     Field featureField = featureConverter.intactToCalimocho((IntactFeatureEvidence) feature);
                     if (featureField != null){
                         featFields.add(featureField);
                     }
@@ -312,9 +306,9 @@ public class InteractorConverter {
             }
 
             // convert stoichiometry
-            if (participant.hasStoichiometry()){
+            if (participant.getStoichiometry() != null) {
                 Field stoichiometry = new DefaultField();
-                stoichiometry.set(CalimochoKeys.VALUE, Integer.toString((int) participant.getStoichiometry()));
+                stoichiometry.set(CalimochoKeys.VALUE, Integer.toString(participant.getStoichiometry().getMinValue()));
                 if (isFirst){
                     row.addField(InteractionKeys.KEY_STOICHIOMETRY_A, stoichiometry);
                 }
@@ -324,11 +318,11 @@ public class InteractorConverter {
             }
             
             // convert participant identification methods
-            if (!participant.getParticipantDetectionMethods().isEmpty()){
-                Collection<Field> detMethodFields = new ArrayList<Field>(participant.getParticipantDetectionMethods().size());
+            if (!participant.getIdentificationMethods().isEmpty()){
+                Collection<Field> detMethodFields = new ArrayList<Field>(participant.getIdentificationMethods().size());
 
-                for (CvIdentification detMethod : participant.getParticipantDetectionMethods()){
-                    Field methodField = cvObjectConverter.intactToCalimocho(detMethod);
+                for (CvTerm detMethod : participant.getIdentificationMethods()){
+                    Field methodField = cvObjectConverter.intactToCalimocho((IntactCvTerm) detMethod);
                     if (methodField != null){
                         detMethodFields.add(methodField);
                     }
@@ -353,7 +347,7 @@ public class InteractorConverter {
                 }
 
                 for (Annotation annots : participant.getAnnotations()){
-                    Field annotField = annotationConverter.intactToCalimocho(annots);
+                    Field annotField = annotationConverter.intactToCalimocho((AbstractIntactAnnotation) annots);
 
                     if (annotField != null){
                         annotFields.add(annotField);
@@ -377,8 +371,8 @@ public class InteractorConverter {
                     xrefFields = new ArrayList<Field>(participant.getXrefs().size());
                 }
 
-                for (ComponentXref xrefs : participant.getXrefs()){
-                    Field xrefField = xrefConverter.intactToCalimocho(xrefs, true);
+                for (Xref xrefs : participant.getXrefs()){
+                    Field xrefField = xrefConverter.intactToCalimocho((ParticipantEvidenceXref) xrefs, true);
 
                     if (xrefField != null){
                         xrefFields.add(xrefField);

@@ -30,14 +30,14 @@ public abstract class AbstractMitabFilter extends IntactFilter{
         super(exporter, false);
         this.mitab = mitab;
         this.interactionsToExclude = new HashSet<String>();
-        this.interactionsToExclude.addAll(this.queryFactory.getInteractionAcsExcludedWithFilters());
+        this.interactionsToExclude.addAll(this.queryFactory.getInteractionAcsExcludedWithFilters(intactDao));
     }
 
     public AbstractMitabFilter(InteractionExporter exporter){
         super(exporter, false);
         this.mitab = null;
         this.interactionsToExclude = new HashSet<String>();
-        this.interactionsToExclude.addAll(this.queryFactory.getInteractionAcsExcludedWithFilters());
+        this.interactionsToExclude.addAll(this.queryFactory.getInteractionAcsExcludedWithFilters(intactDao));
     }
 
     protected void processMiTerms(BinaryInteraction interaction, MiClusterContext context, String intactAc){

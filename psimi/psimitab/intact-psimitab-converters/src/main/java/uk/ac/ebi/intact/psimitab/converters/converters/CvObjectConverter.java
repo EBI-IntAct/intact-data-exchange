@@ -17,11 +17,11 @@ package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
-import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
+import uk.ac.ebi.intact.jami.model.extension.CvTermXref;
+import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,29 +33,29 @@ import java.util.Collection;
  * @version $Id$
  * @since 2.0.0
  */
-public class CvObjectConverter<O extends CvObject> {
+public class CvObjectConverter {
 
     public static final Log logger = LogFactory.getLog( CvObjectConverter.class );
-    private CrossReferenceConverter<? extends CvObjectXref> crossRefConverter;
+    private CrossReferenceConverter<CvTermXref> crossRefConverter;
 
     public CvObjectConverter(){
-        this.crossRefConverter = new CrossReferenceConverter<CvObjectXref>();
+        this.crossRefConverter = new CrossReferenceConverter<>();
     }
 
-    public CrossReference toCrossReference( O cvObject )  {
+    public CrossReference toCrossReference( IntactCvTerm cvObject )  {
         if ( cvObject == null ) {
             throw new IllegalArgumentException( "CvObject must not be null. " );
         }
 
         // name of the cv is the fullname
-        String text = cvObject.getFullName()!= null ? cvObject.getFullName() : cvObject.getShortLabel();
-        String identity = cvObject.getIdentifier();
+        String text = cvObject.getFullName()!= null ? cvObject.getFullName() : cvObject.getShortName();
+        String identity = cvObject.getMIIdentifier();
 
         if(identity == null ) {
             throw new NullPointerException( cvObject.getClass().getSimpleName() + "("+ text +") didn't have an identity" );
         }
 
-        final CvObjectXref idXref = findMatchingIdentityXref(cvObject.getXrefs(), identity); //XrefUtils.getIdentityXref(cvObject, CvDatabase.PSI_MI_MI_REF);
+        final CvTermXref idXref = findMatchingIdentityXref(cvObject.getXrefs(), identity); //XrefUtils.getIdentityXref(cvObject, CvDatabase.PSI_MI_MI_REF);
 
         if (idXref != null){
             try {
@@ -72,21 +72,21 @@ public class CvObjectConverter<O extends CvObject> {
         }
     } 
     
-    private CvObjectXref findMatchingIdentityXref(Collection<CvObjectXref> xrefs, String identity){
+    private CvTermXref findMatchingIdentityXref(Collection<Xref> xrefs, String identity){
 
-        CvObjectXref identityRef = null;
+        CvTermXref identityRef = null;
         
-        Collection<CvObjectXref> identities = new ArrayList<CvObjectXref>(xrefs.size());
+        Collection<CvTermXref> identities = new ArrayList<>(xrefs.size());
         
-        for (CvObjectXref xref : xrefs){
-             if (xref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equalsIgnoreCase(xref.getCvXrefQualifier().getIdentifier())){
-                 if (identity.equalsIgnoreCase(xref.getPrimaryId())){
-                     identityRef = xref;
+        for (Xref xref : xrefs){
+             if (xref.getQualifier() != null && Xref.IDENTITY_MI.equalsIgnoreCase(xref.getQualifier().getMIIdentifier())){
+                 if (identity.equalsIgnoreCase(xref.getId())){
+                     identityRef = (CvTermXref) xref;
                      break;
                  }
              }
             else {
-                identities.add(xref);
+                identities.add((CvTermXref) xref);
             }
         }
 
@@ -96,9 +96,5 @@ public class CvObjectConverter<O extends CvObject> {
         }
 
         return identityRef;
-    }
-
-    public O fromCrossReference( Class<O> clazz ) {
-        throw new UnsupportedOperationException();
     }
 }

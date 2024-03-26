@@ -1,11 +1,10 @@
 package uk.ac.ebi.intact.psimitab.converters.converters;
 
+import psidev.psi.mi.jami.model.Range;
+import psidev.psi.mi.jami.model.Xref;
 import psidev.psi.mi.tab.model.FeatureImpl;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.Feature;
-import uk.ac.ebi.intact.model.FeatureXref;
-import uk.ac.ebi.intact.model.Range;
-import uk.ac.ebi.intact.model.util.FeatureUtils;
+import uk.ac.ebi.intact.jami.model.extension.IntactFeatureEvidence;
+import uk.ac.ebi.intact.psimitab.converters.util.PsimitabTools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +19,16 @@ import java.util.List;
 
 public class FeatureConverter {
 
-    public psidev.psi.mi.tab.model.Feature intactToMitab(Feature feature){
+    public psidev.psi.mi.tab.model.Feature intactToMitab(IntactFeatureEvidence feature){
         if (feature != null){
             String name = null;
             String text = null;
 
-            if (feature.getCvFeatureType() != null && feature.getCvFeatureType().getFullName() != null){
-                name = feature.getCvFeatureType().getFullName();
+            if (feature.getType() != null && feature.getType().getFullName() != null){
+                name = feature.getType().getFullName();
             }
-            else if (feature.getCvFeatureType() != null && feature.getCvFeatureType().getShortLabel() != null){
-                name = feature.getCvFeatureType().getShortLabel();
+            else if (feature.getType() != null && feature.getType().getShortName() != null){
+                name = feature.getType().getShortName();
             }
             else {
                 name = CrossReferenceConverter.DATABASE_UNKNOWN;
@@ -38,7 +37,7 @@ public class FeatureConverter {
             List<String> rangesMitab = new ArrayList<String>(feature.getRanges().size());
 
             for (Range range : feature.getRanges()){
-                String rangeAsString = FeatureUtils.convertRangeIntoString(range);
+                String rangeAsString = PsimitabTools.convertRangeIntoString(range);
                 if (rangeAsString != null){
                     rangesMitab.add(rangeAsString);
                 }
@@ -51,11 +50,11 @@ public class FeatureConverter {
 
             psidev.psi.mi.tab.model.Feature mitabFeature = new FeatureImpl(name, rangesMitab);
 
-            for (FeatureXref refs : feature.getXrefs()){
+            for (Xref refs : feature.getXrefs()){
 
-                if (refs.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equalsIgnoreCase(refs.getCvXrefQualifier().getIdentifier())){
-                    if (refs.getPrimaryId() != null){
-                        mitabFeature.setText(refs.getPrimaryId());
+                if (refs.getQualifier() != null && Xref.IDENTITY_MI.equalsIgnoreCase(refs.getQualifier().getMIIdentifier())){
+                    if (refs.getId() != null){
+                        mitabFeature.setText(refs.getId());
                     }
                 }
             }

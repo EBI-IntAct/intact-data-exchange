@@ -17,13 +17,14 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.jami.model.Interactor;
+import psidev.psi.mi.jami.model.ParticipantEvidence;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Checksum;
 import psidev.psi.mi.tab.model.ChecksumImpl;
 import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
 
 import java.util.*;
@@ -64,8 +65,8 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
     // Implements ExpansionStrategy contract
 
     @Override
-    protected Collection<BinaryInteraction> processExpansionWithoutBait(Interaction interaction, BinaryInteraction interactionTemplate) {
-        List<BinaryInteraction> interactions = new ArrayList<BinaryInteraction>(interaction.getComponents().size());
+    protected Collection<BinaryInteraction> processExpansionWithoutBait(IntactInteractionEvidence interaction, BinaryInteraction interactionTemplate) {
+        List<BinaryInteraction> interactions = new ArrayList<>(interaction.getParticipants().size());
         // bait was null
         if (logger.isDebugEnabled())
             logger.debug("Could not find a bait component. Pick a component arbitrarily: 1st by alphabetical order.");
@@ -75,10 +76,10 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
         }
 
         // Collect and sort participants by name
-        List<Component> sortedComponents = sortComponents(interaction.getComponents());
+        List<ParticipantEvidence> sortedComponents = sortComponents(interaction.getParticipants());
 
         // Pick the first one
-        Component fakeBait = sortedComponents.get(0);
+        ParticipantEvidence fakeBait = sortedComponents.get(0);
 
         Set<RigDataModel> rigDataModels = new HashSet<RigDataModel>(sortedComponents.size() - 1);
         boolean isFirst = true;
@@ -86,9 +87,13 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
 
         // Build interactions
         for (int i = 1; i < sortedComponents.size(); i++) {
-            Component fakePrey = sortedComponents.get(i);
+            ParticipantEvidence fakePrey = sortedComponents.get(i);
 
-            MitabExpandedInteraction spokeInteraction = buildInteraction(interactionTemplate, fakeBait, fakePrey, true);
+            MitabExpandedInteraction spokeInteraction = buildInteraction(
+                    interactionTemplate,
+                    (IntactParticipantEvidence) fakeBait,
+                    (IntactParticipantEvidence) fakePrey,
+                    true);
             BinaryInteraction expandedBinary2 = spokeInteraction.getBinaryInteraction();
             interactions.add( expandedBinary2 );
 
@@ -131,7 +136,7 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
     }
 
     @Override
-    public boolean isExpandable(Interaction interaction) {
+    public boolean isExpandable(IntactInteractionEvidence interaction) {
         return isExpandableBasic(interaction);
     }
 
@@ -144,12 +149,12 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
      * @param components collection to sort.
      * @return a non null List of Participant.
      */
-    protected List<Component> sortComponents( Collection<Component> components ) {
+    protected List<ParticipantEvidence> sortComponents( Collection<ParticipantEvidence> components ) {
 
-        List<Component> sortedComponents = new ArrayList<Component>( components );
+        List<ParticipantEvidence> sortedComponents = new ArrayList<ParticipantEvidence>( components );
 
-        Collections.sort( sortedComponents, new Comparator<Component>() {
-            public int compare( Component p1, Component p2 ) {
+        Collections.sort( sortedComponents, new Comparator<ParticipantEvidence>() {
+            public int compare( ParticipantEvidence p1, ParticipantEvidence p2 ) {
 
                 Interactor i1 = p1.getInteractor();
                 if ( i1 == null ) {
@@ -160,8 +165,8 @@ public class SpokeWithoutBaitExpansion extends SpokeExpansion {
                     throw new IllegalArgumentException( "Both participant should hold a valid interactor." );
                 }
 
-                String name1 = i1.getShortLabel();
-                String name2 = i2.getShortLabel();
+                String name1 = i1.getShortName();
+                String name2 = i2.getShortName();
 
                 int result;
                 if ( name1 == null ) {

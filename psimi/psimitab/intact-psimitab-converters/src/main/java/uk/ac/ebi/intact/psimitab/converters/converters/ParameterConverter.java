@@ -1,7 +1,7 @@
 package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import psidev.psi.mi.tab.model.ParameterImpl;
-import uk.ac.ebi.intact.model.Parameter;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactParameter;
 
 /**
  * This class allows to convert a Intact parameter to a MITAB parameter
@@ -18,25 +18,25 @@ public class ParameterConverter {
      * @param param : the intact parameter
      * @return a calimocho field tha represents the interaction parameter
      */
-    public psidev.psi.mi.tab.model.Parameter intactToMitab(Parameter param){
+    public psidev.psi.mi.tab.model.Parameter intactToMitab(AbstractIntactParameter param){
         if (param != null){
 
             String db = CrossReferenceConverter.DATABASE_UNKNOWN;
-            if (param.getCvParameterType() != null && param.getCvParameterType().getShortLabel() != null){
-                db= param.getCvParameterType().getShortLabel();
+            if (param.getType() != null && param.getType().getShortName() != null){
+                db= param.getType().getShortName();
             }
 
             StringBuffer value = new StringBuffer();
-            if (param.getFactor() != null && param.getFactor() != 0){
+            if (param.getFactor() != 0){
                 value.append(param.getFactor()).append("x");
             }
-            if (param.getBase() != null && param.getBase() != 0){
+            if (param.getBase() != 0){
                 value.append(param.getBase());
             }
-            if (param.getExponent() != null && param.getExponent() != 0){
+            if (param.getExponent() != 0){
                 value.append("^").append(param.getExponent());
             }
-            if (param.getUncertainty() != null && param.getUncertainty() != 0){
+            if (param.getUncertainty() != null && param.getUncertainty().intValue() != 0){
                 value.append(" ~").append(param.getUncertainty());
             }
 
@@ -46,8 +46,8 @@ public class ParameterConverter {
 
             psidev.psi.mi.tab.model.Parameter mitabParameter = new ParameterImpl(db, value.toString());
 
-            if (param.getCvParameterUnit() != null && param.getCvParameterUnit().getShortLabel() != null){
-                mitabParameter.setUnit(param.getCvParameterUnit().getShortLabel());
+            if (param.getUnit() != null && param.getUnit().getShortName() != null){
+                mitabParameter.setUnit(param.getUnit().getShortName());
             }
 
             return mitabParameter;

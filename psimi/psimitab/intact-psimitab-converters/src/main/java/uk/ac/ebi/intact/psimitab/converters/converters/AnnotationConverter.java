@@ -2,7 +2,6 @@ package uk.ac.ebi.intact.psimitab.converters.converters;
 
 import psidev.psi.mi.tab.model.Annotation;
 import psidev.psi.mi.tab.model.AnnotationImpl;
-import uk.ac.ebi.intact.model.CvTopic;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,22 +23,22 @@ public class AnnotationConverter {
     }
 
     private void initializeTopicsToExclude(){
-        topicsToExclude.add(CvTopic.NEGATIVE);
+        topicsToExclude.add("negative");
     }
 
-    public Annotation intactToMitab(uk.ac.ebi.intact.model.Annotation intactAnnotation){
+    public Annotation intactToMitab(psidev.psi.mi.jami.model.Annotation intactAnnotation){
 
-        if (intactAnnotation != null && intactAnnotation.getCvTopic() != null){
+        if (intactAnnotation != null && intactAnnotation.getTopic() != null){
 
-            String topic = CvTopic.COMMENT;
+            String topic = psidev.psi.mi.jami.model.Annotation.COMMENT;
 
-            if (intactAnnotation.getCvTopic().getShortLabel() != null){
-                topic = intactAnnotation.getCvTopic().getShortLabel();
+            if (intactAnnotation.getTopic().getShortName() != null){
+                topic = intactAnnotation.getTopic().getShortName();
             }
 
             if (!topicsToExclude.contains(topic)){
                 Annotation annot = new AnnotationImpl(topic);
-                annot.setText(intactAnnotation.getAnnotationText());
+                annot.setText(intactAnnotation.getValue());
 
                 return annot;
             }

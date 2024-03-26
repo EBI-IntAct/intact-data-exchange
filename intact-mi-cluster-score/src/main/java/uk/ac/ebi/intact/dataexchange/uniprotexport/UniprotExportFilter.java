@@ -1,6 +1,5 @@
 package uk.ac.ebi.intact.dataexchange.uniprotexport;
 
-import uk.ac.ebi.intact.core.context.IntactContext;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.factory.InteractionFilterFactory;
 import uk.ac.ebi.intact.dataexchange.uniprotexport.variables.InteractionSource;
 import uk.ac.ebi.intact.util.uniprotExport.UniprotExportException;

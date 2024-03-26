@@ -15,14 +15,15 @@
  */
 package uk.ac.ebi.intact.psimitab.converters.expansion;
 
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Participant;
+import psidev.psi.mi.jami.model.ParticipantEvidence;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvExperimentalRole;
-import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.MitabInteractor;
@@ -73,7 +74,7 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
      * @param c2          component to add to the newly created interaction.
      * @return a new interaction having c1 and c2 as component.
      */
-    protected MitabExpandedInteraction buildInteraction( BinaryInteraction interaction, Component c1, Component c2, boolean isExpanded ) {
+    protected MitabExpandedInteraction buildInteraction(BinaryInteraction interaction, IntactParticipantEvidence c1, IntactParticipantEvidence c2, boolean isExpanded ) {
         MitabInteractor mitabInteractorA = interactorConverter.intactToMitab(c1);
         MitabInteractor mitabInteractorB = interactorConverter.intactToMitab(c2);
         Interactor interactorA = mitabInteractorA != null ? mitabInteractorA.getInteractor() : null;
@@ -87,7 +88,7 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
             expandedInteraction.setAuthors(interaction.getAuthors());
             expandedInteraction.setChecksums(interaction.getChecksums());
             if (isExpanded){
-                expandedInteraction.getComplexExpansion().add(new CrossReferenceImpl(CvDatabase.PSI_MI, getMI(), getName()));
+                expandedInteraction.getComplexExpansion().add(new CrossReferenceImpl(CvTerm.PSI_MI, getMI(), getName()));
             }
             expandedInteraction.setConfidenceValues(interaction.getConfidenceValues());
             expandedInteraction.setCreationDate(interaction.getCreationDate());
@@ -108,25 +109,23 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
         return mitabExpandednResults;
     }
 
-    public boolean isExpandable(Interaction interaction) {
+    public boolean isExpandable(IntactInteractionEvidence interaction) {
         return isExpandableBasic(interaction);
     }
 
-    protected boolean isExpandableBasic(Interaction interaction) {
-        if (interaction.getComponents().isEmpty()) {
+    protected boolean isExpandableBasic(IntactInteractionEvidence interaction) {
+        if (interaction.getParticipants().isEmpty()) {
             return false;
         }
 
         return true;
     }
 
-    protected boolean containsRole(Collection<CvExperimentalRole> experimentalRoles, String[] rolesToFind) {
-        if (experimentalRoles != null) {
-            for (CvExperimentalRole expRole : experimentalRoles) {
-                for (String roleToFind : rolesToFind) {
-                    if (roleToFind.equals(expRole.getIdentifier())) {
-                        return true;
-                    }
+    protected boolean roleIsAnyOf(CvTerm experimentalRole, String[] rolesToFind) {
+        if (experimentalRole != null) {
+            for (String roleToFind : rolesToFind) {
+                if (roleToFind.equals(experimentalRole.getMIIdentifier())) {
+                    return true;
                 }
             }
         }
@@ -134,22 +133,24 @@ public abstract class BinaryExpansionStrategy implements ExpansionStrategy {
     }
 
     @Override
-    public InteractionCategory findInteractionCategory(Interaction interaction) {
-        if (interaction.getComponents().size() == 1) {
-            Component c = interaction.getComponents().iterator().next();
+    public InteractionCategory findInteractionCategory(IntactInteractionEvidence interaction) {
+        if (interaction.getParticipants().size() == 1) {
+            ParticipantEvidence c = interaction.getParticipants().iterator().next();
 
             // we have a self interaction but inter molecular
-            if (c.getStoichiometry() >= 2 || (c.getStoichiometry() == 0 && !containsRole(c.getExperimentalRoles(), new String[]{CvExperimentalRole.SELF_PSI_REF, PUTATIVE_SELF_PSI_REF}))){
+            if (c.getStoichiometry() != null &&
+                    (c.getStoichiometry().getMinValue() >= 2 ||
+                            (c.getStoichiometry().getMinValue() == 0 && !roleIsAnyOf(c.getExperimentalRole(), new String[]{Participant.SELF_ROLE_MI, Participant.PUTATIVE_SELF_ROLE_MI})))) {
                 return InteractionCategory.self_inter_molecular;
             }
             else {
                 return InteractionCategory.self_intra_molecular;
             }
         }
-        else if (interaction.getComponents().size() == 2){
+        else if (interaction.getParticipants().size() == 2){
             return InteractionCategory.binary;
         }
-        else if (interaction.getComponents().size() > 2){
+        else if (interaction.getParticipants().size() > 2){
             return InteractionCategory.n_ary;
         }
 

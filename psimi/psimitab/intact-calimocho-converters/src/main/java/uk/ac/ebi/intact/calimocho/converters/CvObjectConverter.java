@@ -3,12 +3,9 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvObject;
-import uk.ac.ebi.intact.model.CvObjectXref;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.util.XrefUtils;
+import psidev.psi.mi.jami.model.Xref;
+import uk.ac.ebi.intact.jami.model.extension.CvTermXref;
+import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
 
 import java.util.Collection;
 
@@ -22,22 +19,22 @@ import java.util.Collection;
 
 public class CvObjectConverter {
 
-    private CrossReferenceConverter xrefConverter;
+    private CrossReferenceConverter<CvTermXref> xrefConverter;
     
     public CvObjectConverter(){
-        this.xrefConverter = new CrossReferenceConverter();
+        this.xrefConverter = new CrossReferenceConverter<>();
     }
     
-    public Field intactToCalimocho(CvObject object){
+    public Field intactToCalimocho(IntactCvTerm object){
         if (object != null){
             Field field = null;           
 
-            Collection<CvObjectXref> refs = object.getXrefs();
+            Collection<Xref> refs = object.getXrefs();
 
-            for (CvObjectXref ref : refs){
+            for (Xref ref : refs){
                 // identity xrefs
-                if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
-                    Field identity = xrefConverter.intactToCalimocho(ref, false);
+                if (ref.getQualifier() != null && Xref.IDENTITY_MI.equals(ref.getQualifier().getMIIdentifier())){
+                    Field identity = xrefConverter.intactToCalimocho((CvTermXref) ref, false);
                     if (identity != null){
                         field = identity;
                         break;
@@ -53,56 +50,24 @@ public class CvObjectConverter {
                 field.set(CalimochoKeys.VALUE, "-");
                 field.set(CalimochoKeys.TEXT, object.getFullName());
             }
-            else if (field == null && object.getShortLabel() != null){
+            else if (field == null && object.getShortName() != null){
                 field = new DefaultField();
 
                 field.set(CalimochoKeys.KEY, CrossReferenceConverter.DATABASE_UNKNOWN);
                 field.set(CalimochoKeys.DB, CrossReferenceConverter.DATABASE_UNKNOWN);
                 field.set(CalimochoKeys.VALUE, "-");
-                field.set(CalimochoKeys.TEXT, object.getShortLabel());
+                field.set(CalimochoKeys.TEXT, object.getShortName());
             }
             else if (field != null && object.getFullName() != null){
                 field.set(CalimochoKeys.TEXT, object.getFullName());
             }
-            else if (field != null && object.getShortLabel() != null){
-                field.set(CalimochoKeys.TEXT, object.getShortLabel());
+            else if (field != null && object.getShortName() != null){
+                field.set(CalimochoKeys.TEXT, object.getShortName());
             }
 
             return field;
         }
 
-        return null;
-    }
-    
-    public CvObject calimochoToIntact(Field field, Class<? extends CvObject> classType) throws IllegalAccessException, InstantiationException {
-        
-        if (field != null && classType != null){
-
-            String db = field.get(CalimochoKeys.DB);
-            String value = field.get(CalimochoKeys.VALUE);
-            String text = field.get(CalimochoKeys.TEXT);
-
-            if (db != null && (value != null || text != null)){
-                CvObject object = classType.newInstance();
-
-                object.setShortLabel(text != null ? text : value.toLowerCase());
-                object.setIdentifier( value );
-
-                CvObjectXref identityRef = new CvObjectXref();
-                CvDatabase database = new CvDatabase(IntactContext.getCurrentInstance().getInstitution(), db);
-                CvXrefQualifier refQualifier = new CvXrefQualifier(IntactContext.getCurrentInstance().getInstitution(), CvXrefQualifier.IDENTITY);
-                refQualifier.setIdentifier(CvXrefQualifier.IDENTITY_MI_REF);
-                CvObjectXref psiRef = XrefUtils.createIdentityXrefPsiMi(refQualifier, CvXrefQualifier.IDENTITY_MI_REF);
-                refQualifier.addXref(psiRef);
-
-                identityRef.setCvDatabase(database);
-                identityRef.setCvXrefQualifier(refQualifier);
-                object.addXref(identityRef);
-
-                return object;
-            }
-        }
-        
         return null;
     }
 }

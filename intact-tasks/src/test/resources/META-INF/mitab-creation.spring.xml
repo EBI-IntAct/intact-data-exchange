@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:batch="http://www.springframework.org/schema/batch"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
@@ -8,7 +9,7 @@
            http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 
     <!-- Initialize the datasource -->
-    <bean id="intactDataSourceInitializer" class="uk.ac.ebi.intact.core.batch.BatchDatasourceInitializer">
+    <bean id="intactDataSourceInitializer" class="psidev.psi.mi.jami.batch.BatchDataSourceInitializer">
         <property name="dataSource" ref="intactBatchDataSource"/>
         <property name="initScripts" value="classpath*:/org/springframework/batch/core/schema-h2.sql"/>
     </bean>
@@ -18,6 +19,26 @@
         <property name="url" value="jdbc:h2:mem:intactbatch"/>
         <property name="username" value="sa"/>
         <property name="password" value=""/>
+    </bean>
+
+    <!-- Standard job config -->
+    <bean id="intactJobRepository"
+          class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+          p:dataSource-ref="intactBatchDataSource" p:transactionManager-ref="batchTransactionManager" />
+
+    <bean id="batchTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          lazy-init="true">
+        <property name="dataSource" ref="intactBatchDataSource"/>
+    </bean>
+
+    <!-- Steps -->
+    <bean id="intactBatchStep"
+          class="org.springframework.batch.core.step.item.SimpleStepFactoryBean"
+          abstract="true">
+        <property name="transactionManager" ref="batchTransactionManager"/>
+        <property name="jobRepository" ref="intactJobRepository"/>
+        <property name="startLimit" value="100"/>
+        <property name="commitInterval" value="50"/>
     </bean>
 
     <!-- Some beans -->
@@ -160,5 +181,42 @@
             </batch:tasklet>
         </batch:step>
     </batch:job>
+
+    <!-- The LocalContainerEntityManagerFactoryBean gives full control over EntityManagerFactory configuration
+    and is appropriate for environments where fine-grained customization is required-->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitName" value="intact-jami"/>
+        <property name="persistenceXmlLocation" value="classpath*:/META-INF/jami-persistence.xml"/>
+        <property name="dataSource" ref="jamiCoreDataSourceTest"/>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">${db.hbm2ddl}</prop>
+                <prop key="hibernate.connection.release_mode">after_transaction</prop>
+            </props>
+        </property>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="databasePlatform" value="org.hibernate.dialect.H2Dialect"/>
+                <property name="showSql" value="false"/>
+                <property name="generateDdl" value="false"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- Intact core basic datasource -->
+    <bean id="jamiCoreDataSourceTest" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:intactcore;DB_CLOSE_DELAY=-1;LOCK_MODE=0"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+    </bean>
+
+    <!-- model readers -->
+    <bean id="baseModelReader" abstract="true">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <property name="pageSize" value="50"/>
+    </bean>
 
 </beans>

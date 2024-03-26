@@ -1,13 +1,20 @@
 package uk.ac.ebi.intact.psimitab.converters.enrichers;
 
-import psidev.psi.mi.tab.model.*;
+import psidev.psi.mi.jami.model.Alias;
+import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.tab.model.AliasImpl;
+import psidev.psi.mi.tab.model.ChecksumImpl;
+import psidev.psi.mi.tab.model.CrossReference;
+import psidev.psi.mi.tab.model.CrossReferenceImpl;
 import psidev.psi.mi.tab.model.Interactor;
-import uk.ac.ebi.intact.model.Annotation;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.jami.model.extension.IntactMolecule;
+import uk.ac.ebi.intact.jami.model.extension.ParticipantEvidenceXref;
 import uk.ac.ebi.intact.psimitab.converters.converters.AliasConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.CrossReferenceConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractorConverter;
+import uk.ac.ebi.intact.psimitab.converters.util.PsimitabTools;
 
 import java.util.Collection;
 
@@ -19,16 +26,16 @@ import java.util.Collection;
  * @since <pre>09/08/12</pre>
  */
 
-public class SmallMoleculeConverter extends AbstractEnricher{
+public class SmallMoleculeConverter extends AbstractEnricher<IntactMolecule> {
 
     public final static String STANDARD_INCHI_KEY = "standard inchi key";
     public final static String INCHI_MI_REF ="MI:2010";
 
-    public SmallMoleculeConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv){
+    public SmallMoleculeConverter(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv){
         super(xrefConv, alisConv);
     }
 
-    public SmallMoleculeConverter(CrossReferenceConverter<InteractorXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
+    public SmallMoleculeConverter(CrossReferenceConverter<ParticipantEvidenceXref> xrefConv, AliasConverter alisConv, String defaultInstitution) {
         super(xrefConv, alisConv, defaultInstitution);
     }
 
@@ -38,11 +45,11 @@ public class SmallMoleculeConverter extends AbstractEnricher{
      * @param mitabInteractor
      * @return the standard InchiKey for the small molecule. Can be null if no standard inchi key available
      */
-    public String enrichSmallMoleculeFromIntact(SmallMolecule smallMolecule, Interactor mitabInteractor){
+    public String enrichSmallMoleculeFromIntact(IntactMolecule smallMolecule, Interactor mitabInteractor){
 
         if (smallMolecule != null && mitabInteractor != null){
-            Collection<InteractorXref> interactorXrefs = smallMolecule.getXrefs();
-            Collection<InteractorAlias> aliases = smallMolecule.getAliases();
+            Collection<Xref> interactorXrefs = smallMolecule.getXrefs();
+            Collection<Alias> aliases = smallMolecule.getAliases();
 
             // xrefs
             boolean hasFoundCHEBIdentity = processXrefs(mitabInteractor, interactorXrefs);
@@ -72,15 +79,15 @@ public class SmallMoleculeConverter extends AbstractEnricher{
     }
 
     @Override
-    protected void processAccessionAndDisplay(uk.ac.ebi.intact.model.Interactor mol, Interactor mitabInteractor, boolean hasFoundCHEBIIdentity) {
+    protected void processAccessionAndDisplay(IntactMolecule mol, Interactor mitabInteractor, boolean hasFoundCHEBIIdentity) {
         // if it is a small molecule from CHEBI, Assume the short label is the molecule name
         // aliases
         if (hasFoundCHEBIIdentity){
             // the shortlabel is the display short
-            psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT );
+            psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_SHORT );
             mitabInteractor.getAliases().add(displayShort);
             // the interactor unique id is the display long
-            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mitabInteractor.getIdentifiers().iterator().next().getIdentifier(), InteractorConverter.DISPLAY_LONG  );
+            psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mitabInteractor.getIdentifiers().iterator().next().getIdentifier(), InteractorConverter.DISPLAY_LONG  );
             mitabInteractor.getAliases().add(displayLong);
 
             // convert ac as identity or secondary identifier
@@ -98,7 +105,7 @@ public class SmallMoleculeConverter extends AbstractEnricher{
             if(mol.getAc() != null){
 
                 // add shortlabel as display short as well
-                psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT  );
+                psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_SHORT  );
                 mitabInteractor.getAliases().add(displayShort);
 
                 // add ac as unique id and add it as display_long as well
@@ -106,20 +113,20 @@ public class SmallMoleculeConverter extends AbstractEnricher{
                 mitabInteractor.getIdentifiers().add(acField);
 
                 // add ac as psi display_long alias
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getAc(), InteractorConverter.DISPLAY_LONG  );
+                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mol.getAc(), InteractorConverter.DISPLAY_LONG  );
                 mitabInteractor.getAliases().add(displayLong);
             }
             // the shortlabel will be identifier because we need an identifier and will be displayLong as well
             else {
-                CrossReference id = new CrossReferenceImpl( defaultInstitution, mol.getShortLabel());
+                CrossReference id = new CrossReferenceImpl( defaultInstitution, mol.getShortName());
                 mitabInteractor.getIdentifiers().add(id);
 
                 // add shortlabel as display short as well
-                psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_SHORT  );
+                psidev.psi.mi.tab.model.Alias displayShort = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_SHORT  );
                 mitabInteractor.getAliases().add(displayShort);
 
                 // add shortlabel as display long as well
-                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvDatabase.PSI_MI, mol.getShortLabel(), InteractorConverter.DISPLAY_LONG  );
+                psidev.psi.mi.tab.model.Alias displayLong = new AliasImpl( CvTerm.PSI_MI, mol.getShortName(), InteractorConverter.DISPLAY_LONG  );
                 mitabInteractor.getAliases().add(displayLong);
 
             }
@@ -127,20 +134,20 @@ public class SmallMoleculeConverter extends AbstractEnricher{
     }
 
     @Override
-    protected boolean processXrefs(Interactor mitabInteractor, Collection<InteractorXref> interactorXrefs) {
+    protected boolean processXrefs(Interactor mitabInteractor, Collection<Xref> interactorXrefs) {
         boolean hasFoundIdentity = false;
 
         if (!interactorXrefs.isEmpty()){
 
             // convert xrefs, and identity
-            for (InteractorXref ref : interactorXrefs){
+            for (Xref ref : interactorXrefs){
 
                 // identity xrefs
-                if (ref.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())){
+                if (ref.getQualifier() != null && Xref.IDENTITY_MI.equals(ref.getQualifier().getMIIdentifier())){
                     // first CHEBI identity
-                    if (!hasFoundIdentity && ref.getCvDatabase() != null && CvDatabase.CHEBI_MI_REF.equals(ref.getCvDatabase().getIdentifier())){
+                    if (!hasFoundIdentity && ref.getDatabase() != null && Xref.CHEBI_MI.equals(ref.getDatabase().getMIIdentifier())){
 
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
                             hasFoundIdentity = true;
 
@@ -149,23 +156,23 @@ public class SmallMoleculeConverter extends AbstractEnricher{
                     }
                     // other identifiers
                     else {
-                        CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                        CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                         if (identity != null){
                             mitabInteractor.getAlternativeIdentifiers().add(identity);
                         }
                     }
                 }
                 // secondary acs are alternative identifiers
-                else if (ref.getCvXrefQualifier() != null && (CvXrefQualifier.SECONDARY_AC_MI_REF.equals(ref.getCvXrefQualifier().getIdentifier())
-                        || intactSecondary.equals(ref.getCvXrefQualifier().getShortLabel()))){
-                    CrossReference identity = xRefConverter.createCrossReference(ref, false);
+                else if (ref.getQualifier() != null && (Xref.SECONDARY_MI.equals(ref.getQualifier().getMIIdentifier())
+                        || intactSecondary.equals(ref.getQualifier().getShortName()))){
+                    CrossReference identity = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, false);
                     if (identity != null){
                         mitabInteractor.getAlternativeIdentifiers().add(identity);
                     }
                 }
                 // other xrefs
                 else {
-                    CrossReference xref = xRefConverter.createCrossReference(ref, true);
+                    CrossReference xref = xRefConverter.createCrossReference((ParticipantEvidenceXref) ref, true);
                     if (xref != null){
                         mitabInteractor.getXrefs().add(xref);
                     }
@@ -175,13 +182,13 @@ public class SmallMoleculeConverter extends AbstractEnricher{
         return hasFoundIdentity;
     }
 
-    public String extractStandardInchiKeyFrom(SmallMolecule interactor) {
+    public String extractStandardInchiKeyFrom(IntactMolecule interactor) {
 
         // find INCHI key
-        final Annotation annotation = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(interactor, INCHI_MI_REF);// INCHI_MI_REF
+        final Annotation annotation = PsimitabTools.findAnnotationByTopicMiOrLabel(interactor.getAnnotations(), INCHI_MI_REF);// INCHI_MI_REF
 
         if (annotation != null){
-            return  annotation.getAnnotationText();
+            return  annotation.getValue();
         }
 
         return null;

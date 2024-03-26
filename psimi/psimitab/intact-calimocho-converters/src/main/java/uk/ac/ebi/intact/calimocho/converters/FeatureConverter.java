@@ -3,11 +3,10 @@ package uk.ac.ebi.intact.calimocho.converters;
 import org.hupo.psi.calimocho.key.CalimochoKeys;
 import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.Field;
-import uk.ac.ebi.intact.model.CvXrefQualifier;
-import uk.ac.ebi.intact.model.Feature;
-import uk.ac.ebi.intact.model.FeatureXref;
-import uk.ac.ebi.intact.model.Range;
-import uk.ac.ebi.intact.model.util.FeatureUtils;
+import psidev.psi.mi.jami.model.Range;
+import psidev.psi.mi.jami.model.Xref;
+import uk.ac.ebi.intact.jami.model.extension.IntactFeatureEvidence;
+import uk.ac.ebi.intact.psimitab.converters.util.PsimitabTools;
 
 /**
  * Feature converter
@@ -19,18 +18,18 @@ import uk.ac.ebi.intact.model.util.FeatureUtils;
 
 public class FeatureConverter {
 
-    public Field intactToCalimocho(Feature feature){
+    public Field intactToCalimocho(IntactFeatureEvidence feature){
         if (feature != null){
             Field field = new DefaultField();
 
-            if (feature.getCvFeatureType() != null && feature.getCvFeatureType().getFullName() != null){
-                String name = feature.getCvFeatureType().getFullName();
+            if (feature.getType() != null && feature.getType().getFullName() != null){
+                String name = feature.getType().getFullName();
 
                 field.set( CalimochoKeys.KEY, name);
                 field.set( CalimochoKeys.DB, name);
             }
-            else if (feature.getCvFeatureType() != null && feature.getCvFeatureType().getShortLabel() != null){
-                String name = feature.getCvFeatureType().getShortLabel();
+            else if (feature.getType() != null && feature.getType().getShortName() != null){
+                String name = feature.getType().getShortName();
 
                 field.set( CalimochoKeys.KEY, name);
                 field.set( CalimochoKeys.DB, name);
@@ -46,7 +45,7 @@ public class FeatureConverter {
 
             StringBuffer buffer = new StringBuffer();
             for (Range range : feature.getRanges()){
-                String rangeAsString = FeatureUtils.convertRangeIntoString(range);
+                String rangeAsString = PsimitabTools.convertRangeIntoString(range);
                 if (rangeAsString != null && hasRange){
                     buffer.append(",").append(rangeAsString);
                 }
@@ -63,11 +62,11 @@ public class FeatureConverter {
                 field.set( CalimochoKeys.VALUE, "?-?");
             }
 
-            for (FeatureXref refs : feature.getXrefs()){
+            for (Xref refs : feature.getXrefs()){
 
-                if (refs.getCvXrefQualifier() != null && CvXrefQualifier.IDENTITY_MI_REF.equalsIgnoreCase(refs.getCvXrefQualifier().getIdentifier())){
-                    if (refs.getPrimaryId() != null){
-                        field.set( CalimochoKeys.TEXT, refs.getPrimaryId());
+                if (refs.getQualifier() != null && Xref.IDENTITY_MI.equalsIgnoreCase(refs.getQualifier().getMIIdentifier())){
+                    if (refs.getId() != null){
+                        field.set( CalimochoKeys.TEXT, refs.getId());
                     }
                 }
             }

@@ -9,23 +9,25 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import psidev.psi.mi.jami.model.Experiment;
+import psidev.psi.mi.jami.model.InteractionEvidence;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.BinaryInteractionImpl;
 import psidev.psi.mi.tab.model.CrossReference;
 import psidev.psi.mi.tab.model.OrganismImpl;
 import psidev.psi.mi.tab.model.builder.MitabWriterUtils;
 import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.Experiment;
-import uk.ac.ebi.intact.model.Interaction;
-import uk.ac.ebi.intact.model.Publication;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
+import uk.ac.ebi.intact.jami.model.extension.IntactExperiment;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
 import uk.ac.ebi.intact.psimitab.converters.converters.ExperimentConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.PublicationConverter;
 import uk.ac.ebi.intact.task.mitab.IntactBinaryInteractionProcessor;
 import uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor;
 import uk.ac.ebi.intact.task.util.FileNameGenerator;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -36,7 +38,10 @@ import java.util.*;
  * @since <pre>20/08/12</pre>
  */
 
-public class PublicationMitabItemProcessor implements ItemProcessor<Publication, SortedSet<PublicationFileEntry>>, ItemStream {
+public class PublicationMitabItemProcessor implements ItemProcessor<IntactPublication, SortedSet<PublicationFileEntry>>, ItemStream {
+
+    @Resource(name = "intactDao")
+    private IntactDao intactDao;
 
     /**
      * The fileName generator
@@ -67,15 +72,15 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public SortedSet<PublicationFileEntry> process(Publication item) throws Exception {
+    public SortedSet<PublicationFileEntry> process(IntactPublication item) throws Exception {
 
         // reattach the publication object to the entity manager because connection may have been closed after reading the object
-        Publication publication = IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().merge(item);
+        IntactPublication publication = intactDao.getEntityManager().merge(item);
 
-        log.info("Start processing publication : " + publication.getShortLabel());
+        log.info("Start processing publication : " + publication.getPubmedId());
         // if the publication does not have any experiments, we skip it
         if (publication.getExperiments().isEmpty()){
-            log.info("Skip publication " + publication.getShortLabel() + " because does not contain any experiments");
+            log.info("Skip publication " + publication.getPubmedId() + " because does not contain any experiments");
             return null;
         }
 
@@ -97,21 +102,21 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
             clearExperimentDetails();
 
             // the processed experiment
-            Experiment exp = iterator.next();
+            IntactExperiment exp = (IntactExperiment) iterator.next();
 
             // convert experiment details
             convertExperimentToMitab(exp);
 
             // number of interactions attached to the processed experiment
-            int interactionSize = exp.getInteractions().size();
+            int interactionSize = exp.getInteractionEvidences().size();
 
             log.info("Process Experiment " + exp.getShortLabel() + ", interactions : " + interactionSize);
 
             // we only process experiments having interactions
             if(interactionSize > 0){
-                for (Interaction interaction : exp.getInteractions()){
+                for (InteractionEvidence interaction : exp.getInteractionEvidences()){
                     // the experiments does contain negative interactions. Normally in intact, one experiment containing one negative should only contain negative
-                    if (InteractionUtils.isNegative(interaction)){
+                    if (interaction.isNegative()){
                         processIntactInteraction(interaction, this.currentNegativeStringBuilder, exp);
                     }
                     // positive interactions
@@ -132,12 +137,12 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
             createPublicationEntry(publicationEntries, publication.getCreated(), publication.getShortLabel(), this.currentStringBuilder, false);
         }
 
-        IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().clear();
+        intactDao.getEntityManager().clear();
 
         return publicationEntries;
     }
 
-    private void convertPublicationToMitab(Publication publication) {
+    private void convertPublicationToMitab(IntactPublication publication) {
         binaryTemplate = new BinaryInteractionImpl();
 
         if (publication == null){
@@ -147,7 +152,7 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
         publicationConverter.intactToMitab(publication, binaryTemplate);
     }
 
-    private void convertExperimentToMitab(Experiment experiment) {
+    private void convertExperimentToMitab(IntactExperiment experiment) {
         if (this.binaryTemplate == null){
             this.binaryTemplate = new BinaryInteractionImpl();
         }
@@ -158,8 +163,8 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
         experimentConverter.intactToMitab(experiment, binaryTemplate, true, false);
     }
 
-    private void processIntactInteraction(Interaction interaction, StringBuffer builder, Experiment exp) throws Exception {
-        Collection<? extends BinaryInteraction> binaryInteractions = this.compositeProcessor.process(interaction);
+    private void processIntactInteraction(InteractionEvidence interaction, StringBuffer builder, Experiment exp) throws Exception {
+        Collection<? extends BinaryInteraction> binaryInteractions = this.compositeProcessor.process((IntactInteractionEvidence) interaction);
         if (binaryInteractions != null && !binaryInteractions.isEmpty()){
             boolean isFirst = true;
 
@@ -181,10 +186,10 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
             binary.setHostOrganism(binaryTemplate.getHostOrganism());
 
             if (binary.getInteractorA() != null && binary.getInteractorA().getParticipantIdentificationMethods().isEmpty()){
-                 experimentConverter.addParticipantDetectionMethodForInteractor(exp,  binary.getInteractorA());
+                 experimentConverter.addParticipantDetectionMethodForInteractor((IntactExperiment) exp,  binary.getInteractorA());
             }
             if (binary.getInteractorB() != null && binary.getInteractorB().getParticipantIdentificationMethods().isEmpty()){
-                experimentConverter.addParticipantDetectionMethodForInteractor(exp,  binary.getInteractorB());
+                experimentConverter.addParticipantDetectionMethodForInteractor((IntactExperiment) exp,  binary.getInteractorB());
             }
 
             // publication details

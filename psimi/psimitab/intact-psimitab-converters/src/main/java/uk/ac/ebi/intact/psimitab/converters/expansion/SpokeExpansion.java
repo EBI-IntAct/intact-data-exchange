@@ -17,14 +17,15 @@ package uk.ac.ebi.intact.psimitab.converters.expansion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import psidev.psi.mi.jami.model.Participant;
+import psidev.psi.mi.jami.model.ParticipantEvidence;
 import psidev.psi.mi.tab.model.BinaryInteraction;
 import psidev.psi.mi.tab.model.Checksum;
 import psidev.psi.mi.tab.model.ChecksumImpl;
 import psidev.psi.mi.tab.model.Interactor;
 import uk.ac.ebi.intact.irefindex.seguid.RigDataModel;
-import uk.ac.ebi.intact.model.Component;
-import uk.ac.ebi.intact.model.CvExperimentalRole;
-import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
 import uk.ac.ebi.intact.psimitab.converters.converters.InteractionConverter;
 
 import java.util.*;
@@ -73,7 +74,7 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
      * @return a non null collection of interaction, in case the expansion is not possible, we may return an empty
      *         collection.
      */
-    public Collection<BinaryInteraction> expand(Interaction interaction) throws NotExpandableInteractionException{
+    public Collection<BinaryInteraction> expand(IntactInteractionEvidence interaction) throws NotExpandableInteractionException{
         if (interaction == null) {
             throw new NotExpandableInteractionException("Interaction is not expandable: "+interaction);
         }
@@ -108,8 +109,12 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
             if (binaryTemplateSelf == null){
                 return Collections.EMPTY_LIST;
             }
-            Component uniqueComponent = interaction.getComponents().iterator().next();
-            MitabExpandedInteraction newInteraction = buildInteraction( binaryTemplateSelf, uniqueComponent, uniqueComponent, false );
+            ParticipantEvidence uniqueComponent = interaction.getParticipants().iterator().next();
+            MitabExpandedInteraction newInteraction = buildInteraction(
+                    binaryTemplateSelf,
+                    (IntactParticipantEvidence) uniqueComponent,
+                    (IntactParticipantEvidence) uniqueComponent,
+                    false );
 
             BinaryInteraction expandedBinary = newInteraction.getBinaryInteraction();
             interactions.add(expandedBinary);
@@ -151,20 +156,24 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
                 return Collections.EMPTY_LIST;
             }
 
-            Component baitComponent = interaction.getBait();
+            ParticipantEvidence baitComponent = getBait(interaction);
 
             if (baitComponent != null) {
 
-                Collection<Component> preyComponents = new ArrayList<Component>(interaction.getComponents().size());
-                preyComponents.addAll(interaction.getComponents());
+                Collection<ParticipantEvidence> preyComponents = new ArrayList<>(interaction.getParticipants().size());
+                preyComponents.addAll(interaction.getParticipants());
                 preyComponents.remove(baitComponent);
 
                 Set<RigDataModel> rigDataModels = new HashSet<RigDataModel>(preyComponents.size());
                 boolean isFirst = true;
                 boolean onlyProtein = true;
 
-                for (Component preyComponent : preyComponents) {
-                    MitabExpandedInteraction newInteraction = buildInteraction(binaryTemplate, baitComponent, preyComponent, true);
+                for (ParticipantEvidence preyComponent : preyComponents) {
+                    MitabExpandedInteraction newInteraction = buildInteraction(
+                            binaryTemplate,
+                            (IntactParticipantEvidence) baitComponent,
+                            (IntactParticipantEvidence) preyComponent,
+                            true);
 
                     BinaryInteraction expandedBinary2 = newInteraction.getBinaryInteraction();
                     interactions.add( expandedBinary2 );
@@ -224,16 +233,16 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
     }
 
     @Override
-    public boolean isExpandable(Interaction interaction) {
+    public boolean isExpandable(IntactInteractionEvidence interaction) {
         if (!super.isExpandable(interaction)) {
             return false;
         }
 
-        if (interaction.getComponents().size() > 1) {
+        if (interaction.getParticipants().size() > 1) {
             boolean containsBait = false;
 
-            for (Component component : interaction.getComponents()) {
-                if (containsRole(component.getExperimentalRoles(), new String[] {CvExperimentalRole.BAIT_PSI_REF})) {
+            for (ParticipantEvidence component : interaction.getParticipants()) {
+                if (roleIsAnyOf(component.getExperimentalRole(), new String[] {Participant.BAIT_ROLE_MI})) {
                     containsBait = true;
                     break;
                 }
@@ -253,8 +262,19 @@ public class SpokeExpansion extends BinaryExpansionStrategy {
         return EXPANSION_MI;
     }
 
-    protected Collection<BinaryInteraction> processExpansionWithoutBait(Interaction interaction, BinaryInteraction interactionTemplate) throws NotExpandableInteractionException {
+    protected Collection<BinaryInteraction> processExpansionWithoutBait(IntactInteractionEvidence interaction, BinaryInteraction interactionTemplate) throws NotExpandableInteractionException {
             throw new NotExpandableInteractionException("Could not find a bait problem for this interaction.");
+    }
+
+    private ParticipantEvidence getBait(IntactInteractionEvidence interaction) {
+        if (interaction != null) {
+            for (ParticipantEvidence participant: interaction.getParticipants()) {
+                if (roleIsAnyOf(participant.getExperimentalRole(), new String[] {Participant.BAIT_ROLE_MI})) {
+                    return participant;
+                }
+            }
+        }
+        return null;
     }
 
 

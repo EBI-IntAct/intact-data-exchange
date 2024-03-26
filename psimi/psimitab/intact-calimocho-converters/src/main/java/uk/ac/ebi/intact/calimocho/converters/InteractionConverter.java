@@ -8,11 +8,23 @@ import org.hupo.psi.calimocho.model.DefaultField;
 import org.hupo.psi.calimocho.model.DefaultRow;
 import org.hupo.psi.calimocho.model.Field;
 import org.hupo.psi.calimocho.model.Row;
+import psidev.psi.mi.jami.model.Annotation;
+import psidev.psi.mi.jami.model.Checksum;
+import psidev.psi.mi.jami.model.Confidence;
+import psidev.psi.mi.jami.model.CvTerm;
+import psidev.psi.mi.jami.model.Parameter;
+import psidev.psi.mi.jami.model.ParticipantEvidence;
+import psidev.psi.mi.jami.model.Xref;
+import psidev.psi.mi.jami.utils.ChecksumUtils;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import uk.ac.ebi.intact.core.context.IntactContext;
-import uk.ac.ebi.intact.model.*;
-import uk.ac.ebi.intact.model.util.InstitutionUtils;
-import uk.ac.ebi.intact.model.util.InteractionUtils;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactAnnotation;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactConfidence;
+import uk.ac.ebi.intact.jami.model.extension.AbstractIntactParameter;
+import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
+import uk.ac.ebi.intact.jami.model.extension.IntactExperiment;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
+import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
+import uk.ac.ebi.intact.jami.model.extension.InteractionXref;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.NotExpandableInteractionException;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
@@ -37,7 +49,7 @@ public class InteractionConverter {
     private CvObjectConverter cvObjectConverter;
     private ConfidenceConverter confidenceConverter;
     private ExperimentConverter experimentConverter;
-    private CrossReferenceConverter xrefConverter;
+    private CrossReferenceConverter<InteractionXref> xrefConverter;
     private AnnotationConverter annotConverter;
     private ParameterConverter parameterConverter;
     private DateFormat dateFormat;
@@ -59,7 +71,7 @@ public class InteractionConverter {
         this.cvObjectConverter = new CvObjectConverter();
         this.confidenceConverter = new ConfidenceConverter();
         this.experimentConverter = new ExperimentConverter();
-        this.xrefConverter = new CrossReferenceConverter();
+        this.xrefConverter = new CrossReferenceConverter<>();
         this.annotConverter = new AnnotationConverter();
         this.parameterConverter = new ParameterConverter();
 
@@ -72,7 +84,7 @@ public class InteractionConverter {
         this.expansionMI = expansionMI;
     }
 
-    public List<Row> intactToCalimocho(Interaction interaction) throws NotExpandableInteractionException {
+    public List<Row> intactToCalimocho(IntactInteractionEvidence interaction) throws NotExpandableInteractionException {
 
         if ( interaction == null ) {
             throw new IllegalArgumentException( "Interaction must not be null" );
@@ -81,13 +93,13 @@ public class InteractionConverter {
         List<Row> rows = new ArrayList<Row>();
 
         // case of intra molecular interactions and self interactions
-        if (interaction.getComponents().size() == 1) {
-            Component c = interaction.getComponents().iterator().next();
+        if (interaction.getParticipants().size() == 1) {
+            ParticipantEvidence c = interaction.getParticipants().iterator().next();
 
-            if (c.getStoichiometry() < 2){
+            if (c.getStoichiometry() != null && c.getStoichiometry().getMinValue() < 2){
                 Row row = processBinaryInteraction(interaction, false);
 
-                interactorConverter.intactToCalimocho(c, row, true);
+                interactorConverter.intactToCalimocho((IntactParticipantEvidence) c, row, true);
                 rows.add(row);
 
                 return rows;
@@ -120,19 +132,19 @@ public class InteractionConverter {
         }
 
         for (BinaryInteraction binary : interactions) {
-            Interaction binaryInteraction = (Interaction) binary;
+            IntactInteractionEvidence binaryInteraction = (IntactInteractionEvidence) binary;
 
             Row row = processBinaryInteraction(binaryInteraction, expanded);
 
             if (row != null){
-                final Collection<Component> components = binaryInteraction.getComponents();
-                Iterator<Component> iterator = components.iterator();
-                final Component componentA = iterator.next();
-                final Component componentB = iterator.next();
+                final Collection<ParticipantEvidence> components = binaryInteraction.getParticipants();
+                Iterator<ParticipantEvidence> iterator = components.iterator();
+                final ParticipantEvidence componentA = iterator.next();
+                final ParticipantEvidence componentB = iterator.next();
 
                 // convert interactors
-                interactorConverter.intactToCalimocho(componentA, row, true);
-                interactorConverter.intactToCalimocho(componentB, row, false);
+                interactorConverter.intactToCalimocho((IntactParticipantEvidence) componentA, row, true);
+                interactorConverter.intactToCalimocho((IntactParticipantEvidence) componentB, row, false);
                 rows.add(row);
             }
         }
@@ -140,12 +152,12 @@ public class InteractionConverter {
         return rows;
     }
 
-    private Row processBinaryInteraction(Interaction binary, boolean isExpanded) {
+    private Row processBinaryInteraction(IntactInteractionEvidence binary, boolean isExpanded) {
         Row row = new DefaultRow();
 
         // process interaction type
-        if (binary.getCvInteractionType() != null){
-            Field type = cvObjectConverter.intactToCalimocho(binary.getCvInteractionType());
+        if (binary.getInteractionType() != null){
+            Field type = cvObjectConverter.intactToCalimocho((IntactCvTerm) binary.getInteractionType());
 
             if (type != null){
                 row.addField(InteractionKeys.KEY_INTERACTION_TYPE, type);
@@ -157,7 +169,7 @@ public class InteractionConverter {
             Collection<Field> confs = new ArrayList<Field>(binary.getConfidences().size());
 
             for (Confidence conf : binary.getConfidences()){
-                Field confField = confidenceConverter.intactToCalimocho(conf);
+                Field confField = confidenceConverter.intactToCalimocho((AbstractIntactConfidence) conf);
 
                 if (confField != null){
                     confs.add(confField);
@@ -170,20 +182,9 @@ public class InteractionConverter {
         if (binary.getAc() != null){
             Field id = new DefaultField();
 
-            id.set(CalimochoKeys.KEY, CvDatabase.INTACT);
-            id.set(CalimochoKeys.DB, CvDatabase.INTACT);
+            id.set(CalimochoKeys.KEY, "intact");
+            id.set(CalimochoKeys.DB, "intact");
             id.set(CalimochoKeys.VALUE, binary.getAc());
-
-            if (binary.getOwner() != null){
-                Institution institution = binary.getOwner();
-
-                CvDatabase database = InstitutionUtils.retrieveCvDatabase(IntactContext.getCurrentInstance(), institution);
-
-                if (database != null && database.getShortLabel() != null){
-                    id.set(CalimochoKeys.KEY, database.getShortLabel());
-                    id.set(CalimochoKeys.DB, database.getShortLabel());
-                }
-            }
 
             row.addField(InteractionKeys.KEY_INTERACTION_ID, id);
         }
@@ -192,7 +193,7 @@ public class InteractionConverter {
         if (isExpanded && expansionMI != null){
             Field expansion = new DefaultField();
 
-            String db = CvDatabase.PSI_MI;
+            String db = CvTerm.PSI_MI;
 
             expansion.set(CalimochoKeys.KEY, db);
             expansion.set(CalimochoKeys.DB, db);
@@ -209,20 +210,20 @@ public class InteractionConverter {
         }
 
         // process experiments
-        for (Experiment exp : binary.getExperiments()){
-            experimentConverter.intactToCalimocho(exp, row);
+        if (binary.getExperiment() != null){
+            experimentConverter.intactToCalimocho((IntactExperiment) binary.getExperiment(), row);
         }
 
         //process xrefs
-        Collection<InteractorXref> interactionRefs = binary.getXrefs();
+        Collection<Xref> interactionRefs = binary.getXrefs();
 
         if (!interactionRefs.isEmpty()){
             Collection<Field> otherXrefs = new ArrayList<Field>(interactionRefs.size());
 
             // convert xrefs
-            for (InteractorXref ref : interactionRefs){
+            for (Xref ref : interactionRefs){
 
-                Field refField = xrefConverter.intactToCalimocho(ref, true);
+                Field refField = xrefConverter.intactToCalimocho((InteractionXref) ref, true);
                 if (refField != null){
                     otherXrefs.add(refField);
                 }
@@ -242,7 +243,7 @@ public class InteractionConverter {
             }
 
             for (Annotation annots : annotations){
-                Field annotField = annotConverter.intactToCalimocho(annots);
+                Field annotField = annotConverter.intactToCalimocho((AbstractIntactAnnotation) annots);
 
                 if (annotField != null){
                     annotationFields.add(annotField);
@@ -258,7 +259,7 @@ public class InteractionConverter {
             Collection<Field> paramFields = new ArrayList<Field>(binary.getParameters().size());
 
             for (Parameter param : binary.getParameters()){
-                Field paramField = parameterConverter.intactToCalimocho(param);
+                Field paramField = parameterConverter.intactToCalimocho((AbstractIntactParameter) param);
 
                 if (paramField != null){
                     paramFields.add(paramField);
@@ -271,17 +272,18 @@ public class InteractionConverter {
         }
 
         //process checksum
-        if (binary.getCrc() != null){
-            Field crc = new DefaultField();
-            crc.set(CalimochoKeys.KEY, CRC);
-            crc.set(CalimochoKeys.DB, CRC);
-            crc.set(CalimochoKeys.VALUE, binary.getCrc());
+        Checksum crc64 = ChecksumUtils.collectFirstChecksumWithMethod(binary.getChecksums(), null, "crc64");
+        if (crc64 != null) {
+            Field crcField = new DefaultField();
+            crcField.set(CalimochoKeys.KEY, CRC);
+            crcField.set(CalimochoKeys.DB, CRC);
+            crcField.set(CalimochoKeys.VALUE, crc64.getValue());
 
-            row.addField(InteractionKeys.KEY_CHECKSUM_I, crc);
+            row.addField(InteractionKeys.KEY_CHECKSUM_I, crcField);
         }
 
         //process negative
-        if (InteractionUtils.isNegative(binary)){
+        if (binary.isNegative()){
             Field neg = new DefaultField();
             neg.set(CalimochoKeys.VALUE, "true");
 

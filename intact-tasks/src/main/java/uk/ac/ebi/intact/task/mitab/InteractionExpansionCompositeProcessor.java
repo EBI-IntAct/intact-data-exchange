@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.tab.model.BinaryInteraction;
-import uk.ac.ebi.intact.model.Interaction;
+import uk.ac.ebi.intact.jami.model.extension.IntactInteractionEvidence;
 import uk.ac.ebi.intact.psimitab.converters.Intact2BinaryInteractionConverter;
 import uk.ac.ebi.intact.psimitab.converters.expansion.ExpansionStrategy;
 import uk.ac.ebi.intact.psimitab.converters.expansion.SpokeWithoutBaitExpansion;
@@ -67,7 +67,7 @@ public class InteractionExpansionCompositeProcessor implements IntactBinaryInter
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public Collection<? extends BinaryInteraction> process(Interaction intactInteraction) throws Exception {
+    public Collection<? extends BinaryInteraction> process(IntactInteractionEvidence intactInteraction) throws Exception {
 
         if (intactInteraction == null){
             return null;

@@ -3,7 +3,7 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange.psimi</groupId>
         <artifactId>intact-psixml</artifactId>
-        <version>3.3.2-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -40,11 +40,10 @@
             </exclusions>
         </dependency>
 
-
         <dependency>
-            <groupId>uk.ac.ebi.intact.core</groupId>
-            <artifactId>intact-core</artifactId>
-            <version>${core.version}</version>
+            <groupId>uk.ac.ebi.intact.jami</groupId>
+            <artifactId>intact-jami</artifactId>
+            <version>${intact.jami.version}</version>
         </dependency>
 
         <!--do not update-->
