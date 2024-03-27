@@ -22,8 +22,10 @@
     <!-- basic job repository -->
     <bean id="basicBatchJobRepository"
           class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+          p:tablePrefix="ia_meta.BATCH_"
           p:isolationLevelForCreate="ISOLATION_DEFAULT"
-          p:dataSource-ref="jamiCoreDataSource" p:transactionManager-ref="jamiTransactionManager" />
+          p:dataSource-ref="jamiCoreDataSource"
+          p:transactionManager-ref="jamiTransactionManager" />
 
     <!-- basic batch job launcher -->
     <bean id="basicBatchJobLauncher"
@@ -37,6 +39,7 @@
 
     <!-- Basic job explorer -->
     <bean id="basicBatchJobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
+          p:tablePrefix="ia_meta.BATCH_"
           p:dataSource-ref="jamiCoreDataSource" />
 
     <!-- Simple job registry -->
