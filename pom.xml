@@ -33,7 +33,7 @@
         <uniprot.japi.version>1.1.2</uniprot.japi.version>
         <chebiws.client.version>2.4</chebiws.client.version>
 
-        <micluster.version>1.8.2</micluster.version>
+        <micluster.version>1.9.0-SNAPSHOT</micluster.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>4.13.2</junit.version>
 

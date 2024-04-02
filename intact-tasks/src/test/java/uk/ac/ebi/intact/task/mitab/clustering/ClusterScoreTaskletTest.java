@@ -57,7 +57,7 @@ public class ClusterScoreTaskletTest{
         Assert.assertTrue(jobExecution.getAllFailureExceptions().isEmpty());
         Assert.assertEquals( "COMPLETED", jobExecution.getExitStatus().getExitCode() );
 
-        File file = new File("target/mitab-clustered.txt");
+        File file = new File("target/mitab-clustered.tsv");
         
         Assert.assertTrue(file.exists());
 	}

@@ -56,9 +56,9 @@
     </bean>
 
     <bean name="clusterScoreTasklet" class="uk.ac.ebi.intact.task.mitab.clustering.ClusterScoreTasklet">
-        <constructor-arg value="src/test/resources/mitab/mitab.txt"/>
-        <constructor-arg value="target/mitab-clustered.txt"/>
-        <property name="header" value="false"/>
+        <constructor-arg value="src/test/resources/mitab/mitab-legacy-2.7.tsv"/>
+        <constructor-arg value="target/mitab-clustered.tsv"/>
+        <property name="header" value="true"/>
         <property name="scoreName" value="intact-miscore"/>
         <property name="databaseToCluster" value="uniprotkb,irefindex,ddbj/embl/genbank,chebi"/>
     </bean>
