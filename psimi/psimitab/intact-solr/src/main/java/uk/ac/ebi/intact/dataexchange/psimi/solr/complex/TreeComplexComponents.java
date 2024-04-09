@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.hibernate.Hibernate;
@@ -59,7 +60,7 @@ public class TreeComplexComponents {
         return STC ;
     }
 
-    public void indexFields( SolrInputDocument solrDocument ) throws SolrServerException {
+    public void indexFields( SolrInputDocument solrDocument ) throws SolrServerException, JsonProcessingException {
         for (TreeComponents comp : complexSons){
             comp.indexFields(solrDocument);
         }
@@ -93,7 +94,7 @@ public class TreeComplexComponents {
             return root.getSTC() ;
         }
 
-        public void indexFields( SolrInputDocument solrDocument ) throws SolrServerException {
+        public void indexFields( SolrInputDocument solrDocument ) throws SolrServerException, JsonProcessingException {
             root.indexFields( solrDocument );
         }
 
@@ -216,7 +217,7 @@ public class TreeComplexComponents {
                 }
             }
 
-            private void indexFields(SolrInputDocument solrDocument) throws SolrServerException {
+            private void indexFields(SolrInputDocument solrDocument) throws SolrServerException, JsonProcessingException {
 
                 Interactor interactor = component.getInteractor();
                 if (interactor != null){

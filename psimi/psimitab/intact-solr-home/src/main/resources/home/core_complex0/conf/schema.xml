@@ -105,6 +105,7 @@
         <field name="pxref"                     type="text_ws"         indexed="true"  stored="false"  multiValued="true"/>
         <field name="pxref_e"                   type="text_ws"         indexed="true"  stored="false"  multiValued="true"/>
         <field name="stc"                       type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
+        <field name="serialised_interactor"     type="text_general"	 indexed="false"  stored="true"  multiValued="true"/>
         <!-- fields same as PSICQUIC -->
         <field name="pbiorole"                  type="text_ws"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
         <field name="pbiorole_f"                type="facetString"  indexed="true"  stored="false"  multiValued="true"/>
