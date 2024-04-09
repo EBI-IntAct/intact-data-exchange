@@ -1,21 +1,15 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.util;
 
-//import psidev.psi.mi.jami.utils.AnnotationUtils;
 import uk.ac.ebi.intact.model.Alias;
-import uk.ac.ebi.intact.model.AnnotatedObject;
 import uk.ac.ebi.intact.model.Annotation;
-import uk.ac.ebi.intact.model.Complex;
 import uk.ac.ebi.intact.model.Component;
 import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.model.CvDatabase;
-import uk.ac.ebi.intact.model.CvTopic;
-import uk.ac.ebi.intact.model.InteractionImpl;
+import uk.ac.ebi.intact.model.CvInteractorType;
 import uk.ac.ebi.intact.model.Interactor;
 import uk.ac.ebi.intact.model.InteractorXref;
-import uk.ac.ebi.intact.model.Protein;
-import uk.ac.ebi.intact.model.SmallMolecule;
-import uk.ac.ebi.intact.model.Xref;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
+import uk.ac.ebi.intact.model.util.CvObjectUtils;
 import uk.ac.ebi.intact.model.util.ProteinUtils;
 import uk.ac.ebi.intact.model.util.SmallMoleculeUtils;
 import uk.ac.ebi.intact.model.util.XrefUtils;
@@ -38,15 +32,13 @@ public final class ComplexUtils {
         Interactor interactor = participant.getInteractor();
         String name = null;
         if (interactor != null) {
-            if (interactor instanceof Protein) {
-                Protein protein = (Protein) interactor;
-                name = ProteinUtils.getGeneName(protein);
-            } else if (interactor instanceof SmallMolecule) {
-                SmallMolecule bioactiveEntity = (SmallMolecule) interactor;
-                name = bioactiveEntity.getShortLabel();
-            } else if (interactor instanceof Complex) {
-                Complex complexParticipant = (Complex) interactor;
-                name = getComplexName(complexParticipant);
+            CvInteractorType interactorType = interactor.getCvInteractorType();
+            if (CvObjectUtils.isProteinType(interactorType)) {
+                name = ProteinUtils.getGeneName(interactor);
+            } else if (CvObjectUtils.isSmallMoleculeType(interactorType)) {
+                name = interactor.getShortLabel();
+            } else if (CvObjectUtils.isComplexType(interactorType)) {
+                name = getComplexName(interactor);
             } else {
                 name = getAlias(interactor, RNA_CENTRAL_MI);
             }
@@ -67,10 +59,10 @@ public final class ComplexUtils {
 
     public static String getParticipantIdentifierLink(Component participant, String identifier) {
         InteractorXref xref = getParticipantIdentifierXref(participant);
-        if (xref != null) {
-            Annotation annot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel((AnnotatedObject<?, ?>) xref, SEARCH_MI);
+        if (xref != null && xref.getParent() != null) {
+            Annotation annot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(xref.getCvDatabase(), SEARCH_MI);
             if (annot == null) {
-                annot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel((AnnotatedObject<?, ?>) xref, SEARCH);
+                annot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(xref.getCvDatabase(), SEARCH);
             }
 
             if (annot != null) {
@@ -82,7 +74,7 @@ public final class ComplexUtils {
 
     public static String getParticipantStoichiometry(Component participant) {
         if (participant.getStoichiometry() != 0 || participant.getMaxStoichiometry() != 0) {
-            return "minValue: " + participant.getStoichiometry() + ", maxValue: " + participant.getMaxStoichiometry();
+            return "minValue: " + ((int) participant.getStoichiometry()) + ", maxValue: " + ((int) participant.getMaxStoichiometry());
         }
         return null;
     }
@@ -94,20 +86,25 @@ public final class ComplexUtils {
             participantList.sort(comparator);
             Collection<Component> merged = new ArrayList<>();
             Component aux = participantList.get(0);
-            int stochiometry = 0;
+            int minStochiometry = 0;
+            int maxStochiometry = 0;
             for (Component participant : participantList) {
                 if (aux.getInteractor().getAc().equals(participant.getInteractor().getAc())) {
                     //Same
-                    stochiometry += (int) participant.getStoichiometry();
+                    minStochiometry += (int) participant.getStoichiometry();
+                    maxStochiometry += (int) participant.getMaxStoichiometry();
                 } else {
                     //Different
-                    aux.setStoichiometry(stochiometry);
+                    aux.setStoichiometry(minStochiometry);
+                    aux.setMaxStoichiometry(maxStochiometry);
                     merged.add(aux);
                     aux = participant;
-                    stochiometry = (int) aux.getStoichiometry();
+                    minStochiometry = (int) participant.getStoichiometry();
+                    maxStochiometry = (int) participant.getMaxStoichiometry();
                 }
             }
-            aux.setStoichiometry(stochiometry);
+            aux.setStoichiometry(minStochiometry);
+            aux.setMaxStoichiometry(maxStochiometry);
             merged.add(aux);
             return merged;
         } else {
@@ -130,7 +127,7 @@ public final class ComplexUtils {
         return null;
     }
 
-    private static String getComplexName(Complex complex) {
+    private static String getComplexName(Interactor complex) {
         return getAlias(complex, CvAliasType.COMPLEX_RECOMMENDED_NAME_MI_REF);
     }
     private static String getAlias(Interactor complex, String id) {
@@ -146,18 +143,16 @@ public final class ComplexUtils {
         Interactor interactor = participant.getInteractor();
         InteractorXref xref = null;
         if (interactor != null) {
-            if (interactor instanceof Protein) {
-                Protein protein = (Protein) interactor;
-                xref = ProteinUtils.getUniprotXref(protein);
+            CvInteractorType interactorType = interactor.getCvInteractorType();
+            if (CvObjectUtils.isProteinType(interactorType)) {
+                xref = ProteinUtils.getUniprotXref(interactor);
                 if (xref == null) {
-                    xref = XrefUtils.getIdentityXref(protein, CvDatabase.REFSEQ_MI_REF);
+                    xref = XrefUtils.getIdentityXref(interactor, CvDatabase.REFSEQ_MI_REF);
                 }
-            } else if (interactor instanceof SmallMolecule) {
-                SmallMolecule bioactiveEntity = (SmallMolecule) interactor;
-                xref = SmallMoleculeUtils.getChebiXref(bioactiveEntity);
-            } else if (interactor instanceof Complex) {
-                Complex complexParticipant = (Complex) interactor;
-                xref = getComplexPrimaryXref(complexParticipant);
+            } else if (CvObjectUtils.isSmallMoleculeType(interactorType)) {
+                xref = SmallMoleculeUtils.getChebiXref(interactor);
+            } else if (CvObjectUtils.isComplexType(interactorType)) {
+                xref = getComplexPrimaryXref(interactor);
             } else {
                 xref = XrefUtils.getIdentityXref(interactor, RNA_CENTRAL_MI);
             }

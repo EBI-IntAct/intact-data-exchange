@@ -255,7 +255,9 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
                                         }
                                     }
                                     catch(IOException e){
-                                        log.error("ERROR with psicquic client serving "+shortLabel+" data. Cannot fetch data.", e);
+                                        log.error(
+                                                "ERROR with psicquic client serving '" + shortLabel + "' data. Cannot fetch data for id '" + ID + "'.",
+                                                e);
                                     }
                                     finally {
 
