@@ -193,7 +193,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         enrichXrefs(ComplexFieldNames.INTERACTOR_XREF, ComplexFieldNames.INTERACTOR_XREF_EXACT, ComplexFieldNames.INTERACTOR_ID, interactorXrefs, solrDocument, false);
     }
 
-    public void enrichSerialisedParticipant(Component participant, SolrInputDocument solrDocument) throws JsonProcessingException {
+    public void enrichSerialisedParticipant(Component participant, SolrInputDocument solrDocument) throws JsonProcessingException, SolrServerException {
         Interactor interactor = participant.getInteractor();
         String identifier = ComplexUtils.getParticipantIdentifier(participant);
 
@@ -203,7 +203,8 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
                 ComplexUtils.getParticipantName(participant),
                 interactor.getFullName(),
                 ComplexUtils.getParticipantStoichiometry(participant),
-                interactor.getCvInteractorType().getFullName());
+                interactor.getCvInteractorType().getFullName(),
+                findInteractorOrganismName(interactor));
         String serialisedInteractor = mapper.writeValueAsString(complexInteractor);
         solrDocument.addField(ComplexFieldNames.SERIALISED_INTERACTION, serialisedInteractor);
     }
@@ -373,6 +374,22 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
 
         // return an OntologyTerm using tax id and short label
         return biosource != null ? findOntologyTerm(biosource.getTaxId(), biosource.getShortLabel()) : null ;
+    }
+
+    // is for find the ontology term for a specific interaction. Needs to take the host organism coming from experiment
+    public String findInteractorOrganismName(Interactor interactor) throws SolrServerException {
+        // get BioSource information from interactor
+        BioSource biosource = interactor.getBioSource();
+
+        if (biosource != null) {
+            // get OntologyTerm using tax id and short label
+            OntologyTerm ontologyTerm = findOntologyTerm(biosource.getTaxId(), biosource.getShortLabel());
+            if (ontologyTerm != null) {
+                return ontologyTerm.getName() + "; " + ontologyTerm.getId();
+            }
+        }
+
+        return null;
     }
 
     public String getComplexProperties() {

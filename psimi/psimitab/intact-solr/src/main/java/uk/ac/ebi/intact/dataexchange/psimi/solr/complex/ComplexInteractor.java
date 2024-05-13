@@ -14,13 +14,15 @@ public class ComplexInteractor {
                              String name,
                              String description,
                              String stochiometry,
-                             String interactorType) {
+                             String interactorType,
+                             String organismName) {
         this.identifier = identifier;
         this.identifierLink = identifierLink;
         this.name = name;
         this.description = description;
         this.stochiometry = stochiometry;
         this.interactorType = interactorType;
+        this.organismName = organismName;
     }
 
     /*********************************/
@@ -75,6 +77,14 @@ public class ComplexInteractor {
         this.interactorType = interactorType;
     }
 
+    public String setOrganismName() {
+        return organismName;
+    }
+
+    public void setOrganismName(String organismName) {
+        this.organismName = organismName;
+    }
+
     /********************************/
     /*      Private attributes      */
     /********************************/
@@ -85,4 +95,5 @@ public class ComplexInteractor {
     private String description = null;
     private String stochiometry = null;
     private String interactorType;
+    private String organismName;
 }
