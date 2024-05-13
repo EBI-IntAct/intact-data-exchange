@@ -77,7 +77,7 @@ public class ComplexInteractor {
         this.interactorType = interactorType;
     }
 
-    public String setOrganismName() {
+    public String getOrganismName() {
         return organismName;
     }
 
