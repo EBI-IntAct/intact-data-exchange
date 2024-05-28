@@ -95,16 +95,16 @@ public final class ComplexUtils {
                     maxStochiometry += (int) participant.getMaxStoichiometry();
                 } else {
                     //Different
-                    aux.setStoichiometry(minStochiometry);
-                    aux.setMaxStoichiometry(maxStochiometry);
+                    aux.setStoichiometry((float) minStochiometry);
+                    aux.setMaxStoichiometry((float) maxStochiometry);
                     merged.add(aux);
                     aux = participant;
                     minStochiometry = (int) participant.getStoichiometry();
                     maxStochiometry = (int) participant.getMaxStoichiometry();
                 }
             }
-            aux.setStoichiometry(minStochiometry);
-            aux.setMaxStoichiometry(maxStochiometry);
+            aux.setStoichiometry((float) minStochiometry);
+            aux.setMaxStoichiometry((float) maxStochiometry);
             merged.add(aux);
             return merged;
         } else {

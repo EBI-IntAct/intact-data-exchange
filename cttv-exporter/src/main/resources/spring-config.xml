@@ -65,6 +65,7 @@
                 <prop key="hibernate.format_sql">false</prop>
                 <prop key="hibernate.hbm2ddl.auto">${db.hbm2ddl}</prop>
                 <prop key="hibernate.connection.release_mode">after_transaction</prop>
+                <prop key="hibernate.default_schema">intact</prop>
             </props>
         </property>
         <property name="jpaVendorAdapter">

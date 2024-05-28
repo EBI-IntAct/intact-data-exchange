@@ -9,4 +9,4 @@ echo "MAVEN_OPTS=$MAVEN_OPTS"
 
 MAVEN_PROFILE=$5
 
-mvn clean install -Pbinary-export,${MAVEN_PROFILE} -Drule=$1 -Dmitab=$2 -DfileExported=$3 -DfileExcluded=$4 -Dmaven.test.skip -Ddb=oracle
+mvn clean install -Pbinary-export,${MAVEN_PROFILE} -Drule=$1 -Dmitab=$2 -DfileExported=$3 -DfileExcluded=$4 -Dmaven.test.skip -Ddb=postgres
