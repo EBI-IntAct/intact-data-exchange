@@ -79,6 +79,10 @@ public final class ComplexUtils {
         return null;
     }
 
+    public static String getGeneName(Interactor interactor) {
+        return getAlias(interactor, CvAliasType.GENE_NAME_MI_REF);
+    }
+
     public static Collection<Component> mergeParticipants(Collection<Component> participants) {
         if (participants.size() > 1) {
             Comparator<Component> comparator = Comparator.comparing(o -> o.getInteractor().getAc());
@@ -130,6 +134,7 @@ public final class ComplexUtils {
     private static String getComplexName(Interactor complex) {
         return getAlias(complex, CvAliasType.COMPLEX_RECOMMENDED_NAME_MI_REF);
     }
+
     private static String getAlias(Interactor complex, String id) {
         for (Alias alias : complex.getAliases()) {
             if (alias.getName() != null && alias.getCvAliasType() != null && alias.getCvAliasType().getIdentifier().equals(id)) {

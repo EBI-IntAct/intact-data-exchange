@@ -204,7 +204,8 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
                 interactor.getFullName(),
                 ComplexUtils.getParticipantStoichiometry(participant),
                 interactor.getCvInteractorType().getFullName(),
-                findInteractorOrganismName(interactor));
+                findInteractorOrganismName(interactor),
+                ComplexUtils.getGeneName(interactor));
         String serialisedInteractor = mapper.writeValueAsString(complexInteractor);
         solrDocument.addField(ComplexFieldNames.SERIALISED_INTERACTION, serialisedInteractor);
     }

@@ -15,7 +15,8 @@ public class ComplexInteractor {
                              String description,
                              String stochiometry,
                              String interactorType,
-                             String organismName) {
+                             String organismName,
+                             String geneName) {
         this.identifier = identifier;
         this.identifierLink = identifierLink;
         this.name = name;
@@ -23,6 +24,7 @@ public class ComplexInteractor {
         this.stochiometry = stochiometry;
         this.interactorType = interactorType;
         this.organismName = organismName;
+        this.geneName = geneName;
     }
 
     /*********************************/
@@ -85,6 +87,14 @@ public class ComplexInteractor {
         this.organismName = organismName;
     }
 
+    public String getGeneName() {
+        return geneName;
+    }
+
+    public void setGeneName(String geneName) {
+        this.geneName = geneName;
+    }
+
     /********************************/
     /*      Private attributes      */
     /********************************/
@@ -96,4 +106,5 @@ public class ComplexInteractor {
     private String stochiometry = null;
     private String interactorType;
     private String organismName;
+    private String geneName;
 }
