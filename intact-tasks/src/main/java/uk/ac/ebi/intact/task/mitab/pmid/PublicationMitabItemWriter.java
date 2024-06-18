@@ -126,11 +126,14 @@ public class PublicationMitabItemWriter implements ItemWriter<Collection<Publica
                 // the all collection is about a same publication so we can extract created date from the first item
                 PublicationFileEntry publication = publicationEntries.iterator().next();
 
-                // we extract the created date
-                Date created = publication.getCreatedDate();
-
                 // the folder name is the date of creation of the publication
-                String folderName = dateFormat.format(created);
+                // we extract the publication date
+                String folderName = publication.getPublicationDate();
+                if (folderName == null) {
+                    // If there is no publication date, we get the created date
+                    Date created = publication.getCreatedDate();
+                    folderName = dateFormat.format(created);
+                }
 
                 if (currentYear == null){
                     currentYear = initializeYearDirectory(folderName);

@@ -121,12 +121,15 @@ public class PublicationFileEntryWriter implements ItemWriter<SortedSet<Publicat
             if (!publicationEntries.isEmpty()){
                 // the all collection is about a same publication so we can extract created date from the first item
                 PublicationFileEntry publication = publicationEntries.iterator().next();
-
-                // we extract the created date
-                Date created = publication.getCreatedDate();
+                // we extract the publication date
+                Date date = publication.getPublicationDate();
+                if (date == null) {
+                    // If there is no publication date, we extract the created date
+                    date = publication.getCreatedDate();
+                }
 
                 // the folder name is the date of creation of the publication
-                String folderName = dateFormat.format(created);
+                String folderName = dateFormat.format(date);
 
                 if (currentYear == null){
                     currentYear = initializeYearDirectory(folderName);

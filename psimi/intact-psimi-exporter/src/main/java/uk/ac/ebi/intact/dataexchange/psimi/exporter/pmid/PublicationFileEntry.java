@@ -30,11 +30,14 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry> {
      */
     private List<InteractionEvidence> interactions;
 
-    public PublicationFileEntry(Date createdDate, String pubId, List<InteractionEvidence> interactions){
+    private Date publicationDate;
+
+    public PublicationFileEntry(Date createdDate, String pubId, List<InteractionEvidence> interactions, Date publicationDate){
         super();
         this.createdDate = createdDate;
         this.entryName = pubId;
         this.interactions = interactions;
+        this.publicationDate = publicationDate;
     }
 
     public Date getCreatedDate() {
@@ -47,6 +50,10 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry> {
 
     public List<InteractionEvidence> getInteractions() {
         return interactions;
+    }
+
+    public Date getPublicationDate() {
+        return publicationDate;
     }
 
     @Override
