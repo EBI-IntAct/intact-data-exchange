@@ -12,7 +12,7 @@
     <groupId>uk.ac.ebi.intact.dataexchange</groupId>
     <artifactId>intact-dataexchange-master</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.1-SNAPSHOT</version>
 
     <name>IntAct Data Exchange</name>
     <description>Data Exchange Master POM</description>
@@ -20,7 +20,7 @@
 
     <properties>
         <core.version>3.0.1-SNAPSHOT</core.version>
-        <bridges.version>2.2.2</bridges.version>
+        <bridges.version>2.2.3-SNAPSHOT</bridges.version>
         <commons.version>2.1.10</commons.version>
         <intact.tools.version>2.0.0-SNAPSHOT</intact.tools.version>
         <intact.jami.version>3.0.0-SNAPSHOT</intact.jami.version>
@@ -33,7 +33,7 @@
         <uniprot.japi.version>1.1.2</uniprot.japi.version>
         <chebiws.client.version>2.4</chebiws.client.version>
 
-        <micluster.version>1.9.0-SNAPSHOT</micluster.version>
+        <micluster.version>1.9.1-SNAPSHOT</micluster.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>4.13.2</junit.version>
 
@@ -221,10 +221,6 @@
         <repository>
             <id>nexus</id>
             <url>https://www.ebi.ac.uk/intact/maven/nexus/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>nexus-ebi-repo-old</id>
-            <url>https://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
         </repository>
         <repository>
             <id>nexus-ebi-release-repo</id>
