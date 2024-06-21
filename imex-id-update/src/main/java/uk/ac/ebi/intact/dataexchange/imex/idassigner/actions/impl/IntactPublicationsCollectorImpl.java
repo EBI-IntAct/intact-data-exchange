@@ -67,7 +67,6 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     public IntactPublicationsCollectorImpl(){
     }
 
-
     private List<String> collectPublicationHavingAtLeastTwoProteins() {
         List<Object[]> publicationsHavingProteinPeptide = collectPublicationsHavingProteinsOrPeptides();
 
@@ -122,32 +121,40 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
-
     private List<String> collectPublicationsElligibleForImex(){
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
-        String publicationsToAssign = "select distinct p.ac from IntactPublication as p join p.dbAnnotations as a" +
-                " where a.topic.identifier = :curation " +
-                "and a.value = :imex " +
-                "and ( lower(p.source.shortName) = :intact " +
-                "or lower(p.source.shortName) = :i2d " +
-                "or lower(p.source.shortName) = :innatedb " +
-                "or lower(p.source.shortName) = :molecularConnections " +
-                "or lower(p.source.shortName) = :uniprot " +
-                "or lower(p.source.shortName) = :mbinfo " +
-                "or lower(p.source.shortName) = :mpidb " +
-                "or lower(p.source.shortName) = :mint " +
-                "or lower(p.source.shortName) = :hpidb " +
-                "or lower(p.source.shortName) = :dip " +
-                "or lower(p.source.shortName) = :bhf" +
+        String publicationsToAssign = "select distinct p.ac " +
+                "from intact.ia_publication p " +
+                "join intact.ia_pub2annot pub2ann on p.ac = pub2ann.publication_ac " +
+                "join intact.ia_annotation a on pub2ann.annotation_ac = a.ac " +
+                "join intact.ia_controlledvocab topic on a.topic_ac = topic.ac " +
+                "join intact.ia_institution source on p.owner_ac = source.ac " +
+                "where topic.identifier = :curation " +
+                "and a.description = :imex " +
+                "and (lower(source.shortlabel) = :intact " +
+                " or lower(source.shortlabel) = :i2d " +
+                " or lower(source.shortlabel) = :innatedb " +
+                " or lower(source.shortlabel) = :molecularConnections " +
+                " or lower(source.shortlabel) = :uniprot " +
+                " or lower(source.shortlabel) = :mbinfo " +
+                " or lower(source.shortlabel) = :mpidb " +
+                " or lower(source.shortlabel) = :mint " +
+                " or lower(source.shortlabel) = :hpidb " +
+                " or lower(source.shortlabel) = :dip " +
+                " or lower(source.shortlabel) = :bhf " +
                 ") " +
-                "and p.ac not in (" +
-                "select distinct p2.ac from IntactPublication as p2 join p2.dbXrefs as x where " +
-                "x.database.identifier = :imexDatabase " +
-                " and x.qualifier.identifier = :imexPrimary " +
+                "and p.ac not in ( " +
+                " select distinct p2.ac " +
+                " from intact.ia_publication p2 " +
+                " join intact.ia_publication_xref x on p2.ac = x.parent_ac " +
+                " join intact.ia_controlledvocab database on x.database_ac = database.ac " +
+                " join intact.ia_controlledvocab qualifier on x.qualifier_ac = qualifier.ac " +
+                " where database.identifier = :imexDatabase " +
+                " and qualifier.identifier = :imexPrimary " +
                 ")";
 
-        Query query = manager.createQuery(publicationsToAssign);
+        Query query = manager.createNativeQuery(publicationsToAssign);
         query.setParameter("curation", "MI:0955");
         query.setParameter("imex", "imex curation");
         query.setParameter("imexDatabase", Xref.IMEX_MI);
@@ -170,9 +177,11 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<String> collectPublicationAcceptedForRelease() {
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
-        String datasetQuery = "select distinct p.ac from IntactPublication p join p.cvStatus as s " +
-                "where s.shortName = :released or s.shortName = :accepted or s.shortName= :readyForRelease";
-        Query query = manager.createQuery(datasetQuery);
+        String datasetQuery = "select distinct p.ac " +
+                "from intact.ia_publication p " +
+                "join intact.ia_controlledvocab s on p.status_ac = s.ac " +
+                "where s.shortlabel = :released or s.shortlabel = :accepted or s.shortlabel= :readyForRelease";
+        Query query = manager.createNativeQuery(datasetQuery);
         query.setParameter("released", LifeCycleStatus.RELEASED.shortLabel().toLowerCase());
         query.setParameter("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.shortLabel().toLowerCase());
         query.setParameter("accepted", LifeCycleStatus.ACCEPTED.shortLabel().toLowerCase());
@@ -183,10 +192,15 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<String> collectPublicationHavingUniprotDrExportNo() {
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
-        String uniprotDrQuery = "select distinct p.ac from IntactPublication p join p.experiments as e join e.annotations as a " +
-                "where a.topic.shortName = :uniprotDrExport and (a.value = :no or a.value = :no2)";
+        String uniprotDrQuery = "select distinct p.ac " +
+                "from intact.ia_publication p " +
+                "join intact.ia_experiment e on p.ac = e.publication_ac " +
+                "join intact.ia_exp2annot exp2ann on e.ac = exp2ann.experiment_ac " +
+                "join intact.ia_annotation a on exp2ann.annotation_ac = a.ac " +
+                "join intact.ia_controlledvocab topic on a.topic_ac = topic.ac " +
+                "where topic.shortlabel = :uniprotDrExport and (a.description = :no or a.description = :no2)";
 
-        Query query = manager.createQuery(uniprotDrQuery);
+        Query query = manager.createNativeQuery(uniprotDrQuery);
         query.setParameter("uniprotDrExport", UNIPROT_DR_EXPORT);
         query.setParameter("no", "no");
         query.setParameter("no2", "No");
@@ -195,32 +209,47 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         return publications;
     }
 
-
     private List<String> collectPublicationCandidatesToImexWithImexCurationLevel() {
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
-        String datasetQuery = "select distinct p2.ac from IntactPublication p2 join p2.dbAnnotations as a3 " +
-                "where a3.topic.identifier = :curation and a3.value = :imex";
+        String datasetQuery = "select distinct p2.ac " +
+                "from intact.ia_publication p2 " +
+                "join intact.ia_pub2annot pub2ann on p2.ac = pub2ann.publication_ac " +
+                "join intact.ia_annotation a3 on pub2ann.annotation_ac = a3.ac " +
+                "join intact.ia_controlledvocab topic on a3.topic_ac = topic.ac " +
+                "where topic.identifier = :curation and a3.description = :imex";
 
-        Query query = manager.createQuery(datasetQuery);
+        Query query = manager.createNativeQuery(datasetQuery);
         query.setParameter("curation", "MI:0955");
         query.setParameter("imex", "imex curation");
 
         return query.getResultList();
     }
 
-    public List<Object[]> collectPublicationsHavingProteinsOrPeptides() {
+    private List<Object[]> collectPublicationsHavingProteinsOrPeptides() {
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
-        String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) from IntactInteractionEvidence as i join i.dbExperiments as e " +
-                "join e.publication as p2 join i.participants as c join c.interactor as interactor " +
-                "where i.ac not in " +
-                "(select distinct i2.ac from IntactParticipantEvidence c2 join c2.dbParentInteraction as i2 join c2.interactor as interactor2 " +
-                " where interactor2.interactorType.identifier <> :protein and interactor2.interactorType.identifier <> :peptide)" +
-                "group by p2.ac, i.ac, interactor.interactorType.identifier having (interactor.interactorType.identifier = :protein " +
-                "or interactor.interactorType.identifier = :peptide) order by p2.ac, i.ac";
+        String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) " +
+                "from intact.ia_interactor i " +
+                "join intact.ia_int2exp int2exp on i.ac = int2exp.interaction_ac " +
+                "join intact.ia_experiment e on int2exp.experiment_ac = e.ac " +
+                "join intact.ia_publication p2 on e.publication_ac = p2.ac " +
+                "join intact.ia_component c on i.ac = c.interaction_ac " +
+                "join intact.ia_interactor interactor on c.interactor_ac = interactor.ac " +
+                "join intact.ia_controlledvocab interactor_interactorType on interactor.interactortype_ac = interactor_interactorType.ac " +
+                "where i.ac not in ( " +
+                " select distinct i2.ac " +
+                " from intact.ia_component c2 " +
+                " join intact.ia_interactor i2 on c2.interaction_ac  = i2.ac " +
+                " join intact.ia_interactor interactor2 on c2.interactor_ac = i2.ac " +
+                " join intact.ia_controlledvocab interactor2_interactorType on interactor2.interactortype_ac = interactor2_interactorType.ac " +
+                " where interactor2_interactorType.identifier <> :protein and interactor2_interactorType.identifier <> :peptide " +
+                ") " +
+                "and (interactor_interactorType.identifier = :protein or interactor_interactorType.identifier = :peptide) " +
+                "group by p2.ac, i.ac, interactor_interactorType.identifier " +
+                "order by p2.ac, i.ac";
 
-        Query query = manager.createQuery(proteinQuery);
+        Query query = manager.createNativeQuery(proteinQuery);
         query.setParameter("protein", Protein.PROTEIN_MI);
         query.setParameter("peptide", Protein.PEPTIDE_MI);
 
@@ -230,18 +259,25 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<String> collectPublicationsHavingPPIInteractions() {
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
-        String datasetQuery = "select distinct p2.ac from IntactParticipantEvidence c join c.dbParentInteraction as i " +
-                "join i.dbExperiments as e " +
-                "join e.publication as p2 " +
-                "join c.interactor as interactor " +
-                "where (interactor.interactorType.identifier = :protein " +
-                "or interactor.interactorType.identifier = :peptide) " +
-                "and i.ac not in (select distinct i2.ac from IntactInteractionEvidence i2 " +
-                "join i2.participants as comp " +
-                "join comp.interactor as interactor2 " +
-                "where interactor2.interactorType.identifier <> :protein and interactor2.interactorType.identifier <> :peptide)";
+        String datasetQuery = "select distinct p2.ac " +
+                "from intact.ia_component c " +
+                "join intact.ia_interactor i on c.interaction_ac  = i.ac " +
+                "join intact.ia_int2exp int2exp on i.ac = int2exp.interaction_ac " +
+                "join intact.ia_experiment e on int2exp.experiment_ac = e.ac " +
+                "join intact.ia_publication p2 on e.publication_ac = p2.ac " +
+                "join intact.ia_interactor interactor on c.interactor_ac = interactor.ac " +
+                "join intact.ia_controlledvocab interactor_interactorType on interactor.interactortype_ac = interactor_interactorType.ac " +
+                "where (interactor_interactorType.identifier = :protein or interactor_interactorType.identifier = :peptide) " +
+                "and i.ac not in ( " +
+                " select distinct i2.ac " +
+                " from intact.ia_interactor i2 " +
+                " join intact.ia_component comp on i2.ac = comp.interaction_ac " +
+                " join intact.ia_interactor interactor2 on comp.interactor_ac = i2.ac " +
+                " join intact.ia_controlledvocab interactor2_interactorType on interactor2.interactortype_ac = interactor2_interactorType.ac " +
+                " where interactor2_interactorType.identifier <> :protein and interactor2_interactorType.identifier <> :peptide " +
+                ")";
 
-        Query query = manager.createQuery(datasetQuery);
+        Query query = manager.createNativeQuery(datasetQuery);
         query.setParameter("protein", Protein.PROTEIN_MI);
         query.setParameter("peptide", Protein.PEPTIDE_MI);
 
@@ -252,11 +288,17 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
 
-        String imexInteractionQuery = "select distinct p3.ac from IntactInteractionEvidence i join i.dbExperiments as e " +
-                "join e.publication as p3 join i.dbXrefs as x " +
-                "where x.database.identifier = :imex and x.qualifier.identifier = :imexPrimary";
+        String imexInteractionQuery = "select distinct p3.ac " +
+                "from intact.ia_interactor i " +
+                "join intact.ia_int2exp int2exp on i.ac = int2exp.interaction_ac " +
+                "join intact.ia_experiment e on int2exp.experiment_ac = e.ac " +
+                "join intact.ia_publication p3 on e.publication_ac = p3.ac " +
+                "join intact.ia_interactor_xref x on p3.ac = x.parent_ac " +
+                "join intact.ia_controlledvocab database on x.database_ac = database.ac " +
+                "join intact.ia_controlledvocab qualifier on x.qualifier_ac = qualifier.ac " +
+                "where database.identifier = :imex and qualifier.identifier = :imexPrimary";
 
-        Query query = manager.createQuery(imexInteractionQuery);
+        Query query = manager.createNativeQuery(imexInteractionQuery);
         query.setParameter("imex", Xref.IMEX_MI);
         query.setParameter("imexPrimary", Xref.IMEX_PRIMARY_MI);
 
@@ -267,10 +309,15 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
 
-        String imexExperimentQuery = "select distinct p4.ac from IntactExperiment e2 join e2.publication as p4 join e2.xrefs as x2 " +
-                "where x2.database.identifier = :imex and x2.qualifier.identifier = :imexPrimary";
+        String imexExperimentQuery = "select distinct e2.ac" +
+                "from intact.ia_experiment e2 " +
+                "join intact.ia_publication p4 on e2.publication_ac = p4.ac " +
+                "join intact.ia_experiment_xref x2 on e2.ac = x2.parent_ac " +
+                "join intact.ia_controlledvocab database on x2.database_ac = database.ac " +
+                "join intact.ia_controlledvocab qualifier on x2.qualifier_ac = qualifier.ac " +
+                "where database.identifier = :imex and qualifier.identifier = :imexPrimary";
 
-        Query query = manager.createQuery(imexExperimentQuery);
+        Query query = manager.createNativeQuery(imexExperimentQuery);
         query.setParameter("imex", Xref.IMEX_MI);
         query.setParameter("imexPrimary", Xref.IMEX_PRIMARY_MI);
 
@@ -281,10 +328,14 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
 
-        String imexPublicationQuery = "select distinct p5.ac from IntactPublication p5 join p5.dbXrefs as x3 " +
-                "where x3.database.identifier = :imex and x3.qualifier.identifier = :imexPrimary";
+        String imexPublicationQuery = "select distinct p5.ac " +
+                "from intact.ia_publication p5 " +
+                "join intact.ia_publication_xref x3 on p5.ac = x3.parent_ac " +
+                "join intact.ia_controlledvocab database on x3.database_ac = database.ac " +
+                "join intact.ia_controlledvocab qualifier on x3.qualifier_ac = qualifier.ac " +
+                "where database.identifier = :imex and qualifier.identifier = :imexPrimary";
 
-        Query query = manager.createQuery(imexPublicationQuery);
+        Query query = manager.createNativeQuery(imexPublicationQuery);
         query.setParameter("imex", Xref.IMEX_MI);
         query.setParameter("imexPrimary", Xref.IMEX_PRIMARY_MI);
 
@@ -440,33 +491,40 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
 
     @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public void initialise() {
+        System.out.println("DEBUG - initialise - BEGIN");
         if (publicationsHavingImexId == null){
+            System.out.println("DEBUG - initialise - publicationsHavingImexId");
             publicationsHavingImexId = collectPublicationsHavingImexIds();
         }
         if (publicationsWithInteractionsHavingImexId == null){
+            System.out.println("DEBUG - initialise - collectPublicationHavingInteractionImexIds");
             publicationsWithInteractionsHavingImexId = collectPublicationHavingInteractionImexIds();
         }
         if (publicationsWithExperimentsHavingImexId == null){
+            System.out.println("DEBUG - initialise - collectPublicationHavingExperimentImexIds");
             publicationsWithExperimentsHavingImexId = collectPublicationHavingExperimentImexIds();
         }
         if (publicationsElligibleForImex == null){
+            System.out.println("DEBUG - initialise - collectPublicationsElligibleForImex");
             publicationsElligibleForImex = collectPublicationsElligibleForImex();
         }
         if (publicationsHavingImexCurationLevel == null){
+            System.out.println("DEBUG - initialise - collectPublicationCandidatesToImexWithImexCurationLevel");
             publicationsHavingImexCurationLevel = collectPublicationCandidatesToImexWithImexCurationLevel();
         }
         if (publicationsAcceptedForRelease == null){
+            System.out.println("DEBUG - initialise - collectPublicationAcceptedForRelease");
             publicationsAcceptedForRelease = collectPublicationAcceptedForRelease();
         }
         if (publicationsInvolvingPPI == null){
-
+            System.out.println("DEBUG - initialise - collectPublicationHavingAtLeastTwoProteins");
             publicationsInvolvingPPI = collectPublicationHavingAtLeastTwoProteins();
         }
         if (publicationsHavingUniprotDRExportNo == null){
-
+            System.out.println("DEBUG - initialise - collectPublicationHavingUniprotDrExportNo");
             publicationsHavingUniprotDRExportNo = collectPublicationHavingUniprotDrExportNo();
         }
-
+        System.out.println("DEBUG - initialise - END");
         isInitialised = true;
     }
 }

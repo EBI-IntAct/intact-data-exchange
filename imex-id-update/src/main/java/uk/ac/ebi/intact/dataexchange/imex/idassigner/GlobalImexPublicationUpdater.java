@@ -179,14 +179,21 @@ public class GlobalImexPublicationUpdater {
      * Update existing IMEx publications in IntAct and assign interaction imex ids if not already done
      */
     public void updateExistingImexPublications(){
+        System.out.println("DEBUG - Before getImexCentralManager");
         ImexCentralManager imexCentralManager = getImexCentralManager();
+        System.out.println("DEBUG - After getImexCentralManager");
 
         imexCentralManager.registerListenersIfNotDoneYet();
+        System.out.println("DEBUG - Before getBean intactPublicationCollector");
         IntactPublicationCollector intactPublicationCollector = ApplicationContextProvider.getBean("intactPublicationCollector");
+        System.out.println("DEBUG - After getBean intactPublicationCollector");
 
+        System.out.println("DEBUG - Before getPublicationsHavingIMExIdToUpdate");
         Collection<String> publicationsToUpdate = intactPublicationCollector.getPublicationsHavingIMExIdToUpdate();
+        System.out.println("DEBUG - After getPublicationsHavingIMExIdToUpdate");
 
             for (String publication : publicationsToUpdate){
+                System.out.println("DEBUG - Processing update of publication " + publication);
                 log.info("Processing update of publication " + publication);
 
                 try {
