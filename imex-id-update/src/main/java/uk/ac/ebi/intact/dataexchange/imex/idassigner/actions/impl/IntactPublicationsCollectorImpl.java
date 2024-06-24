@@ -61,10 +61,14 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     private List<String> collectPublicationHavingAtLeastTwoProteins() {
+        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - collectPublicationsHavingProteinsOrPeptides");
         List<Object[]> publicationsHavingProteinPeptide = collectPublicationsHavingProteinsOrPeptides();
 
         // collect all the interactions having only protein-protein or peptide interactions
+        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - collectPublicationsHavingPPIInteractions");
         List<String> publications = collectPublicationsHavingPPIInteractions();
+
+        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - after both queries");
 
         Map<String, Set<String>> mapOfPublicationsAndInteractions = new HashMap<String, Set<String>>(publicationsHavingProteinPeptide.size());
         Map<String, Long> mapOfNumberParticipants = new HashMap<String, Long>(publicationsHavingProteinPeptide.size());
@@ -99,6 +103,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
             }
         }
 
+        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - after while loop");
+
         for (Map.Entry<String, Set<String>> pubEntry : mapOfPublicationsAndInteractions.entrySet()){
             Set<String> interactionsAcs = pubEntry.getValue();
             String pubAc = pubEntry.getKey();
@@ -110,6 +116,8 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 }
             }
         }
+
+        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - after for loop");
 
         return publications;
     }
@@ -484,40 +492,40 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
 
     @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public void initialise() {
-        System.out.println("DEBUG - initialise - BEGIN");
+        log.info("DEBUG - initialise - BEGIN");
         if (publicationsHavingImexId == null){
-            System.out.println("DEBUG - initialise - publicationsHavingImexId");
+            log.info("DEBUG - initialise - publicationsHavingImexId");
             publicationsHavingImexId = collectPublicationsHavingImexIds();
         }
         if (publicationsWithInteractionsHavingImexId == null){
-            System.out.println("DEBUG - initialise - collectPublicationHavingInteractionImexIds");
+            log.info("DEBUG - initialise - collectPublicationHavingInteractionImexIds");
             publicationsWithInteractionsHavingImexId = collectPublicationHavingInteractionImexIds();
         }
         if (publicationsWithExperimentsHavingImexId == null){
-            System.out.println("DEBUG - initialise - collectPublicationHavingExperimentImexIds");
+            log.info("DEBUG - initialise - collectPublicationHavingExperimentImexIds");
             publicationsWithExperimentsHavingImexId = collectPublicationHavingExperimentImexIds();
         }
         if (publicationsElligibleForImex == null){
-            System.out.println("DEBUG - initialise - collectPublicationsElligibleForImex");
+            log.info("DEBUG - initialise - collectPublicationsElligibleForImex");
             publicationsElligibleForImex = collectPublicationsElligibleForImex();
         }
         if (publicationsHavingImexCurationLevel == null){
-            System.out.println("DEBUG - initialise - collectPublicationCandidatesToImexWithImexCurationLevel");
+            log.info("DEBUG - initialise - collectPublicationCandidatesToImexWithImexCurationLevel");
             publicationsHavingImexCurationLevel = collectPublicationCandidatesToImexWithImexCurationLevel();
         }
         if (publicationsAcceptedForRelease == null){
-            System.out.println("DEBUG - initialise - collectPublicationAcceptedForRelease");
+            log.info("DEBUG - initialise - collectPublicationAcceptedForRelease");
             publicationsAcceptedForRelease = collectPublicationAcceptedForRelease();
         }
         if (publicationsInvolvingPPI == null){
-            System.out.println("DEBUG - initialise - collectPublicationHavingAtLeastTwoProteins");
+            log.info("DEBUG - initialise - collectPublicationHavingAtLeastTwoProteins");
             publicationsInvolvingPPI = collectPublicationHavingAtLeastTwoProteins();
         }
         if (publicationsHavingUniprotDRExportNo == null){
-            System.out.println("DEBUG - initialise - collectPublicationHavingUniprotDrExportNo");
+            log.info("DEBUG - initialise - collectPublicationHavingUniprotDrExportNo");
             publicationsHavingUniprotDRExportNo = collectPublicationHavingUniprotDrExportNo();
         }
-        System.out.println("DEBUG - initialise - END");
+        log.info("DEBUG - initialise - END");
         isInitialised = true;
     }
 }
