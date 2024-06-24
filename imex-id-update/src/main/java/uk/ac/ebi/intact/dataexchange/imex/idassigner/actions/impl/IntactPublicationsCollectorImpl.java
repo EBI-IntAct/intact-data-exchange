@@ -8,21 +8,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import psidev.psi.mi.jami.model.Annotation;
 import psidev.psi.mi.jami.model.Protein;
 import psidev.psi.mi.jami.model.Xref;
 import uk.ac.ebi.intact.dataexchange.imex.idassigner.actions.IntactPublicationCollector;
 import uk.ac.ebi.intact.jami.ApplicationContextProvider;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
-import uk.ac.ebi.intact.jami.model.extension.IntactExperiment;
-import uk.ac.ebi.intact.jami.model.extension.IntactParticipantEvidence;
-import uk.ac.ebi.intact.jami.model.extension.IntactPublication;
 import uk.ac.ebi.intact.jami.model.lifecycle.LifeCycleStatus;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -309,7 +302,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
 
-        String imexExperimentQuery = "select distinct e2.ac" +
+        String imexExperimentQuery = "select distinct e2.ac " +
                 "from intact.ia_experiment e2 " +
                 "join intact.ia_publication p4 on e2.publication_ac = p4.ac " +
                 "join intact.ia_experiment_xref x2 on e2.ac = x2.parent_ac " +
