@@ -42,7 +42,6 @@ import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 /**
@@ -102,7 +101,6 @@ public class ImexCentralManager {
     @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public void updateIntactPublicationHavingIMEx(String publicationAc) throws PublicationImexUpdaterException, EnricherException {
         // register intactdao in the transaction manager so it can clean cache after transaction commit
-        log.info("updateIntactPublicationHavingIMEx > registerSynchronization");
         afterCommitExecutor.registerDaoForSynchronization(this.intactDao);
         PublicationDao pubDao = intactDao.getPublicationDao();
 
@@ -172,7 +170,6 @@ public class ImexCentralManager {
     @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public void assignImexAndUpdatePublication(String publicationAc) throws PublicationImexUpdaterException, EnricherException {
         // register intactdao in the transaction manager so it can clean cache after transaction commit
-        log.info("assignImexAndUpdatePublication > registerSynchronization");
         afterCommitExecutor.registerDaoForSynchronization(this.intactDao);
         PublicationDao pubDao = intactDao.getPublicationDao();
 
@@ -234,7 +231,6 @@ public class ImexCentralManager {
     @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED)
     public void registerAndUpdatePublication(String publicationAc) throws EnricherException {
         // register intactdao in the transaction manager so it can clean cache after transaction commit
-        log.info("registerAndUpdatePublication > registerSynchronization");
         afterCommitExecutor.registerDaoForSynchronization(this.intactDao);
         PublicationDao pubDao = intactDao.getPublicationDao();
 
@@ -294,7 +290,6 @@ public class ImexCentralManager {
      */
     public void discardPublication(String publicationAc) throws BridgeFailedException {
         // register intactdao in the transaction manager so it can clean cache after transaction commit
-        log.info("discardPublication > registerSynchronization");
         afterCommitExecutor.registerDaoForSynchronization(this.intactDao);
         PublicationDao pubDao = intactDao.getPublicationDao();
 

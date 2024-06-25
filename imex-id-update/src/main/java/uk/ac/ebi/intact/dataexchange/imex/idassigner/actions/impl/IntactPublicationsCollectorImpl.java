@@ -16,6 +16,7 @@ import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.model.lifecycle.LifeCycleStatus;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -61,14 +62,10 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     }
 
     private List<String> collectPublicationHavingAtLeastTwoProteins() {
-        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - collectPublicationsHavingProteinsOrPeptides");
         List<Object[]> publicationsHavingProteinPeptide = collectPublicationsHavingProteinsOrPeptides();
 
         // collect all the interactions having only protein-protein or peptide interactions
-        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - collectPublicationsHavingPPIInteractions");
         List<String> publications = collectPublicationsHavingPPIInteractions();
-
-        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - after both queries");
 
         Map<String, Set<String>> mapOfPublicationsAndInteractions = new HashMap<String, Set<String>>(publicationsHavingProteinPeptide.size());
         Map<String, Long> mapOfNumberParticipants = new HashMap<String, Long>(publicationsHavingProteinPeptide.size());
@@ -82,7 +79,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
             if (o.length == 3){
                 String pubAc = (String) o[0];
                 String interactionAc = (String) o[1];
-                long number = (Long) o[2];
+                BigInteger number = (BigInteger) o[2];
 
                 if (mapOfPublicationsAndInteractions.containsKey(pubAc)){
                     mapOfPublicationsAndInteractions.get(pubAc).add(interactionAc);
@@ -94,16 +91,14 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 }
 
                 if (mapOfNumberParticipants.containsKey(interactionAc)){
-                    long newNumber = mapOfNumberParticipants.get(interactionAc)+number;
+                    long newNumber = mapOfNumberParticipants.get(interactionAc) + number.longValue();
                     mapOfNumberParticipants.put(interactionAc, newNumber);
                 }
                 else {
-                    mapOfNumberParticipants.put(interactionAc, number);
+                    mapOfNumberParticipants.put(interactionAc, number.longValue());
                 }
             }
         }
-
-        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - after while loop");
 
         for (Map.Entry<String, Set<String>> pubEntry : mapOfPublicationsAndInteractions.entrySet()){
             Set<String> interactionsAcs = pubEntry.getValue();
@@ -116,8 +111,6 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 }
             }
         }
-
-        log.info("DEBUG - collectPublicationHavingAtLeastTwoProteins - after for loop");
 
         return publications;
     }
@@ -145,13 +138,14 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 " or lower(source.shortlabel) = :dip " +
                 " or lower(source.shortlabel) = :bhf " +
                 ") " +
-                "and p.ac not in ( " +
-                " select distinct p2.ac " +
+                "and not exists ( " +
+                " select * " +
                 " from intact.ia_publication p2 " +
                 " join intact.ia_publication_xref x on p2.ac = x.parent_ac " +
                 " join intact.ia_controlledvocab database on x.database_ac = database.ac " +
                 " join intact.ia_controlledvocab qualifier on x.qualifier_ac = qualifier.ac " +
-                " where database.identifier = :imexDatabase " +
+                " where p2.ac = p.ac " +
+                " and database.identifier = :imexDatabase " +
                 " and qualifier.identifier = :imexPrimary " +
                 ")";
 
@@ -230,7 +224,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
     private List<Object[]> collectPublicationsHavingProteinsOrPeptides() {
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
-        String proteinQuery = "select p2.ac, i.ac, count(distinct c.ac) " +
+        String proteinQuery = "select p2.ac as pub_ac, i.ac as int_ac, count(distinct c.ac) " +
                 "from intact.ia_interactor i " +
                 "join intact.ia_int2exp int2exp on i.ac = int2exp.interaction_ac " +
                 "join intact.ia_experiment e on int2exp.experiment_ac = e.ac " +
@@ -238,13 +232,14 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 "join intact.ia_component c on i.ac = c.interaction_ac " +
                 "join intact.ia_interactor interactor on c.interactor_ac = interactor.ac " +
                 "join intact.ia_controlledvocab interactor_interactorType on interactor.interactortype_ac = interactor_interactorType.ac " +
-                "where i.ac not in ( " +
-                " select distinct i2.ac " +
+                "where not exists ( " +
+                " select * " +
                 " from intact.ia_component c2 " +
                 " join intact.ia_interactor i2 on c2.interaction_ac  = i2.ac " +
                 " join intact.ia_interactor interactor2 on c2.interactor_ac = i2.ac " +
                 " join intact.ia_controlledvocab interactor2_interactorType on interactor2.interactortype_ac = interactor2_interactorType.ac " +
-                " where interactor2_interactorType.identifier <> :protein and interactor2_interactorType.identifier <> :peptide " +
+                " where i2.ac = i.ac " +
+                " and interactor2_interactorType.identifier <> :protein and interactor2_interactorType.identifier <> :peptide " +
                 ") " +
                 "and (interactor_interactorType.identifier = :protein or interactor_interactorType.identifier = :peptide) " +
                 "group by p2.ac, i.ac, interactor_interactorType.identifier " +
@@ -269,13 +264,14 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 "join intact.ia_interactor interactor on c.interactor_ac = interactor.ac " +
                 "join intact.ia_controlledvocab interactor_interactorType on interactor.interactortype_ac = interactor_interactorType.ac " +
                 "where (interactor_interactorType.identifier = :protein or interactor_interactorType.identifier = :peptide) " +
-                "and i.ac not in ( " +
-                " select distinct i2.ac " +
+                "and not exists ( " +
+                " select * " +
                 " from intact.ia_interactor i2 " +
                 " join intact.ia_component comp on i2.ac = comp.interaction_ac " +
                 " join intact.ia_interactor interactor2 on comp.interactor_ac = i2.ac " +
                 " join intact.ia_controlledvocab interactor2_interactorType on interactor2.interactortype_ac = interactor2_interactorType.ac " +
-                " where interactor2_interactorType.identifier <> :protein and interactor2_interactorType.identifier <> :peptide " +
+                " where i2.ac = i.ac " +
+                " and interactor2_interactorType.identifier <> :protein and interactor2_interactorType.identifier <> :peptide " +
                 ")";
 
         Query query = manager.createNativeQuery(datasetQuery);
@@ -294,7 +290,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
                 "join intact.ia_int2exp int2exp on i.ac = int2exp.interaction_ac " +
                 "join intact.ia_experiment e on int2exp.experiment_ac = e.ac " +
                 "join intact.ia_publication p3 on e.publication_ac = p3.ac " +
-                "join intact.ia_interactor_xref x on p3.ac = x.parent_ac " +
+                "join intact.ia_interactor_xref x on i.ac = x.parent_ac " +
                 "join intact.ia_controlledvocab database on x.database_ac = database.ac " +
                 "join intact.ia_controlledvocab qualifier on x.qualifier_ac = qualifier.ac " +
                 "where database.identifier = :imex and qualifier.identifier = :imexPrimary";
@@ -310,7 +306,7 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
         IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
         EntityManager manager = intactDao.getEntityManager();
 
-        String imexExperimentQuery = "select distinct e2.ac " +
+        String imexExperimentQuery = "select distinct p4.ac " +
                 "from intact.ia_experiment e2 " +
                 "join intact.ia_publication p4 on e2.publication_ac = p4.ac " +
                 "join intact.ia_experiment_xref x2 on e2.ac = x2.parent_ac " +
@@ -492,40 +488,33 @@ public class IntactPublicationsCollectorImpl implements IntactPublicationCollect
 
     @Transactional(value = "jamiTransactionManager", propagation = Propagation.REQUIRED, readOnly = true)
     public void initialise() {
-        log.info("DEBUG - initialise - BEGIN");
         if (publicationsHavingImexId == null){
-            log.info("DEBUG - initialise - publicationsHavingImexId");
             publicationsHavingImexId = collectPublicationsHavingImexIds();
         }
         if (publicationsWithInteractionsHavingImexId == null){
-            log.info("DEBUG - initialise - collectPublicationHavingInteractionImexIds");
             publicationsWithInteractionsHavingImexId = collectPublicationHavingInteractionImexIds();
         }
         if (publicationsWithExperimentsHavingImexId == null){
-            log.info("DEBUG - initialise - collectPublicationHavingExperimentImexIds");
             publicationsWithExperimentsHavingImexId = collectPublicationHavingExperimentImexIds();
         }
         if (publicationsElligibleForImex == null){
-            log.info("DEBUG - initialise - collectPublicationsElligibleForImex");
             publicationsElligibleForImex = collectPublicationsElligibleForImex();
         }
         if (publicationsHavingImexCurationLevel == null){
-            log.info("DEBUG - initialise - collectPublicationCandidatesToImexWithImexCurationLevel");
             publicationsHavingImexCurationLevel = collectPublicationCandidatesToImexWithImexCurationLevel();
         }
         if (publicationsAcceptedForRelease == null){
-            log.info("DEBUG - initialise - collectPublicationAcceptedForRelease");
             publicationsAcceptedForRelease = collectPublicationAcceptedForRelease();
         }
         if (publicationsInvolvingPPI == null){
-            log.info("DEBUG - initialise - collectPublicationHavingAtLeastTwoProteins");
+
             publicationsInvolvingPPI = collectPublicationHavingAtLeastTwoProteins();
         }
         if (publicationsHavingUniprotDRExportNo == null){
-            log.info("DEBUG - initialise - collectPublicationHavingUniprotDrExportNo");
+
             publicationsHavingUniprotDRExportNo = collectPublicationHavingUniprotDrExportNo();
         }
-        log.info("DEBUG - initialise - END");
+
         isInitialised = true;
     }
 }

@@ -233,13 +233,30 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
             IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
             EntityManager manager = intactDao.getEntityManager();
 
-            String datasetQuery = "select distinct e.ac from IntactExperiment e " +
-                    "where e.publication.ac = :pubAc and (e.ac not in " +
-                    "(select e2.ac from IntactExperiment e2 join e2.xrefs as x2 where e2.publication.ac = :pubAc and x2.database.identifier = :imex " +
-                    "and x2.qualifier.identifier = :imexPrimary and x2.id = :imexId) or " +
-                    "e.ac in (select e3.ac from IntactExperiment e3 join e3.xrefs as x3 where e3.publication.ac = :pubAc " +
-                    "and x3.database.identifier = :imex and x3.qualifier.identifier = :imexPrimary and x3.id = :imexId " +
-                    "group by e3.ac having count (distinct x3.ac) > 1))";
+            String datasetQuery = "select distinct e.ac " +
+                    "from IntactExperiment e " +
+                    "where e.publication.ac = :pubAc " +
+                    "and ( " +
+                    " e.ac in ( " +
+                    "  select e3.ac " +
+                    "  from IntactExperiment e3 " +
+                    "  join e3.xrefs as x3 " +
+                    "  where e3.publication.ac = :pubAc " +
+                    "  and x3.database.identifier = :imex " +
+                    "  and x3.qualifier.identifier = :imexPrimary " +
+                    "  and x3.id = :imexId " +
+                    "  group by e3.ac " +
+                    "  having count (distinct x3.ac) > 1) " +
+                    " or not exists ( " +
+                    "  select e2.ac " +
+                    "  from IntactExperiment e2 " +
+                    "  join e2.xrefs as x2 " +
+                    "  where e2.ac = e.ac " +
+                    "  and e2.publication.ac = :pubAc " +
+                    "  and x2.database.identifier = :imex " +
+                    "  and x2.qualifier.identifier = :imexPrimary " +
+                    "  and x2.id = :imexId) " +
+                    ")";
 
             Query query = manager.createQuery(datasetQuery);
             query.setParameter("pubAc", ((IntactPublication)pub).getAc());
@@ -260,15 +277,33 @@ public class IntactImexAssignerImpl extends ImexAssignerImpl implements IntactIm
             IntactDao intactDao = ApplicationContextProvider.getBean("intactDao");
             EntityManager manager = intactDao.getEntityManager();
 
-            String datasetQuery = "select distinct i.ac from IntactInteractionEvidence i join i.dbExperiments as e " +
-                    "where e.publication.ac = :pubAc and (i.ac not in " +
-                    "(select i2.ac from IntactInteractionEvidence i2 join i2.dbXrefs as x2 join i2.dbExperiments as e2 " +
-                    "where e2.publication.ac = :pubAc and x2.database.identifier = :imex " +
-                    "and x2.qualifier.identifier = :imexPrimary and x2.id like :imexId) or " +
-                    "i.ac in (select i3.ac from IntactInteractionEvidence i3 join i3.dbXrefs as x3 join i3.dbExperiments as e3 " +
-                    "where e3.publication.ac = :pubAc and x3.database.identifier = :imex " +
-                    "and x3.qualifier.identifier = :imexPrimary and x3.id like :imexId " +
-                    "group by i3.ac having count (distinct x3.ac) > 1))";
+            String datasetQuery = "select distinct i.ac " +
+                    "from IntactInteractionEvidence i " +
+                    "join i.dbExperiments as e " +
+                    "where e.publication.ac = :pubAc " +
+                    "and ( " +
+                    " i.ac in ( " +
+                    "  select i3.ac " +
+                    "  from IntactInteractionEvidence i3 " +
+                    "  join i3.dbXrefs as x3 " +
+                    "  join i3.dbExperiments as e3 " +
+                    "  where e3.publication.ac = :pubAc " +
+                    "  and x3.database.identifier = :imex " +
+                    "  and x3.qualifier.identifier = :imexPrimary " +
+                    "  and x3.id like :imexId " +
+                    "  group by i3.ac " +
+                    "  having count (distinct x3.ac) > 1) " +
+                    " or not exists ( " +
+                    "  select i2 " +
+                    "  from IntactInteractionEvidence i2 " +
+                    "  join i2.dbXrefs as x2 " +
+                    "  join i2.dbExperiments as e2 " +
+                    "  where i2.ac = i.ac " +
+                    "  and e2.publication.ac = :pubAc " +
+                    "  and x2.database.identifier = :imex " +
+                    "  and x2.qualifier.identifier = :imexPrimary " +
+                    "  and x2.id like :imexId) " +
+                    ")";
 
             Query query = manager.createQuery(datasetQuery);
             query.setParameter("pubAc", pub.getAc());
