@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.hupo.psi.mi.psicquic</groupId>
             <artifactId>psicquic-solr</artifactId>
-            <version>1.2.4</version>
+            <version>${psicquic.solr.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
