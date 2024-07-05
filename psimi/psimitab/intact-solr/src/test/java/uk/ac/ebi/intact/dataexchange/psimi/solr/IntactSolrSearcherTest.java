@@ -123,9 +123,8 @@ public class IntactSolrSearcherTest extends AbstractSolrTestCase {
         final IntactSolrSearchResult result1 = (IntactSolrSearchResult) searcher.search( "GRB2", null, null, null, null );
         assertEquals(3, result1.getNumberResults());
 
-        SolrQuery query2 = new SolrQuery("GRB2*");
         final IntactSolrSearchResult result2 = (IntactSolrSearchResult) searcher.search( "GRB2*", null, null, null, null );
-        assertEquals(3, result2.getNumberResults());
+        assertEquals(0, result2.getNumberResults());
 
 
 

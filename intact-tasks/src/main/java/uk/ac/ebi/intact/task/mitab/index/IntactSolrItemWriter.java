@@ -58,11 +58,10 @@ public class IntactSolrItemWriter extends SolrItemWriter {
 
     @Override
     public void close() throws ItemStreamException {
-        super.close();
-
         if (this.ontologySearcher != null){
             this.ontologySearcher.shutdown();
         }
+        super.close();
     }
 
     public void setOntologiesSolrUrl(String ontologiesSolrUrl) {
