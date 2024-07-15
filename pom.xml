@@ -67,6 +67,7 @@
         <module>complex-pdb-export</module>
         <module>complex-tab-export</module>
         <module>complex-uniprot-dr-export</module>
+        <module>intact-orthology-import</module>
     </modules>
 
     <build>
