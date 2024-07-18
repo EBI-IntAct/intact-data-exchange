@@ -166,6 +166,9 @@ public class ComplexSolrConverter {
         // add info to complex_id field: ac, owner, (db, id and db:id) from xrefs
         indexComplexAC(complex, solrDocument) ;
 
+        // Predicted complex
+        solrDocument.addField(ComplexFieldNames.PREDICTED_COMPLEX, complex.isPredictedComplex());
+
         // add info to complex_alias field: short label, full name, (name and type) from  alias
         // and add info to complex_name
         indexComplexNames(complex, solrDocument) ;

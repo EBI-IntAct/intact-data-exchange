@@ -18,11 +18,13 @@ public class ComplexSearchResults {
                                 String complexName_,
                                 String organismName_,
                                 String description_,
+                                Boolean predictedComplex_,
                                 List<ComplexInteractor> interactors_) {
         this.complexAC = complexAC_;
         this.complexName = complexName_;
         this.organismName = organismName_;
         this.description = description_;
+        this.predictedComplex = predictedComplex_;
         this.interactors = interactors_;
     }
 
@@ -41,6 +43,9 @@ public class ComplexSearchResults {
     public String getDescription() {
         return description;
     }
+    public boolean isPredictedComplex() {
+        return predictedComplex != null && predictedComplex;
+    }
     public List<ComplexInteractor> getInteractors() {
         return interactors;
     }
@@ -57,6 +62,9 @@ public class ComplexSearchResults {
     public void setDescription(String Desc) {
         description = Desc;
     }
+    public void setPredictedComplex(Boolean Predicted) {
+        predictedComplex = Predicted;
+    }
     public void setInteractors(List<ComplexInteractor> interactors) {
         this.interactors = interactors;
     }
@@ -68,6 +76,7 @@ public class ComplexSearchResults {
     private String complexName = null;
     private String organismName = null;
     private String description = null;
+    private Boolean predictedComplex = false;
     private List<ComplexInteractor> interactors = null;
 
 }

@@ -89,6 +89,18 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
         return result .toString ( ) .trim ( ) ;
     }
 
+    // getFieldValues is a method to retrieve data for a specific field
+    protected Boolean getBooleanFieldValue ( SolrDocument solrDocument, String field ) {
+        StringBuilder result = new StringBuilder ( ) ;
+        Collection < Object > fieldValues = solrDocument.getFieldValues ( field ) ;
+        // If the SolrDocument has data for this field
+        if ( fieldValues != null && fieldValues.size() == 1 ) {
+            // We iterate through the data and append to the result String
+            return (Boolean) fieldValues.iterator().next();
+        }
+        return null;
+    }
+
     protected List<String> getListOfFieldValues(SolrDocument solrDocument, String field) {
         List<String> result = new ArrayList<>();
         Collection<Object> fieldValues = solrDocument.getFieldValues(field);
@@ -119,6 +131,7 @@ public class ComplexResultIterator implements Iterator <ComplexSearchResults> {
 
         // Get field values for this specific fields
         result.setComplexAC(getFieldValues(solrDocument, ComplexFieldNames.COMPLEX_AC));
+        result.setPredictedComplex(getBooleanFieldValue(solrDocument, ComplexFieldNames.PREDICTED_COMPLEX));
         result.setComplexName(getFieldValues(solrDocument, ComplexFieldNames.COMPLEX_NAME));
         result.setOrganismName(getFieldValues(solrDocument, ComplexFieldNames.ORGANISM_NAME));
         result.setDescription(getFieldValues(solrDocument, ComplexFieldNames.DESCRIPTION));
