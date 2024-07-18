@@ -168,6 +168,7 @@ public class ComplexSolrConverter {
 
         // Predicted complex
         solrDocument.addField(ComplexFieldNames.PREDICTED_COMPLEX, complex.isPredictedComplex());
+        solrDocument.addField(ComplexFieldNames.PREDICTED_COMPLEX_F, complex.isPredictedComplex());
 
         // add info to complex_alias field: short label, full name, (name and type) from  alias
         // and add info to complex_name

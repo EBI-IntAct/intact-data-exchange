@@ -21,6 +21,7 @@
         <fieldType name="uuid"          class="solr.UUIDField"/>
         <fieldType name="int"           class="solr.TrieIntField"   positionIncrementGap="0"     precisionStep="0"/>
         <fieldType name="boolean"       class="solr.BoolField"      sortMissingLast="true"       omitNorms="true"/>
+        <fieldType name="facetBoolean"  class="solr.BoolField"      sortMissingLast="true"       omitNorms="true"/>
         <fieldType name="facetString"   class="solr.StrField"       positionIncrementGap="100"   omitNorms="true"/>
         <fieldType name="string"        class="solr.TextField"      positionIncrementGap="100"   omitNorms="true">
             <analyzer>
@@ -96,6 +97,7 @@
         <field name="description"               type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
         <field name="organism_name"             type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
         <field name="predicted_complex"         type="boolean"      indexed="true"  stored="true"  multiValued="false" default="false"/>
+        <field name="predicted_complex_f"       type="facetBoolean"      indexed="true"  stored="false"  multiValued="false" default="false"/>
         <!-- TODO: do we want to also add humap confidence to display it in the search results? Or even to filter search results? -->
         <field name="udate"                     type="int"          indexed="true"  stored="false"  multiValued="false" default="0"/>
         <field name="param"                     type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->

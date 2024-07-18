@@ -29,6 +29,7 @@ public interface ComplexFieldNames {
     final static String DESCRIPTION                  = "description";
     final static String ORGANISM_NAME                = "organism_name";
     final static String PREDICTED_COMPLEX            = "predicted_complex";
+    final static String PREDICTED_COMPLEX_F            = "predicted_complex_f";
     final static String UDATE                        = "udate";
 
     final static String INTERACTOR_ID                = "id";
