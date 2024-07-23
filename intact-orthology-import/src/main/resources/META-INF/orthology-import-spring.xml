@@ -170,7 +170,11 @@
 
     <!-- readers -->
 
-    <bean id="orthologsGrouper" class="uk.ac.ebi.intact.ortholog.OrthologsGrouper">
+    <bean id="orthologsGrouper" class="uk.ac.ebi.intact.ortholog.OrthologsManager">
+        <constructor-arg index="0" ref="uniprotProteinFetcher"/>
+    </bean>
+
+    <bean id="proteinOrthologs" class="uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation">
         <constructor-arg ref="uniprotProteinFetcher"/>
     </bean>
 
