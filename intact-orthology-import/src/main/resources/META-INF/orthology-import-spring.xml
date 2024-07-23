@@ -170,9 +170,9 @@
 
     <!-- readers -->
 
-<!--    <bean id="OrthologsGrouper" class="uk.ac.ebi.intact.ortholog">-->
-<!--        <constructor-arg value="${orthologsFilePath}"/>-->
-<!--    </bean>-->
+    <bean id="orthologsGrouper" class="uk.ac.ebi.intact.ortholog.OrthologsGrouper">
+        <constructor-arg ref="uniprotProteinFetcher"/>
+    </bean>
 
     <!-- processors -->
 
