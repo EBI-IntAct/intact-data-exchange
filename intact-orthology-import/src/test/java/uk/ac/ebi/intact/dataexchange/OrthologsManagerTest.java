@@ -7,7 +7,7 @@ import junit.framework.TestSuite;
 /**
  * Unit test for simple App.
  */
-public class OrthologsGrouperTest
+public class OrthologsManagerTest
     extends TestCase
 {
     /**
@@ -15,7 +15,7 @@ public class OrthologsGrouperTest
      *
      * @param testName name of the test case
      */
-    public OrthologsGrouperTest(String testName )
+    public OrthologsManagerTest(String testName )
     {
         super( testName );
     }
@@ -25,7 +25,7 @@ public class OrthologsGrouperTest
      */
     public static Test suite()
     {
-        return new TestSuite( OrthologsGrouperTest.class );
+        return new TestSuite( OrthologsManagerTest.class );
     }
 
     /**
