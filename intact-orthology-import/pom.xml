@@ -9,7 +9,6 @@
 
     <artifactId>intact-orthology-import</artifactId>
     <packaging>jar</packaging>
-
     <name>intact-orthology-import</name>
 
     <properties>
@@ -21,6 +20,12 @@
     </properties>
 
     <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>com.google.inject</groupId>-->
+<!--            <artifactId>guice</artifactId>-->
+<!--            <version>5.0.1</version>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
             <artifactId>jami-core</artifactId>
@@ -51,7 +56,6 @@
             <version>${intact.jami.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
@@ -62,6 +66,18 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.21</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
         </dependency>
     </dependencies>
 </project>
