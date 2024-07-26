@@ -20,6 +20,7 @@
     <context:component-scan base-package="psidev.psi.mi.jami.batch" />
     <context:component-scan base-package="uk.ac.ebi.intact.ortholog" />
 
+
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations" value="classpath*:/META-INF/orthology-import.properties"/>
     </bean>
@@ -39,8 +40,8 @@
         <property name="taskExecutor" ref="syncTaskExecutor" />
     </bean>
 
-    <!-- syncTaskExecutor -->
     <bean id="syncTaskExecutor" class="org.springframework.core.task.SyncTaskExecutor"/>
+
 
     <!-- Basic job explorer -->
     <bean id="basicBatchJobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
@@ -164,36 +165,36 @@
         <property name="postalAddress" value="European Bioinformatics Institute; Wellcome Trust Genome Campus; Hinxton, Cambridge; CB10 1SD; United Kingdom"/>
     </bean>
 
-    <!-- Uniplex Importer Beans -->
 
-    <bean id="uniprotProteinFetcher" class="psidev.psi.mi.jami.bridges.uniprot.UniprotProteinFetcher"/>
+    <!-- Manager -->
+
+    <bean id="orthologsManager" class="uk.ac.ebi.intact.ortholog.OrthologsManager">
+    </bean>
 
     <!-- readers -->
 
-    <bean id="orthologsGrouper" class="uk.ac.ebi.intact.ortholog.OrthologsManager">
-        <constructor-arg index="0" ref="uniprotProteinFetcher"/>
+    <bean id="orthologsFileReader" class="uk.ac.ebi.intact.ortholog.OrthologsFileReader">
     </bean>
 
-    <bean id="proteinOrthologs" class="uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation">
-        <constructor-arg ref="uniprotProteinFetcher"/>
+    <bean id="orthologsFileParser" class="uk.ac.ebi.intact.ortholog.OrthologsFileParser">
     </bean>
 
-    <!-- processors -->
+
+    <bean id="orthologsProteinAssociation" class="uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation">
+<!--        <constructor-arg index="0" ref="intactDao"/>-->
+    </bean>
 
     <!-- writers -->
 
     <!-- Import Steps -->
-    <batch:step id="uniplexClusterImportStep" parent="basicBatchStep">
+    <batch:step id="orthologyImportStep" parent="basicBatchStep">
         <batch:tasklet transaction-manager="jamiTransactionManager">
             <batch:listeners>
                 <batch:listener ref="basicChunkLoggerListener"/>
             </batch:listeners>
 
-            <batch:chunk reader="uniplexFileReader"
-                         processor="uniplexClusterProcessor"
-                         writer="uniplexComplexWriter"
-                         commit-interval="50"
-                         retry-limit="10">
+            <batch:chunk reader="orthologsFileReader"
+                         processor="orthologsFileParser">
 
                 <batch:retryable-exception-classes>
                     <batch:include class="org.springframework.batch.item.ItemStreamException"/>
@@ -201,27 +202,20 @@
                 </batch:retryable-exception-classes>
 
                 <batch:streams>
-                    <batch:stream ref="uniplexFileReader"/>
-                    <batch:stream ref="uniplexClusterProcessor"/>
-                    <batch:stream ref="uniplexComplexWriter"/>
+                    <batch:stream ref="orthologsFileReader"/>
+                    <batch:stream ref="orthologsFileParser"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
     </batch:step>
 
     <!--Import jobs -->
-    <batch:job id="uniplexClusterImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
+    <batch:job id="orthologyImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
 
         <batch:listeners>
             <batch:listener ref="basicJobLoggerListener"/>
         </batch:listeners>
 
-        <batch:step id="processUniplexFile" parent="basicBatchStep">
-            <batch:tasklet ref="uniplexFileProcessorTasklet"/>
-            <batch:end on="FAILED"/>
-            <batch:next on="*" to="importStep"/>
-        </batch:step>
-
-        <batch:step id="importStep" parent="uniplexClusterImportStep"/>
+        <batch:step id="importStep" parent="orthologyImportStep"/>
     </batch:job>
 </beans>

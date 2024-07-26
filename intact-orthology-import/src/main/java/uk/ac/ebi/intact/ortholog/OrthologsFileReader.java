@@ -2,6 +2,7 @@ package uk.ac.ebi.intact.ortholog;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import psidev.psi.mi.jami.bridges.uniprot.UniprotProteinFetcher;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -20,6 +21,7 @@ public class OrthologsFileReader {
         urlToDB = urlPanther;
         dataExtractedPath = filePath;
     }
+
 
     public static void decompressGzip(String url, String filePath) throws IOException {
         URL gzipUrl = new URL(url);
