@@ -2,8 +2,6 @@ package uk.ac.ebi.intact.ortholog;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import psidev.psi.mi.jami.bridges.uniprot.UniprotProteinFetcher;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -12,7 +10,7 @@ import java.time.Instant;
 import java.util.zip.GZIPInputStream;
 
 @RequiredArgsConstructor
-public class OrthologsFileReader {
+public class OrthologsFileReader{
 
     String urlToDB;
     String dataExtractedPath;
