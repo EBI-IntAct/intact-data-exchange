@@ -28,10 +28,8 @@
     <!-- basic job repository -->
     <bean id="basicBatchJobRepository"
           class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
-          p:tablePrefix="ia_meta.BATCH_"
           p:isolationLevelForCreate="ISOLATION_DEFAULT"
-          p:dataSource-ref="jamiCoreDataSource"
-          p:transactionManager-ref="jamiTransactionManager" />
+          p:dataSource-ref="jamiCoreDataSource" p:transactionManager-ref="jamiTransactionManager" />
 
     <!-- basic batch job launcher -->
     <bean id="basicBatchJobLauncher"
@@ -41,7 +39,6 @@
     </bean>
 
     <bean id="syncTaskExecutor" class="org.springframework.core.task.SyncTaskExecutor"/>
-
 
     <!-- Basic job explorer -->
     <bean id="basicBatchJobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
@@ -169,6 +166,8 @@
     <!-- Manager -->
 
     <bean id="orthologsManager" class="uk.ac.ebi.intact.ortholog.OrthologsManager">
+        <constructor-arg index="0" ref="intactDao"/>
+        <constructor-arg index="1" ref="orthologsProteinAssociation"/>
     </bean>
 
     <!-- readers -->
@@ -181,41 +180,41 @@
 
 
     <bean id="orthologsProteinAssociation" class="uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation">
-<!--        <constructor-arg index="0" ref="intactDao"/>-->
+        <constructor-arg index="0" ref="intactDao"/>
     </bean>
 
     <!-- writers -->
 
-    <!-- Import Steps -->
-    <batch:step id="orthologyImportStep" parent="basicBatchStep">
-        <batch:tasklet transaction-manager="jamiTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener"/>
-            </batch:listeners>
+<!--    &lt;!&ndash; Import Steps &ndash;&gt;-->
+<!--    <batch:step id="orthologyImportStep" parent="basicBatchStep">-->
+<!--        <batch:tasklet transaction-manager="jamiTransactionManager">-->
+<!--            <batch:listeners>-->
+<!--                <batch:listener ref="basicChunkLoggerListener"/>-->
+<!--            </batch:listeners>-->
 
-            <batch:chunk reader="orthologsFileReader"
-                         processor="orthologsFileParser">
+<!--            <batch:chunk reader="orthologsFileReader"-->
+<!--                         processor="orthologsFileParser">-->
 
-                <batch:retryable-exception-classes>
-                    <batch:include class="org.springframework.batch.item.ItemStreamException"/>
-                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>
-                </batch:retryable-exception-classes>
+<!--                <batch:retryable-exception-classes>-->
+<!--                    <batch:include class="org.springframework.batch.item.ItemStreamException"/>-->
+<!--                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>-->
+<!--                </batch:retryable-exception-classes>-->
 
-                <batch:streams>
-                    <batch:stream ref="orthologsFileReader"/>
-                    <batch:stream ref="orthologsFileParser"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
+<!--                <batch:streams>-->
+<!--                    <batch:stream ref="orthologsFileReader"/>-->
+<!--                    <batch:stream ref="orthologsFileParser"/>-->
+<!--                </batch:streams>-->
+<!--            </batch:chunk>-->
+<!--        </batch:tasklet>-->
+<!--    </batch:step>-->
 
-    <!--Import jobs -->
-    <batch:job id="orthologyImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
+<!--    &lt;!&ndash;Import jobs &ndash;&gt;-->
+<!--    <batch:job id="orthologyImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">-->
 
-        <batch:listeners>
-            <batch:listener ref="basicJobLoggerListener"/>
-        </batch:listeners>
+<!--        <batch:listeners>-->
+<!--            <batch:listener ref="basicJobLoggerListener"/>-->
+<!--        </batch:listeners>-->
 
-        <batch:step id="importStep" parent="orthologyImportStep"/>
-    </batch:job>
+<!--        <batch:step id="importStep" parent="orthologyImportStep"/>-->
+<!--    </batch:job>-->
 </beans>

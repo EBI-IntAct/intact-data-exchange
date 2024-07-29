@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.ortholog;
 
+import org.springframework.batch.item.ItemWriter;
 import psidev.psi.mi.jami.model.Protein;
 import psidev.psi.mi.jami.model.Xref;
 import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;

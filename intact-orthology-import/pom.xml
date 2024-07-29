@@ -1,5 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -9,16 +11,11 @@
     </parent>
 
     <artifactId>intact-orthology-import</artifactId>
-    <packaging>jar</packaging>
+<!--    <packaging>jar</packaging>-->
     <name>intact-orthology-import</name>
 
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <psi.jami.version>3.6.0-SNAPSHOT</psi.jami.version>
-        <intact.jami.version>3.1.0-SNAPSHOT</intact.jami.version>
-        <spring.version>4.3.30.RELEASE</spring.version>
-        <spring.retry.version>1.3.4</spring.retry.version>
         <db.url>${db.protocol}:${db.subprotocol}${db.separator}${db.alias}</db.url>
         <db.hbm2ddl>none</db.hbm2ddl>
     </properties>
@@ -45,36 +42,10 @@
                                 <argument>-Xmx2024m</argument>
                                 <argument>-classpath</argument>
                                 <classpath />
-                                <argument>uk.ac.ebi.complex.service.processor.OrthologsFileReader</argument>
-                                <argument>uk.ac.ebi.complex.service.processor.OrthologsFileParser</argument>
-                            </arguments>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>fetch-protein-orthologs</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <executable>java</executable>
-                            <arguments>
-                                <argument>-Xmx2024m</argument>
-                                <argument>-classpath</argument>
-                                <classpath />
+                                <argument>uk.ac.ebi.intact.ortholog.OrthologsManager</argument>
+                                <argument>uk.ac.ebi.intact.ortholog.OrthologsFileReader</argument>
+                                <argument>uk.ac.ebi.intact.ortholog.OrthologsFileParser</argument>
+                                <argument>uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation</argument>
                                 <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>
                                 <argument>classpath*:/META-INF/orthology-import-spring.xml</argument>
                                 <argument>${job.name}</argument>
@@ -84,31 +55,45 @@
                 </plugins>
             </build>
         </profile>
+
+<!--        <profile>-->
+<!--            <id>fetch-protein-orthologs</id>-->
+<!--            <build>-->
+<!--                <plugins>-->
+<!--                    <plugin>-->
+<!--                        <groupId>org.codehaus.mojo</groupId>-->
+<!--                        <artifactId>exec-maven-plugin</artifactId>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <phase>install</phase>-->
+<!--                                <goals>-->
+<!--                                    <goal>exec</goal>-->
+<!--                                </goals>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                        <configuration>-->
+<!--                            <executable>java</executable>-->
+<!--                            <arguments>-->
+<!--                                <argument>-Xmx2024m</argument>-->
+<!--                                <argument>-classpath</argument>-->
+<!--                                <classpath />-->
+<!--                                <argument>uk.ac.ebi.intact.ortholog.OrthologsManager</argument>-->
+<!--                                <argument>uk.ac.ebi.intact.ortholog.OrthologsFileReader</argument>-->
+<!--                                <argument>uk.ac.ebi.intact.ortholog.OrthologsFileParser</argument>-->
+<!--&lt;!&ndash;                                <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>&ndash;&gt;-->
+<!--                                <argument>classpath*:/META-INF/orthology-import-spring.xml</argument>-->
+<!--                                <argument>${job.name}</argument>-->
+<!--                            </arguments>-->
+<!--                        </configuration>-->
+<!--                    </plugin>-->
+<!--                </plugins>-->
+<!--            </build>-->
+<!--        </profile>-->
     </profiles>
 
 
     <dependencies>
 <!--        base dependencies -->
-
-<!--        <dependency>-->
-<!--            <groupId>uk.ac.ebi.intact.jami.dao.impl</groupId>-->
-<!--            <artifactId>intact-dao</artifactId>-->
-<!--            <version></version>-->
-<!--        </dependency>-->
-
-        <dependency>
-            <groupId>uk.ac.ebi.intact.bridges</groupId>
-            <artifactId>intact-uniprot</artifactId>
-            <version>${bridges.version}</version>
-            <exclusions>
-                <!-- Version incompatible with 2.7.2 pull by
-                    jami-uniport-taxonomy-->
-                <exclusion>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
@@ -143,7 +128,7 @@
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
-            <version>${spring.retry.version}</version>
+            <version>1.3.4</version>
         </dependency>
 
         <dependency>
@@ -153,15 +138,12 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
+
+        <!--        Added dependencies -->
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -170,69 +152,89 @@
             <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
-        </dependency>
+        <!--        <dependency>-->
+<!--            <groupId>uk.ac.ebi.intact.bridges</groupId>-->
+<!--            <artifactId>intact-uniprot</artifactId>-->
+<!--            <version>${bridges.version}</version>-->
+<!--            <exclusions>-->
+<!--                &lt;!&ndash; Version incompatible with 2.7.2 pull by-->
+<!--                    jami-uniport-taxonomy&ndash;&gt;-->
+<!--                <exclusion>-->
+<!--                    <groupId>net.sf.ehcache</groupId>-->
+<!--                    <artifactId>ehcache</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
+
+
 
 
 <!--        <dependency>-->
-<!--            <groupId>uk.ac.ebi.intact.jami.dao</groupId>-->
-<!--            <artifactId>daoImpl</artifactId>-->
+<!--            <groupId>org.springframework</groupId>-->
+<!--            <artifactId>spring-aop</artifactId>-->
+<!--            <version>${spring.version}</version>-->
 <!--        </dependency>-->
 
 <!--        <dependency>-->
-<!--            <groupId>uk.ac.ebi.intact.jami</groupId>-->
-<!--            <artifactId>intact-jami</artifactId>-->
-<!--            <version>3.1.0-SNAPSHOT</version>-->
-<!--            <scope>compile</scope>-->
+<!--            <groupId>org.springframework</groupId>-->
+<!--            <artifactId>spring-context</artifactId>-->
+<!--            <version>${spring.version}</version>-->
 <!--        </dependency>-->
 
-<!--        Added dependencies -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.6.15.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.14</version>
-        </dependency>
 
 
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>5.0.1</version>
-        </dependency>
 
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
-        </dependency>
 
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.11</version>
-        </dependency>
 
-        <dependency>
-            <groupId>uk.ac.ebi.intact.maven</groupId>
-            <artifactId>intact-hibernate-master</artifactId>
-            <version>48-SNAPSHOT</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.hibernate</groupId>-->
+<!--            <artifactId>hibernate-core</artifactId>-->
+<!--            <version>5.6.15.Final</version>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.httpcomponents</groupId>-->
+<!--            <artifactId>httpclient</artifactId>-->
+<!--            <version>4.5.14</version>-->
+<!--        </dependency>-->
+
+
+<!--        <dependency>-->
+<!--            <groupId>com.google.inject</groupId>-->
+<!--            <artifactId>guice</artifactId>-->
+<!--            <version>5.0.1</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>javax.ws.rs</groupId>-->
+<!--            <artifactId>javax.ws.rs-api</artifactId>-->
+<!--            <version>2.1.1</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-classic</artifactId>-->
+<!--            <version>1.1.11</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>uk.ac.ebi.intact.maven</groupId>-->
+<!--            <artifactId>intact-hibernate-master</artifactId>-->
+<!--            <version>48-SNAPSHOT</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>com.h2database</groupId>-->
+<!--            <artifactId>h2</artifactId>-->
+<!--            <version>${h2.version}</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>log4j</groupId>-->
+<!--            <artifactId>log4j</artifactId>-->
+<!--            <version>1.2.17</version>-->
+<!--        </dependency>-->
 
     </dependencies>
 </project>
