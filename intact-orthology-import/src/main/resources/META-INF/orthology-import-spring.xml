@@ -162,15 +162,11 @@
         <property name="postalAddress" value="European Bioinformatics Institute; Wellcome Trust Genome Campus; Hinxton, Cambridge; CB10 1SD; United Kingdom"/>
     </bean>
 
-
-    <!-- Manager -->
-
     <bean id="orthologsManager" class="uk.ac.ebi.intact.ortholog.OrthologsManager">
-        <constructor-arg index="0" ref="intactDao"/>
-        <constructor-arg index="1" ref="orthologsProteinAssociation"/>
+<!--        <constructor-arg index="0" value="reportFile"/>-->
+<!--        <constructor-arg index="1" value="filePath"/>-->
+<!--        <constructor-arg index="2" value="urlPanther"/>-->
     </bean>
-
-    <!-- readers -->
 
     <bean id="orthologsFileReader" class="uk.ac.ebi.intact.ortholog.OrthologsFileReader">
     </bean>
@@ -178,12 +174,13 @@
     <bean id="orthologsFileParser" class="uk.ac.ebi.intact.ortholog.OrthologsFileParser">
     </bean>
 
-
     <bean id="orthologsProteinAssociation" class="uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation">
         <constructor-arg index="0" ref="intactDao"/>
     </bean>
 
-    <!-- writers -->
+    <bean id="orthologsXrefWriter" class="uk.ac.ebi.intact.ortholog.OrthologsXrefWriter">
+    </bean>
+
 
 <!--    &lt;!&ndash; Import Steps &ndash;&gt;-->
 <!--    <batch:step id="orthologyImportStep" parent="basicBatchStep">-->

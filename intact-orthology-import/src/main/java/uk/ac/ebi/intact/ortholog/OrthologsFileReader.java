@@ -28,7 +28,7 @@ public class OrthologsFileReader{
         Instant startTime = Instant.now();
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            System.out.println("Connected to URL");
+            System.out.println("Connected to URL.");
             try (InputStream in = connection.getInputStream();
                  GZIPInputStream gis = new GZIPInputStream(in);
                  TarArchiveInputStream tis = new TarArchiveInputStream(gis)) {
@@ -51,7 +51,7 @@ public class OrthologsFileReader{
             }
             finally {
                 connection.disconnect();
-                System.out.println("Disconnected from URL");
+                System.out.println("Disconnected from URL.");
             }
         }
         else {

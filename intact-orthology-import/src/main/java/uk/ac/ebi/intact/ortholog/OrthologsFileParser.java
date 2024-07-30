@@ -42,7 +42,6 @@ public class OrthologsFileParser {
                 while (pantherMatcher.find()) {
                     uniprotMatches.forEach(up -> uniprotAndPTHR.put(up, pantherMatcher.group()));
                 }
-
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
