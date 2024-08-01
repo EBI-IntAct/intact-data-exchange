@@ -30,17 +30,17 @@ public class OrthologsManager {
         String report = "";
 
 //        OrthologsFileReader.decompressGzip(urlPanther,filePath);// working
-//
+
         Map<String, String> uniprotAndPanther = OrthologsFileParser.parseFile(filePath);// working
         System.out.println("Total number of orthologs parsed: " + uniprotAndPanther.size());
         report += "Total number of orthologs parsed: " + uniprotAndPanther.size() + "\n";
 
-//        Collection<IntactProtein> proteins = orthologsProteinAssociation.getIntactProtein();// working
-//        System.out.println("Total number of Intact proteins: " + proteins.size());
-//        report += "Total number of Intact proteins: " + proteins.size() + "\n";
-//        Map<IntactProtein, String> proteinAndPanther = orthologsProteinAssociation.associateProteinToPantherId(uniprotAndPanther, proteins);
+        Collection<IntactProtein> proteins = orthologsProteinAssociation.getIntactProtein();// working
+        System.out.println("Total number of Intact proteins: " + proteins.size());
+        report += "Total number of Intact proteins: " + proteins.size() + "\n";
 
-        Map<Collection<IntactProtein>, String> proteinAndPanther = orthologsProteinAssociation.associateProteinToPantherId(uniprotAndPanther);
+        Map<IntactProtein, String> proteinAndPanther = orthologsProteinAssociation.associateAllProteinsToPantherId(uniprotAndPanther, proteins);
+//        Map<Collection<IntactProtein>, String> proteinAndPanther = orthologsProteinAssociation.associateProteinToPantherId(uniprotAndPanther);
         System.out.println("Number of protein associated to Panther id: " + proteinAndPanther.size());
         report += "Number of protein associated to Panther id: " + proteinAndPanther.size() + "\n";
 //

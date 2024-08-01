@@ -121,6 +121,7 @@
         <property name="dataSource" ref="jamiCoreDataSource"/>
         <property name="jpaProperties">
             <props>
+                <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
                 <prop key="hibernate.generate_statistics">true</prop>
                 <prop key="hibernate.format_sql">false</prop>
                 <prop key="hibernate.hbm2ddl.auto">${db.hbm2ddl}</prop>
@@ -182,7 +183,8 @@
     </bean>
 
 
-<!--    &lt;!&ndash; Import Steps &ndash;&gt;-->
+
+    <!--    &lt;!&ndash; Import Steps &ndash;&gt;-->
 <!--    <batch:step id="orthologyImportStep" parent="basicBatchStep">-->
 <!--        <batch:tasklet transaction-manager="jamiTransactionManager">-->
 <!--            <batch:listeners>-->
