@@ -18,6 +18,7 @@ public class OrthologsXrefWriter {
             IntactProtein protein = entry.getKey();
             String pantherId = entry.getValue();
             addOrthologyXref(protein, pantherId);
+            System.out.println(protein.getXrefs());
         }
     }
 

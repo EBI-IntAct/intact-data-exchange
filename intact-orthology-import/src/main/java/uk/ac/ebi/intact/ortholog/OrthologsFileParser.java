@@ -18,7 +18,6 @@ public class OrthologsFileParser {
 
     String filePath;
 
-
     public static Map<String, String> parseFile(String filePath) {
         Pattern uniprotKBRegex = Pattern.compile("UniProtKB=([A-Z0-9]+)");
         Pattern pantherRegex = Pattern.compile("PTHR\\d+");
