@@ -53,9 +53,7 @@ public class MitabIntactInteractionEvidenceFeeder extends MitabInteractionEviden
 
                 if (pub != null){
                     getWriter().write(MitabUtils.FIELD_SEPARATOR);
-                    writeInteractionAnnotationTagsFrom(pub);
-
-
+                    writeInteractionAnnotationTagsFrom(pub, false);
                 }
             }
         }
@@ -63,9 +61,10 @@ public class MitabIntactInteractionEvidenceFeeder extends MitabInteractionEviden
             Publication pub = interaction.getExperiment().getPublication();
 
             if (pub != null){
-
                 // writes curation depth first
-                writeInteractionAnnotationTagsFrom(pub);
+                writeInteractionAnnotationTagsFrom(pub, true);
+            } else {
+                getWriter().write(MitabUtils.EMPTY_COLUMN);
             }
         }
         else{

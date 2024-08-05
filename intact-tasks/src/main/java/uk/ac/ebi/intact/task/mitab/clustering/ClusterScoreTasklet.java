@@ -95,7 +95,7 @@ public class ClusterScoreTasklet implements Tasklet {
         /* Retrieve results */
         Map<Integer, EncoreInteraction> interactionMapping = interactionClusterScore.getInteractionMapping();
 
-        PsimiTabWriter writer = new PsimiTabWriter(PsimiTabVersion.v2_5);
+        PsimiTabWriter writer = new PsimiTabWriter(PsimiTabVersion.v2_6);
 
         BufferedWriter outputWriter = new BufferedWriter(new FileWriter(mitabOutputFile));
 

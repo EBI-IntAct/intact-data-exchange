@@ -22,4 +22,4 @@ FILE=$2
 rm -rf target
 mkdir target
 
-mvn clean install -Pcomplex-cc-export,${DATABASE} -DoutputFile=${FILE} -Ddb=oracle -Dmaven.test.skip=true
+mvn clean install -Pcomplex-cc-export,${DATABASE} -DoutputFile=${FILE} -Ddb=postgres -Dmaven.test.skip=true

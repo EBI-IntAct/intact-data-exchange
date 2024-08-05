@@ -143,8 +143,7 @@
                 <prop key="hibernate.generate_statistics">true</prop>
                 <prop key="hibernate.format_sql">false</prop>
                 <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-                <!-- hibernate interceptor to clear the synchronizer caches after each transaction-->
-                <prop key="hibernate.connection.release_mode">after_transaction</prop>
+                <prop key="hibernate.default_schema">intact</prop>
             </props>
         </property>
         <property name="jpaVendorAdapter">

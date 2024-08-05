@@ -101,7 +101,7 @@ public class MitabClusterScoreItemProcessorTest extends IntactBasicTestCase{
 
         PsimiTabReader mitabReader = new PsimiTabReader();
 
-        Iterator<BinaryInteraction> binaryInteractionIterator = mitabReader.iterate(new File(MitabClusterScoreItemProcessorTest.class.getResource("/mitab.txt").getFile()));
+        Iterator<BinaryInteraction> binaryInteractionIterator = mitabReader.iterate(new File(MitabClusterScoreItemProcessorTest.class.getResource("/mitab/mitab.txt").getFile()));
 
         // skip the eight first lines because we want to test 9th and 10th line
         binaryInteractionIterator.next();

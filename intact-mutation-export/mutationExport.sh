@@ -35,4 +35,4 @@ mkdir target
 # Make sure we are using institution intact by default.
 INTACT_OPTS="-Duk.ac.ebi.intact.INSTITUTION_LABEL=intact -Duk.ac.ebi.intact.AC_PREFIX=EBI"
 
-mvn clean install -Pmutation-export,${DATABASE},oracle -Dfolder=${FOLDER} -Dmaven.test.skip=true
+mvn clean install -Pmutation-export,${DATABASE},postgres -Dfolder=${FOLDER} -Dmaven.test.skip=true

@@ -82,7 +82,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
         Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
         selfComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.SELF);
         selfComponent.getCvExperimentalRole().setIdentifier(CvExperimentalRole.SELF_PSI_REF);
-        selfComponent.setStoichiometry( 2 );
+        selfComponent.setStoichiometry(2f);
 
         Interaction interaction = getMockBuilder().createInteraction( selfComponent );
 
@@ -99,7 +99,7 @@ public class SpokeWithoutBaitExpansionTest extends IntactBasicTestCase {
         Component selfComponent = getMockBuilder().createComponentPrey(getMockBuilder().createProteinRandom());
         selfComponent.getCvExperimentalRole().setShortLabel(CvExperimentalRole.NEUTRAL);
         selfComponent.getCvExperimentalRole().setIdentifier(CvExperimentalRole.NEUTRAL_PSI_REF);
-        selfComponent.setStoichiometry( 3 );
+        selfComponent.setStoichiometry(3f);
 
         Interaction interaction = getMockBuilder().createInteraction( selfComponent );
 
