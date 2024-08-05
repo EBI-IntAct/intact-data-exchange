@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.util.*;
 import java.io.IOException;
 
+// This class is just for testing
 
 @RequiredArgsConstructor
 public class OrthologsManager {
