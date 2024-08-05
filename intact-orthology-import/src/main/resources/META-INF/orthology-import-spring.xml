@@ -176,12 +176,13 @@
     </bean>
 
     <bean id="orthologsItemReader" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsItemReader">
-        <constructor-arg index="0" value="${filePath}"/>
+        <constructor-arg index="0" ref="intactDao"/>
+        <constructor-arg index="1" ref="orthologsProteinAssociation"/>
+        <constructor-arg index="2" value="${filePath}"/>
     </bean>
 
     <bean id="orthologsItemProcessor" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsItemProcessor">
-        <constructor-arg index="0" ref="orthologsProteinAssociation"/>
-        <constructor-arg index="1" ref="orthologsXrefWriter"/>
+        <constructor-arg index="0" ref="orthologsXrefWriter"/>
     </bean>
 
     <bean id="proteinCollectionWriter" class="uk.ac.ebi.intact.ortholog.jobs.ProteinCollectionWriter">

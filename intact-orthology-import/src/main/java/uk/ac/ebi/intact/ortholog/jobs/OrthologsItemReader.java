@@ -8,29 +8,36 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import uk.ac.ebi.intact.jami.dao.IntactDao;
+import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import uk.ac.ebi.intact.ortholog.OrthologsFileParser;
+import uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class OrthologsItemReader implements ItemReader<Map.Entry<String, String>>, ItemStream {
+public class OrthologsItemReader implements ItemReader<Map.Entry<IntactProtein, String>>, ItemStream {
 
+    private final IntactDao intactDao;
+    private final OrthologsProteinAssociation orthologsProteinAssociation;
     private final String filePath;
 
-    private Map<String, String> uniprotAndPanther;
-
-    private Iterator<Map.Entry<String, String>> uniprotAndPantherIterator;
+    private Iterator<Map.Entry<IntactProtein, String>> uniprotAndPantherIterator;
 
     @Override
-    public Map.Entry<String, String> read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public Map.Entry<IntactProtein, String> read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
         return uniprotAndPantherIterator.hasNext() ? uniprotAndPantherIterator.next() : null;
     }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        uniprotAndPanther = OrthologsFileParser.parseFile(filePath);
-        uniprotAndPantherIterator = uniprotAndPanther.entrySet().iterator();
+        Collection<IntactProtein> allProteins = intactDao.getProteinDao().getAll();
+        Map<String, String> uniprotAndPanther = OrthologsFileParser.parseFile(filePath);
+        Map<IntactProtein, String> uniprotAndPantherMap = orthologsProteinAssociation
+                .associateAllProteinsToPantherId(uniprotAndPanther, allProteins);
+        uniprotAndPantherIterator = uniprotAndPantherMap.entrySet().iterator();
     }
 
     @Override

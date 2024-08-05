@@ -23,10 +23,6 @@ public class OrthologsProteinAssociation {
         return intactDao.getProteinDao().getAll();
     }
 
-    public Collection<IntactProtein> getSpecificIntactProtein(String proteinId) {
-        return intactDao.getProteinDao().getByXref(proteinId);
-    }
-
     // Method below are just for testing
 
     public Collection<IntactProtein> getFewIntactProtein() {

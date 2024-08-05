@@ -8,11 +8,10 @@ import org.springframework.batch.item.ItemWriter;
 import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import uk.ac.ebi.intact.jami.service.InteractorService;
 
-import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class ProteinCollectionWriter implements ItemWriter<Collection<IntactProtein>>, ItemStream {
+public class ProteinCollectionWriter implements ItemWriter<IntactProtein>, ItemStream {
 
     private final InteractorService interactorService;
 
@@ -32,9 +31,7 @@ public class ProteinCollectionWriter implements ItemWriter<Collection<IntactProt
     }
 
     @Override
-    public void write(List<? extends Collection<IntactProtein>> items) throws Exception {
-        for (Collection<IntactProtein> proteins : items) {
-            interactorService.saveOrUpdate(proteins);
-        }
+    public void write(List<? extends IntactProtein> items) throws Exception {
+        interactorService.saveOrUpdate(items);
     }
 }
