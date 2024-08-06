@@ -1,17 +1,15 @@
 package uk.ac.ebi.intact.ortholog;
 
+import lombok.extern.log4j.Log4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+@Log4j
 public class OrthologsFileReader{
-
-    private static final Logger log = Logger.getLogger(OrthologsFileReader.class.getName());
 
     public static void decompressGzip(String url, String filePath) throws IOException {
         URL gzipUrl = new URL(url);

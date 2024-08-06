@@ -7,7 +7,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import uk.ac.ebi.intact.ortholog.OrthologsXrefWriter;
-
 import java.util.Map;
 
 @RequiredArgsConstructor

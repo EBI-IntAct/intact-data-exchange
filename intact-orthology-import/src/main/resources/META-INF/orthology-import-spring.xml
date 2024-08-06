@@ -178,9 +178,8 @@
     </bean>
 
     <bean id="orthologsItemReader" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsItemReader">
-        <constructor-arg index="0" ref="intactDao"/>
-        <constructor-arg index="1" ref="orthologsProteinAssociation"/>
-        <constructor-arg index="2" value="${filePath}"/>
+        <constructor-arg index="0" ref="orthologsProteinAssociation"/>
+        <constructor-arg index="1" value="${filePath}"/>
     </bean>
 
     <bean id="orthologsItemProcessor" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsItemProcessor">
@@ -190,19 +189,6 @@
     <bean id="proteinCollectionWriter" class="uk.ac.ebi.intact.ortholog.jobs.ProteinCollectionWriter">
         <constructor-arg index="0" ref="interactorService"/>
     </bean>
-
-<!--    <bean id="orthologsManager" class="uk.ac.ebi.intact.ortholog.OrthologsManager">-->
-<!--        &lt;!&ndash;        <constructor-arg index="0" value="reportFile"/>&ndash;&gt;-->
-<!--        &lt;!&ndash;        <constructor-arg index="1" value="filePath"/>&ndash;&gt;-->
-<!--        &lt;!&ndash;        <constructor-arg index="2" value="urlPanther"/>&ndash;&gt;-->
-<!--    </bean>-->
-
-<!--    <bean id="orthologsFileReader" class="uk.ac.ebi.intact.ortholog.OrthologsFileReader">-->
-<!--    </bean>-->
-
-<!--    <bean id="orthologsFileParser" class="uk.ac.ebi.intact.ortholog.OrthologsFileParser">-->
-<!--    </bean>-->
-
 
     <!-- Import Steps -->
     <batch:step id="orthologyImportStep" parent="basicBatchStep">
