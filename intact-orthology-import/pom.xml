@@ -8,11 +8,11 @@
     <parent>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
         <artifactId>intact-dataexchange-master</artifactId>
-        <version>3.3.2-SNAPSHOT</version>
+        <version>4.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>intact-orthology-import</artifactId>
-<!--    <packaging>jar</packaging>-->
+    <packaging>jar</packaging>
     <name>intact-orthology-import</name>
 
 
@@ -44,10 +44,6 @@
                                 <argument>-Xms256m</argument>
                                 <argument>-classpath</argument>
                                 <classpath />
-                                <argument>uk.ac.ebi.intact.ortholog.OrthologsManager</argument>
-                                <argument>uk.ac.ebi.intact.ortholog.OrthologsFileReader</argument>
-                                <argument>uk.ac.ebi.intact.ortholog.OrthologsFileParser</argument>
-                                <argument>uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation</argument>
                                 <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>
                                 <argument>classpath*:/META-INF/orthology-import-spring.xml</argument>
                                 <argument>${job.name}</argument>
@@ -57,44 +53,11 @@
                 </plugins>
             </build>
         </profile>
-
-<!--        <profile>-->
-<!--            <id>fetch-protein-orthologs</id>-->
-<!--            <build>-->
-<!--                <plugins>-->
-<!--                    <plugin>-->
-<!--                        <groupId>org.codehaus.mojo</groupId>-->
-<!--                        <artifactId>exec-maven-plugin</artifactId>-->
-<!--                        <executions>-->
-<!--                            <execution>-->
-<!--                                <phase>install</phase>-->
-<!--                                <goals>-->
-<!--                                    <goal>exec</goal>-->
-<!--                                </goals>-->
-<!--                            </execution>-->
-<!--                        </executions>-->
-<!--                        <configuration>-->
-<!--                            <executable>java</executable>-->
-<!--                            <arguments>-->
-<!--                                <argument>-Xmx2024m</argument>-->
-<!--                                <argument>-classpath</argument>-->
-<!--                                <classpath />-->
-<!--                                <argument>uk.ac.ebi.intact.ortholog.OrthologsManager</argument>-->
-<!--                                <argument>uk.ac.ebi.intact.ortholog.OrthologsFileReader</argument>-->
-<!--                                <argument>uk.ac.ebi.intact.ortholog.OrthologsFileParser</argument>-->
-<!--&lt;!&ndash;                                <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>&ndash;&gt;-->
-<!--                                <argument>classpath*:/META-INF/orthology-import-spring.xml</argument>-->
-<!--                                <argument>${job.name}</argument>-->
-<!--                            </arguments>-->
-<!--                        </configuration>-->
-<!--                    </plugin>-->
-<!--                </plugins>-->
-<!--            </build>-->
-<!--        </profile>-->
     </profiles>
 
 
     <dependencies>
+
 <!--        base dependencies -->
 
         <dependency>
@@ -153,88 +116,6 @@
             <version>1.21</version>
             <scope>compile</scope>
         </dependency>
-
-
-        <!--        <dependency>-->
-<!--            <groupId>uk.ac.ebi.intact.bridges</groupId>-->
-<!--            <artifactId>intact-uniprot</artifactId>-->
-<!--            <version>${bridges.version}</version>-->
-<!--            <exclusions>-->
-<!--                &lt;!&ndash; Version incompatible with 2.7.2 pull by-->
-<!--                    jami-uniport-taxonomy&ndash;&gt;-->
-<!--                <exclusion>-->
-<!--                    <groupId>net.sf.ehcache</groupId>-->
-<!--                    <artifactId>ehcache</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
-
-
-
-<!--        <dependency>-->
-<!--            <groupId>org.springframework</groupId>-->
-<!--            <artifactId>spring-aop</artifactId>-->
-<!--            <version>${spring.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.springframework</groupId>-->
-<!--            <artifactId>spring-context</artifactId>-->
-<!--            <version>${spring.version}</version>-->
-<!--        </dependency>-->
-
-
-
-<!--        <dependency>-->
-<!--            <groupId>org.hibernate</groupId>-->
-<!--            <artifactId>hibernate-core</artifactId>-->
-<!--            <version>5.6.15.Final</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.httpcomponents</groupId>-->
-<!--            <artifactId>httpclient</artifactId>-->
-<!--            <version>4.5.14</version>-->
-<!--        </dependency>-->
-
-
-<!--        <dependency>-->
-<!--            <groupId>com.google.inject</groupId>-->
-<!--            <artifactId>guice</artifactId>-->
-<!--            <version>5.0.1</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>javax.ws.rs</groupId>-->
-<!--            <artifactId>javax.ws.rs-api</artifactId>-->
-<!--            <version>2.1.1</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>ch.qos.logback</groupId>-->
-<!--            <artifactId>logback-classic</artifactId>-->
-<!--            <version>1.1.11</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>uk.ac.ebi.intact.maven</groupId>-->
-<!--            <artifactId>intact-hibernate-master</artifactId>-->
-<!--            <version>48-SNAPSHOT</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>com.h2database</groupId>-->
-<!--            <artifactId>h2</artifactId>-->
-<!--            <version>${h2.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>log4j</groupId>-->
-<!--            <artifactId>log4j</artifactId>-->
-<!--            <version>1.2.17</version>-->
-<!--        </dependency>-->
 
     </dependencies>
 </project>

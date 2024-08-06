@@ -1,7 +1,5 @@
 package uk.ac.ebi.intact.ortholog;
 
-import lombok.RequiredArgsConstructor;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,10 +11,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@RequiredArgsConstructor
 public class OrthologsFileParser {
-
-    String filePath;
 
     public static Map<String, String> parseFile(String filePath) {
         Pattern uniprotKBRegex = Pattern.compile("UniProtKB=([A-Z0-9]+)");

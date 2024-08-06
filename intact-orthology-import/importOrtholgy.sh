@@ -11,4 +11,4 @@ PROFILE=$1;
 
 echo "Profile: $PROFILE"
 
-mvn clean -U install -P import-orthology,${PROFILE} -Djob.name=orthologyImportStep -Dmaven.test.skip
+mvn clean -U install -P import-orthology,${PROFILE} -Djob.name=orthologyImport -Dmaven.test.skip
