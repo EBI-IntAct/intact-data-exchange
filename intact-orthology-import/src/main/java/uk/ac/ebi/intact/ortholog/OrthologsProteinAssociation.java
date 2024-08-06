@@ -23,24 +23,18 @@ public class OrthologsProteinAssociation {
         return intactDao.getProteinDao().getAll();
     }
 
-    public Collection<IntactProtein> flattenProteinCollection(Collection<Collection<IntactProtein>> nestedProteins) {
-        List<IntactProtein> flatProteins = new ArrayList<>();
-        for (Collection<IntactProtein> proteinCollection : nestedProteins) {
-            flatProteins.addAll(proteinCollection);
-        }
-        return flatProteins;
-    }
+    // Method below are just for testing
 
     public Collection<IntactProtein> getFewIntactProtein() {
         logger.info("Fetching few Intact Proteins...");
-        List<Collection<IntactProtein>> fewIntactProteins = new ArrayList<>();
+        List<IntactProtein> fewIntactProteins = new ArrayList<>();
         List<String> proteinsToFetch = Arrays.asList("P38153", "Q01217", "P38116", "P32449", "Q12406", "P43561", "P15646", "P43561", "P17710", "P19659");
 
         var proteinDao = intactDao.getProteinDao();
         for (String proteinToFetch : proteinsToFetch) {
-            fewIntactProteins.add(proteinDao.getByXref(proteinToFetch));
+            fewIntactProteins.addAll(proteinDao.getByXref(proteinToFetch));
         }
-        return flattenProteinCollection(fewIntactProteins);
+        return fewIntactProteins;
     }
 
     public Map<IntactProtein, String> associateAllProteinsToPantherId(Map<String, String> uniprotIdAndPanther, Collection<IntactProtein> intactProteins) {

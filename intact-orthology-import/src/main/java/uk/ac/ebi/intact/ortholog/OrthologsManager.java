@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.util.*;
 import java.io.IOException;
 
+// This class is just for testing
 
 @RequiredArgsConstructor
 public class OrthologsManager {
@@ -44,7 +45,7 @@ public class OrthologsManager {
         System.out.println("Number of protein associated to Panther id: " + proteinAndPanther.size());
         report += "Number of protein associated to Panther id: " + proteinAndPanther.size() + "\n";
 
-        orthologsXrefWriter.iterateThroughProteins(proteinAndPanther);
+//        orthologsXrefWriter.iterateThroughProteins(proteinAndPanther);
 
         reportWriter(reportFile, report);
     }
@@ -61,4 +62,3 @@ public class OrthologsManager {
         }
     }
 }
-
