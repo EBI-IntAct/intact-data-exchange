@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public class OrthologsProteinAssociation {
 
-    private static final Logger logger = Logger.getLogger(OrthologsProteinAssociation.class.getName());
+    private static final Logger log = Logger.getLogger(OrthologsProteinAssociation.class.getName());
 
     @Resource(name="intactDao")
     private final IntactDao intactDao;
@@ -19,14 +19,14 @@ public class OrthologsProteinAssociation {
     }
 
     public Collection<IntactProtein> getIntactProtein(){
-        logger.info("Fetching all Intact Proteins...");
+        log.info("Fetching all Intact Proteins...");
         return intactDao.getProteinDao().getAll();
     }
 
     // Method below are just for testing
 
     public Collection<IntactProtein> getFewIntactProtein() {
-        logger.info("Fetching few Intact Proteins...");
+        log.info("Fetching few Intact Proteins...");
         List<IntactProtein> fewIntactProteins = new ArrayList<>();
         List<String> proteinsToFetch = Arrays.asList("P38153", "Q01217", "P38116", "P32449", "Q12406", "P43561", "P15646", "P43561", "P17710", "P19659");
 
@@ -38,7 +38,7 @@ public class OrthologsProteinAssociation {
     }
 
     public Map<IntactProtein, String> associateAllProteinsToPantherId(Map<String, String> uniprotIdAndPanther, Collection<IntactProtein> intactProteins) {
-        logger.info("Associating Intact proteins to Panther identifier...");
+        log.info("Associating Intact proteins to Panther identifier...");
         Map<IntactProtein, String> intactProteinAndPanther = new HashMap<>();
 
         for (IntactProtein protein : intactProteins) {
@@ -48,7 +48,7 @@ public class OrthologsProteinAssociation {
                 System.out.println(protein.getUniprotkb() + " -> " + pantherId);
             }
         }
-        logger.info("Intact proteins associated to Panther identifier.");
+        log.info("Number of protein associated to Panther identifier: " + intactProteinAndPanther.size());
         return intactProteinAndPanther;
     }
 }
