@@ -1,15 +1,13 @@
 package uk.ac.ebi.intact.ortholog;
 
+import lombok.extern.log4j.Log4j;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
-
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.logging.Logger;
 
+@Log4j
 public class OrthologsProteinAssociation {
-
-    private static final Logger log = Logger.getLogger(OrthologsProteinAssociation.class.getName());
 
     @Resource(name="intactDao")
     private final IntactDao intactDao;
@@ -41,11 +39,14 @@ public class OrthologsProteinAssociation {
         log.info("Associating Intact proteins to Panther identifier...");
         Map<IntactProtein, String> intactProteinAndPanther = new HashMap<>();
 
+        int counter = 0;
+
         for (IntactProtein protein : intactProteins) {
             String pantherId = uniprotIdAndPanther.get(protein.getUniprotkb());
             if (pantherId != null) {
+                counter += 1;
                 intactProteinAndPanther.put(protein, pantherId);
-                System.out.println(protein.getUniprotkb() + " -> " + pantherId);
+                System.out.println(protein.getUniprotkb() + " -> " + pantherId + " index = " + counter);
             }
         }
         log.info("Number of protein associated to Panther identifier: " + intactProteinAndPanther.size());

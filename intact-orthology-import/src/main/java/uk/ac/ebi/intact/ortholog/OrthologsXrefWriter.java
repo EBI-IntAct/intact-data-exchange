@@ -14,7 +14,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OrthologsXrefWriter {
 
-    private final static String PANTHER_DATABASE_ID = "EBI-968064";
     private final static String PANTHER_DATABASE_MI = "MI:0702";
     private final Map<String, IntactCvTerm> cvTermMap = new HashMap<>();
     private final IntactDao intactDao;
@@ -26,7 +25,6 @@ public class OrthologsXrefWriter {
         if (!protein.getXrefs().contains(xref)){
             protein.getXrefs().add(xref);
         }
-        this.interactorService.saveOrUpdate(protein);
     }
 
     private InteractorXref newOrthologsXref(String id) throws Exception{
