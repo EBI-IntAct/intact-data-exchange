@@ -15,7 +15,7 @@ public class OrthologsReaderTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        OrthologsFileReader.decompressGzip(urlPanther, filePath);
+//        OrthologsFileReader.decompressGzip(urlPanther, filePath);
         return RepeatStatus.FINISHED;
     }
 }
