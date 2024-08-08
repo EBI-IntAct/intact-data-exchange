@@ -187,6 +187,10 @@ public class ComplexSolrConverter {
             this.complexSolrEnricher.enrichInteractionType(complex.getCvInteractionType(), solrDocument);
         }
 
+        if (complex.getCvEvidenceType() != null){
+            this.complexSolrEnricher.enrichEvidenceType(complex.getCvEvidenceType(), solrDocument);
+        }
+
         if (complex.getCvInteractorType() != null){
             this.complexSolrEnricher.enrichComplexType(complex.getCvInteractorType(), solrDocument);
         }

@@ -148,6 +148,11 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         enrichCvTermParents(ComplexFieldNames.INTERACTION_TYPE, null, cvDagObject, solrDocument);
     }
 
+    public void enrichEvidenceType(CvDatabase cvDagObject, SolrInputDocument solrDocument) {
+        solrDocument.addField(ComplexFieldNames.EVIDENCE_TYPE, cvDagObject.getIdentifier());
+        solrDocument.addField(ComplexFieldNames.EVIDENCE_TYPE_F, cvDagObject.getIdentifier());
+    }
+
     // is for enrich complex_organism* fields and return a SolrDocument
     public void enrichOrganism(Interaction interaction, SolrInputDocument solrDocument) throws SolrServerException {
         // retrieve the ontology term for this interaction (using BioSource)
@@ -335,7 +340,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     /****************************/
     // enrich fields in the SolrDocument passed as parameter
     public void enrich (
-            Interaction interaction,
+            InteractionImpl interaction,
             SolrInputDocument solrDocument )
             throws Exception {
         // check parameters and information
@@ -343,6 +348,9 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
 
         // Enrich interaction type
         enrichInteractionType(interaction.getCvInteractionType(), solrDocument) ;
+
+        // Enrich evidence type
+        enrichEvidenceType(interaction.getCvEvidenceType(), solrDocument); ;
 
         // Enrich Complex Organism fields
         enrichOrganism(interaction, solrDocument) ;
