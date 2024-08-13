@@ -6,6 +6,9 @@ import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import javax.annotation.Resource;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Log4j
 public class OrthologsProteinAssociation {
@@ -22,7 +25,7 @@ public class OrthologsProteinAssociation {
         return intactDao.getProteinDao().getAll();
     }
 
-    // Method below are just for testing
+    // Method below is just for testing
 
     public Collection<IntactProtein> getFewIntactProtein() {
         log.info("Fetching few Intact Proteins...");
@@ -39,31 +42,69 @@ public class OrthologsProteinAssociation {
     public Map<IntactProtein, String> associateAllProteinsToPantherId(Map<String, String> uniprotIdAndPanther, Collection<IntactProtein> intactProteins) {
         log.info("Associating Intact proteins to Panther identifier...");
         Map<IntactProtein, String> intactProteinAndPanther = new HashMap<>();
-        List<IntactProtein> intactProteinList = new ArrayList<>(intactProteins);
+//        List<IntactProtein> intactProteinList = new ArrayList<>(intactProteins);
 
-        int counter = 0;
-        int index = 0;
-        String[] lastSave= fetchFromStopped();
+        int batchSize = 1000;
 
-        if (lastSave != null){
-            index = Integer.parseInt(lastSave[3]);
-            counter = Integer.parseInt(lastSave[2]);
-        }
+        AtomicInteger batchCounter = new AtomicInteger();
+        AtomicInteger counter = new AtomicInteger(0);
+        Stream<IntactProtein> intactProteinStream = intactProteins.stream();
+        Stream<List<IntactProtein>> batches = batchStream(intactProteinStream, batchSize);
 
-        for (int i = index; i < intactProteinList.size(); i++) {
-            IntactProtein protein = intactProteinList.get(i);
-            String proteinId = protein.getUniprotkb();
-            String pantherId = uniprotIdAndPanther.get(proteinId);
-            if (pantherId != null) {
-                counter += 1;
-//                intactProteinAndPanther.put(protein, pantherId);
-                System.out.println(proteinId + " -> " + pantherId + " index = " + counter);
-                dataWriter(proteinId + "," + pantherId + "," + counter + "," + i + "\n");
-            }
-        }
-        log.info("Number of protein associated to Panther identifier: " + counter);
+        batches.forEach(batch -> {
+                for (int i = 0; i < batchSize; i++) {
+                    counter.addAndGet(1);
+                    IntactProtein protein = batch.get(i);
+                    String proteinId = protein.getUniprotkb();
+                    String pantherId = uniprotIdAndPanther.get(proteinId);
+                    if (pantherId != null) {
+                        intactProteinAndPanther.put(protein, pantherId);
+                        dataWriter(proteinId + "," + pantherId + "," + (intactProteinAndPanther.size()) + "," + counter + "\n");
+                    }
+                }
+            batchCounter.addAndGet(1);
+            log.info("Finished processing batch, total processed proteins :" + (intactProteinAndPanther.size()));
+        });
+
+//        int counter = 0;
+//        int index = 0;
+//        int nProteinProcessed = 100; // to avoid log at each processed protein
+//
+//        String[] lastSave= fetchFromStopped();
+//
+//        if (lastSave != null){
+//            index = Integer.parseInt(lastSave[3]);
+//            counter = Integer.parseInt(lastSave[2]);
+//        }
+//
+//        for (int i = index; i < intactProteinList.size(); i++) {
+//            IntactProtein protein = intactProteinList.get(i);
+//            String proteinId = protein.getUniprotkb();
+//            String pantherId = uniprotIdAndPanther.get(proteinId);
+//            if (pantherId != null) {
+//                counter += 1;
+////                intactProteinAndPanther.put(protein, pantherId);
+//                // is the system.out creating the memory issue?
+//                if ((counter) % nProteinProcessed == 0) {
+//                    log.info("Protein processed: " + counter );
+//                }
+//                dataWriter(proteinId + "," + pantherId + "," + counter + "," + i + "\n");
+//            }
+//        }
+//        log.info("Number of protein associated to Panther identifier: " + counter);
         return intactProteinAndPanther;
     }
+
+     public Stream<List<IntactProtein>> batchStream(Stream<IntactProtein> proteinStream, int batchSize) {
+        List<IntactProtein> proteins = proteinStream.collect(Collectors.toList());
+        int size = proteins.size();
+        int numberOfBatches = (size + batchSize - 1) / batchSize;
+
+        return Stream.iterate(0, n -> n + 1)
+                .limit(numberOfBatches)
+                .map(i -> proteins.subList(i * batchSize, (i + 1) * batchSize));
+
+     }
 
     public String[] fetchFromStopped() {
      String line = dataReader();
@@ -73,7 +114,7 @@ public class OrthologsProteinAssociation {
      return null;
     }
 
-    public static String dataReader() {
+    public String dataReader() {
         String lastLine = null;
         try (BufferedReader reader = new BufferedReader(new FileReader("proteinAndPanther.txt"))) {
             String line;
@@ -83,21 +124,21 @@ public class OrthologsProteinAssociation {
                     lastLine = line;
                 }
             }
+            reader.close();
             return lastLine;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void dataWriter(String toWrite){
-        try {
-            FileWriter fileWriter = new FileWriter("proteinAndPanther.txt");
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(toWrite);
-            bufferedWriter.close();
-        }
-        catch (Exception e) {
-            e.getStackTrace();
+    public void dataWriter(String toWrite) {
+        try (FileWriter fileWriter = new FileWriter("proteinAndPanther.txt", true);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+             bufferedWriter.write(toWrite);
+             bufferedWriter.newLine(); // Optionally add a newline after the text
+
+        } catch (IOException e) {
+            e.printStackTrace(); // Print the stack trace to help with debugging
         }
     }
 }
