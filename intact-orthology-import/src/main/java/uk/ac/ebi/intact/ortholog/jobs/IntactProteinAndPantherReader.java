@@ -11,34 +11,31 @@ import org.springframework.batch.item.UnexpectedInputException;
 import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import uk.ac.ebi.intact.ortholog.OrthologsFileParser;
 import uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation;
-import uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherProcessor;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class OrthologsItemReader implements ItemReader<Map.Entry<IntactProtein, String>>, ItemStream {
+public class IntactProteinAndPantherReader implements ItemReader<IntactProtein>, ItemStream {
 
     private final OrthologsProteinAssociation orthologsProteinAssociation;
     private final String filePath;
-    private Iterator<Map.Entry<IntactProtein, String>> uniprotAndPantherIterator;
-    private Map<String, String> uniprotAndPanther;
-    private IntactProteinAndPantherProcessor processor;
 
+    private Iterator<IntactProtein> proteinIterator;
+    private Iterator<Map.Entry<String, String>> uniprotAndPantherIterator;
 
     @Override
-    public Map.Entry<IntactProtein, String> read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-        return uniprotAndPantherIterator.hasNext() ? uniprotAndPantherIterator.next() : null;
+    public IntactProtein read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+        return proteinIterator.hasNext() ? proteinIterator.next() : null;
     }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-//        Collection<IntactProtein> allProteins = orthologsProteinAssociation.getIntactProtein();
+        Collection<IntactProtein> allProteins = orthologsProteinAssociation.getIntactProtein();
 //        Map<String, String> uniprotAndPanther = OrthologsFileParser.parseFile(filePath);
-//        Map<IntactProtein, String> uniprotAndPantherMap = processor.process();
-        //TODO: see how to fetch the uniprotAndPantherMap results
-//        uniprotAndPantherIterator = uniprotAndPantherMap.entrySet().iterator();
+//        uniprotAndPantherIterator = uniprotAndPanther.entrySet().iterator();
+        proteinIterator = allProteins.iterator();
     }
 
     @Override

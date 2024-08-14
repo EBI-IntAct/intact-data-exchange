@@ -190,6 +190,46 @@
         <constructor-arg index="0" ref="interactorService"/>
     </bean>
 
+    <bean id="intactProteinAndPantherReader" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherReader">
+        <constructor-arg index="0" ref="orthologsProteinAssociation"/>
+        <constructor-arg index="1" value="${filePath}"/>
+    </bean>
+
+    <bean id="intactProteinAndPantherProcessor" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherProcessor">
+        <constructor-arg index="0" ref="orthologsProteinAssociation"/>
+        <constructor-arg index="1" value="${filePath}"/>
+    </bean>
+
+    <bean id="intactProteinAndPantherWriter" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherWriter">
+        <constructor-arg index="0" ref="interactorService"/>
+    </bean>
+
+<!--    Intact protein and panther association -->
+    <batch:step id="proteinAndPantherAssociation" parent="basicBatchStep">
+        <batch:tasklet transaction-manager="jamiTransactionManager">
+            <batch:listeners>
+                <batch:listener ref="basicChunkLoggerListener"/>
+            </batch:listeners>
+
+            <batch:chunk reader="intactProteinAndPantherReader"
+                         processor="intactProteinAndPantherProcessor"
+                         writer="intactProteinAndPantherWriter"
+                         retry-limit="10">
+
+                <batch:retryable-exception-classes>
+                    <batch:include class="org.springframework.batch.item.ItemStreamException"/>
+                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>
+                </batch:retryable-exception-classes>
+
+                <batch:streams>
+                    <batch:stream ref="intactProteinAndPantherReader"/>
+                    <batch:stream ref="intactProteinAndPantherProcessor"/>
+                    <batch:stream ref="intactProteinAndPantherWriter"/>
+                </batch:streams>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+
     <!-- Import Steps -->
     <batch:step id="orthologyImportStep" parent="basicBatchStep">
         <batch:tasklet transaction-manager="jamiTransactionManager">
@@ -226,9 +266,11 @@
         <batch:step id="readOrthologsStep" parent="basicBatchStep">
             <batch:tasklet ref="orthologsReaderTasklet"/>
             <batch:end on="FAILED"/>
-            <batch:next on="*" to="importStep"/>
+            <batch:next on="*" to="associationStep"/>
         </batch:step>
 
+        <batch:step id="associationStep" parent="proteinAndPantherAssociation" next="importStep"/>
         <batch:step id="importStep" parent="orthologyImportStep"/>
+
     </batch:job>
 </beans>
