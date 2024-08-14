@@ -45,6 +45,7 @@
                                 <!-- The name of the folder-->
                                 <argument>${prefix}</argument>
                                 <argument>${released}</argument>
+                                <argument>${predicted}</argument>
                             </arguments>
                         </configuration>
                     </plugin>

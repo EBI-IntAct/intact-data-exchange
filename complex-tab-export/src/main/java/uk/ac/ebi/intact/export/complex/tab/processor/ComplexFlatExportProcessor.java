@@ -34,9 +34,9 @@ public class ComplexFlatExportProcessor {
                 System.err.println("\nProcessing Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ")");
 
                 int taxId = intactComplex.getOrganism().getTaxId();
-                ExportWriter exportFile = config.getFileExportHandler().getExportFile(taxId);
+                ExportWriter exportFile = config.getFileExportHandler().getExportFile(taxId, intactComplex.isPredictedComplex());
                 if (exportFile == null) {
-                    exportFile = config.getFileExportHandler().createExportFile(taxId);
+                    exportFile = config.getFileExportHandler().createExportFile(taxId, intactComplex.isPredictedComplex());
                 }
                 try {
                     exportFile.writeComplex(intactComplex);

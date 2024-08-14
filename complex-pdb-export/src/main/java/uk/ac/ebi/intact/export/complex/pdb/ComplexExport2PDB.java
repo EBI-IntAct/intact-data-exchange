@@ -33,15 +33,17 @@ public class ComplexExport2PDB {
 
     private static String fileNamePrefix;
     private static boolean released;
+    private static boolean predicted;
 
     public static void main(String[] args) throws IOException {
 
-        if (args.length != 2) {
-            System.err.println("Usage: ComplexExport2PDB <file_name_prefix> <released data [true|false]>");
+        if (args.length != 3) {
+            System.err.println("Usage: ComplexExport2PDB <file_name_prefix> <released data [true|false] [true|false]>");
             System.exit(1);
         }
         fileNamePrefix = args[0];
         released = Boolean.parseBoolean(args[1]);
+        predicted = Boolean.parseBoolean(args[2]);
 
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext(new String[]{"/META-INF/complex-pdb-export-config.xml"});
         ComplexExport2PDB service = (ComplexExport2PDB) springContext.getBean("complexExport2PDB");
@@ -69,10 +71,12 @@ public class ComplexExport2PDB {
         if(!released) {
             query = "select distinct f from IntactComplex f "  +
                     "join f.cvStatus as lcStatus " +
-                    "where (lcStatus.shortName = :readyForChecking " +
+                    "where f.predictedComplex is :predictedComplex " +
+                    "and (lcStatus.shortName = :readyForChecking " +
                     "or lcStatus.shortName = :curationInProgress " +
                     "or lcStatus.shortName = :acceptedOnHold)";
 
+            queryParameters.put("predictedComplex", predicted);
             queryParameters.put("readyForChecking", LifeCycleStatus.READY_FOR_CHECKING.shortLabel());
             queryParameters.put("curationInProgress", LifeCycleStatus.CURATION_IN_PROGRESS.shortLabel());
             queryParameters.put("acceptedOnHold", LifeCycleStatus.ACCEPTED_ON_HOLD.shortLabel());
@@ -80,9 +84,11 @@ public class ComplexExport2PDB {
         else {
             query = "select distinct f from IntactComplex f "  +
                     "join f.cvStatus as lcStatus " +
-                    "where (lcStatus.shortName = :readyForRelease " +
+                    "where f.predictedComplex is :predictedComplex " +
+                    "and (lcStatus.shortName = :readyForRelease " +
                     "or lcStatus.shortName = :released)";
 
+            queryParameters.put("predictedComplex", predicted);
             queryParameters.put("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.shortLabel());
             queryParameters.put("released", LifeCycleStatus.RELEASED.shortLabel());
         }
@@ -115,11 +121,11 @@ public class ComplexExport2PDB {
 
                 if (expandComponents(componentsSb, intactComplex, 1, intactComplex)) { //We maintain the original first level stoichiometries
                     if (complexLine(complexSb, intactComplex)) {
+                        componentsWriter.write(componentsSb.toString());
+                        componentsWriter.flush();
+                        complexWriter.write(complexSb.toString());
+                        complexWriter.flush();
                         if (pdbLine(pdbSb, intactComplex)) {
-                            componentsWriter.write(componentsSb.toString());
-                            componentsWriter.flush();
-                            complexWriter.write(complexSb.toString());
-                            complexWriter.flush();
                             pdbWriter.write(pdbSb.toString());
                             pdbWriter.flush();
                         }
@@ -182,6 +188,8 @@ public class ComplexExport2PDB {
             informationSb.append(pdbIds);
 
             informationSb.append(NEW_LINE);
+        } else {
+            return false;
         }
 
         return true;
