@@ -46,24 +46,22 @@ public class OrthologsProteinAssociation {
 
         int batchSize = 1000;
 
-        AtomicInteger batchCounter = new AtomicInteger();
         AtomicInteger counter = new AtomicInteger(0);
         Stream<IntactProtein> intactProteinStream = intactProteins.stream();
         Stream<List<IntactProtein>> batches = batchStream(intactProteinStream, batchSize);
 
         batches.forEach(batch -> {
-                for (int i = 0; i < batchSize; i++) {
-                    counter.addAndGet(1);
-                    IntactProtein protein = batch.get(i);
-                    String proteinId = protein.getUniprotkb();
-                    String pantherId = uniprotIdAndPanther.get(proteinId);
-                    if (pantherId != null) {
-                        intactProteinAndPanther.put(protein, pantherId);
-                        dataWriter(proteinId + "," + pantherId + "," + (intactProteinAndPanther.size()) + "," + counter + "\n");
-                    }
+            for (int i = 0; i < batchSize; i++) {
+                counter.addAndGet(1);
+                IntactProtein protein = batch.get(i);
+                String proteinId = protein.getUniprotkb();
+                String pantherId = uniprotIdAndPanther.get(proteinId);
+                if (pantherId != null) {
+                    intactProteinAndPanther.put(protein, pantherId);
+                    dataWriter(proteinId + "," + pantherId + "," + intactProteinAndPanther.size() + "," + counter);
                 }
-            batchCounter.addAndGet(1);
-            log.info("Finished processing batch, total processed proteins :" + (intactProteinAndPanther.size()));
+            }
+            log.info("Finished processing batch, total processed proteins :" + intactProteinAndPanther.size());
         });
 
 //        int counter = 0;
@@ -114,6 +112,19 @@ public class OrthologsProteinAssociation {
      return null;
     }
 
+    public Map<IntactProtein, String> associateOneProteinToPantherID(Map<String, String> proteinAndPanther, IntactProtein protein){
+        String proteinId = protein.getUniprotkb();
+        String pantherId = proteinAndPanther.get(proteinId);
+        Map<IntactProtein, String> intactProteinAndPantherId = new HashMap<>();
+        if (pantherId != null) {
+            intactProteinAndPantherId.put(protein, pantherId);
+            dataWriter(proteinId + "," + pantherId);
+            log.info(proteinId + "," + pantherId);
+            return intactProteinAndPantherId;
+        }
+        return intactProteinAndPantherId;
+    }
+
     public String dataReader() {
         String lastLine = null;
         try (BufferedReader reader = new BufferedReader(new FileReader("proteinAndPanther.txt"))) {
@@ -132,7 +143,7 @@ public class OrthologsProteinAssociation {
     }
 
     public void dataWriter(String toWrite) {
-        try (FileWriter fileWriter = new FileWriter("proteinAndPanther.txt", true);
+        try (FileWriter fileWriter = new FileWriter("proteinAndPantherBatches.txt", true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
              bufferedWriter.write(toWrite);
              bufferedWriter.newLine(); // Optionally add a newline after the text
