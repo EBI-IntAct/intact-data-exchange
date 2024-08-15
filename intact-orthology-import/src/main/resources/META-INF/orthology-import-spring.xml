@@ -192,13 +192,12 @@
 
     <bean id="intactProteinAndPantherReader" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherReader">
         <constructor-arg index="0" ref="orthologsProteinAssociation"/>
-<!--        <constructor-arg index="1" value="${filePath}"/>-->
+        <constructor-arg index="1" value="${uncompressedPantherFilePath}"/>
+        <constructor-arg index="2" value="${proteinPantherPairFilePath}"/>
     </bean>
 
     <bean id="intactProteinAndPantherProcessor" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherProcessor">
         <constructor-arg index="0" value="orthologsXrefWriter"/>
-        <constructor-arg index="1" value="${uncompressedPantherFilePath}"/>
-        <constructor-arg index="2" value="${proteinPantherPairFilePath}"/>
     </bean>
 
     <bean id="intactProteinAndPantherWriter" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherWriter">

@@ -153,7 +153,8 @@ public class OrthologsProteinAssociation {
         }
     }
 
-    public static String associateOneProteinToPantherId(String filePath, IntactProtein protein) throws IOException {
+    public static Collection<String> associateOneProteinToPantherIds(String filePath, IntactProtein protein) throws IOException {
+        List<String> pantherIds = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -161,12 +162,12 @@ public class OrthologsProteinAssociation {
                 if (parts.length == 2) {
                     String proteinId = parts[0];
                     if (proteinId.equals(protein.getUniprotkb())) {
-                        return parts[1];
+                        pantherIds.add(parts[1]);
                     }
 
                 }
             }
         }
-        return null;
+        return pantherIds;
     }
 }
