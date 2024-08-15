@@ -20,10 +20,10 @@ import java.util.Map;
 public class IntactProteinAndPantherReader implements ItemReader<IntactProtein>, ItemStream {
 
     private final OrthologsProteinAssociation orthologsProteinAssociation;
-    private final String filePath;
+//    private final String filePath;
 
     private Iterator<IntactProtein> proteinIterator;
-    private Iterator<Map.Entry<String, String>> uniprotAndPantherIterator;
+//    private Iterator<Map.Entry<String, String>> uniprotAndPantherIterator;
 
     @Override
     public IntactProtein read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {

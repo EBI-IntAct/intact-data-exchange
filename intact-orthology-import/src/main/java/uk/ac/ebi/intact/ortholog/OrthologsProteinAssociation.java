@@ -152,4 +152,21 @@ public class OrthologsProteinAssociation {
             e.printStackTrace(); // Print the stack trace to help with debugging
         }
     }
+
+    public static String associateOneProteinToPantherId(String filePath, IntactProtein protein) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    String proteinId = parts[0];
+                    if (proteinId.equals(protein.getUniprotkb())) {
+                        return parts[1];
+                    }
+
+                }
+            }
+        }
+        return null;
+    }
 }
