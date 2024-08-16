@@ -11,27 +11,42 @@ import org.springframework.batch.item.UnexpectedInputException;
 import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import uk.ac.ebi.intact.ortholog.OrthologsFileParser;
 import uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation;
+import uk.ac.ebi.intact.ortholog.model.ProteinAndPantherGroup;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 @RequiredArgsConstructor
-public class IntactProteinAndPantherReader implements ItemReader<IntactProtein>, ItemStream {
+public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPantherGroup>, ItemStream {
 
     private final OrthologsProteinAssociation orthologsProteinAssociation;
-    private final String filePath;
+    private final String uncompressedPantherFilePath;
+    private final String proteinPantherPairDirPath;
 
     private Iterator<IntactProtein> proteinIterator;
-    private Iterator<Map.Entry<String, String>> uniprotAndPantherIterator;
 
     @Override
-    public IntactProtein read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-        return proteinIterator.hasNext() ? proteinIterator.next() : null;
+    public ProteinAndPantherGroup read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+        while (proteinIterator.hasNext()) {
+            IntactProtein protein = proteinIterator.next();
+            Collection<String> pantherIds = OrthologsProteinAssociation
+                    .associateOneProteinToPantherIds(proteinPantherPairDirPath, protein);
+            if (!pantherIds.isEmpty()) {
+                return new ProteinAndPantherGroup(protein, pantherIds);
+            }
+        }
+        return null;
     }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
+        try {
+            OrthologsFileParser.parseFileAndSave(uncompressedPantherFilePath, proteinPantherPairDirPath);
+        } catch (IOException e) {
+            throw new ItemStreamException("Error parsing the file: " + uncompressedPantherFilePath, e);
+        }
+
         Collection<IntactProtein> allProteins = orthologsProteinAssociation.getIntactProtein();
 //        Map<String, String> uniprotAndPanther = OrthologsFileParser.parseFile(filePath);
 //        uniprotAndPantherIterator = uniprotAndPanther.entrySet().iterator();

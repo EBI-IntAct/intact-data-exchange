@@ -5,6 +5,7 @@ import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import javax.annotation.Resource;
 import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -93,7 +94,7 @@ public class OrthologsProteinAssociation {
         return intactProteinAndPanther;
     }
 
-     public Stream<List<IntactProtein>> batchStream(Stream<IntactProtein> proteinStream, int batchSize) {
+    public Stream<List<IntactProtein>> batchStream(Stream<IntactProtein> proteinStream, int batchSize) {
         List<IntactProtein> proteins = proteinStream.collect(Collectors.toList());
         int size = proteins.size();
         int numberOfBatches = (size + batchSize - 1) / batchSize;
@@ -102,14 +103,14 @@ public class OrthologsProteinAssociation {
                 .limit(numberOfBatches)
                 .map(i -> proteins.subList(i * batchSize, (i + 1) * batchSize));
 
-     }
+    }
 
     public String[] fetchFromStopped() {
-     String line = dataReader();
-     if (line != null) {
-         return line.split(",");
-     }
-     return null;
+        String line = dataReader();
+        if (line != null) {
+            return line.split(",");
+        }
+        return null;
     }
 
     public Map<IntactProtein, String> associateOneProteinToPantherID(Map<String, String> proteinAndPanther, IntactProtein protein){
@@ -145,11 +146,30 @@ public class OrthologsProteinAssociation {
     public void dataWriter(String toWrite) {
         try (FileWriter fileWriter = new FileWriter("proteinAndPantherBatches.txt", true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
-             bufferedWriter.write(toWrite);
-             bufferedWriter.newLine(); // Optionally add a newline after the text
+            bufferedWriter.write(toWrite);
+            bufferedWriter.newLine(); // Optionally add a newline after the text
 
         } catch (IOException e) {
             e.printStackTrace(); // Print the stack trace to help with debugging
         }
+    }
+
+    public static Collection<String> associateOneProteinToPantherIds(String dirPath, IntactProtein protein) throws IOException {
+        Path filePath = Path.of(dirPath).resolve(protein.getUniprotkb());
+        List<String> pantherIds = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    String proteinId = parts[0];
+                    if (proteinId.equals(protein.getUniprotkb())) {
+                        pantherIds.add(parts[1]);
+                    }
+
+                }
+            }
+        }
+        return pantherIds;
     }
 }
