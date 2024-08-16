@@ -174,37 +174,37 @@
 
     <bean id="orthologsReaderTasklet" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsReaderTasklet">
         <constructor-arg index="0" value="${urlPanther}"/>
-        <constructor-arg index="1" value="${filePath}"/>
+        <constructor-arg index="1" value="${uncompressedPantherFilePath}"/>
     </bean>
 
-    <bean id="orthologsItemReader" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsItemReader">
-        <constructor-arg index="0" ref="orthologsProteinAssociation"/>
-        <constructor-arg index="1" value="${filePath}"/>
-    </bean>
+    <!--    <bean id="orthologsItemReader" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsItemReader">-->
+    <!--        <constructor-arg index="0" ref="orthologsProteinAssociation"/>-->
+    <!--        <constructor-arg index="1" value="${filePath}"/>-->
+    <!--    </bean>-->
 
-    <bean id="orthologsItemProcessor" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsItemProcessor">
-        <constructor-arg index="0" ref="orthologsXrefWriter"/>
-    </bean>
+    <!--    <bean id="orthologsItemProcessor" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsItemProcessor">-->
+    <!--        <constructor-arg index="0" ref="orthologsXrefWriter"/>-->
+    <!--    </bean>-->
 
-    <bean id="proteinCollectionWriter" class="uk.ac.ebi.intact.ortholog.jobs.ProteinCollectionWriter">
-        <constructor-arg index="0" ref="interactorService"/>
-    </bean>
+    <!--    <bean id="proteinCollectionWriter" class="uk.ac.ebi.intact.ortholog.jobs.ProteinCollectionWriter">-->
+    <!--        <constructor-arg index="0" ref="interactorService"/>-->
+    <!--    </bean>-->
 
     <bean id="intactProteinAndPantherReader" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherReader">
         <constructor-arg index="0" ref="orthologsProteinAssociation"/>
-        <constructor-arg index="1" value="${filePath}"/>
+        <constructor-arg index="1" value="${uncompressedPantherFilePath}"/>
+        <constructor-arg index="2" value="${proteinPantherPairDirPath}"/>
     </bean>
 
     <bean id="intactProteinAndPantherProcessor" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherProcessor">
-        <constructor-arg index="0" ref="orthologsProteinAssociation"/>
-        <constructor-arg index="1" value="${filePath}"/>
+        <constructor-arg index="0" ref="orthologsXrefWriter"/>
     </bean>
 
     <bean id="intactProteinAndPantherWriter" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherWriter">
         <constructor-arg index="0" ref="interactorService"/>
     </bean>
 
-<!--    Intact protein and panther association -->
+    <!--    Intact protein and panther association -->
     <batch:step id="proteinAndPantherAssociation" parent="basicBatchStep">
         <batch:tasklet transaction-manager="jamiTransactionManager">
             <batch:listeners>
@@ -231,30 +231,30 @@
     </batch:step>
 
     <!-- Import Steps -->
-    <batch:step id="orthologyImportStep" parent="basicBatchStep">
-        <batch:tasklet transaction-manager="jamiTransactionManager">
-            <batch:listeners>
-                <batch:listener ref="basicChunkLoggerListener"/>
-            </batch:listeners>
+    <!--    <batch:step id="orthologyImportStep" parent="basicBatchStep">-->
+    <!--        <batch:tasklet transaction-manager="jamiTransactionManager">-->
+    <!--            <batch:listeners>-->
+    <!--                <batch:listener ref="basicChunkLoggerListener"/>-->
+    <!--            </batch:listeners>-->
 
-            <batch:chunk reader="orthologsItemReader"
-                         processor="orthologsItemProcessor"
-                         writer="proteinCollectionWriter"
-                         retry-limit="10">
+    <!--            <batch:chunk reader="orthologsItemReader"-->
+    <!--                         processor="orthologsItemProcessor"-->
+    <!--                         writer="proteinCollectionWriter"-->
+    <!--                         retry-limit="10">-->
 
-                <batch:retryable-exception-classes>
-                    <batch:include class="org.springframework.batch.item.ItemStreamException"/>
-                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>
-                </batch:retryable-exception-classes>
+    <!--                <batch:retryable-exception-classes>-->
+    <!--                    <batch:include class="org.springframework.batch.item.ItemStreamException"/>-->
+    <!--                    <batch:include class="javax.net.ssl.SSLHandshakeException"/>-->
+    <!--                </batch:retryable-exception-classes>-->
 
-                <batch:streams>
-                    <batch:stream ref="orthologsItemReader"/>
-                    <batch:stream ref="orthologsItemProcessor"/>
-                    <batch:stream ref="proteinCollectionWriter"/>
-                </batch:streams>
-            </batch:chunk>
-        </batch:tasklet>
-    </batch:step>
+    <!--                <batch:streams>-->
+    <!--                    <batch:stream ref="orthologsItemReader"/>-->
+    <!--                    <batch:stream ref="orthologsItemProcessor"/>-->
+    <!--                    <batch:stream ref="proteinCollectionWriter"/>-->
+    <!--                </batch:streams>-->
+    <!--            </batch:chunk>-->
+    <!--        </batch:tasklet>-->
+    <!--    </batch:step>-->
 
     <!--Import jobs -->
     <batch:job id="orthologyImport" job-repository="basicBatchJobRepository" parent="basicBatchJob">
@@ -269,8 +269,7 @@
             <batch:next on="*" to="associationStep"/>
         </batch:step>
 
-        <batch:step id="associationStep" parent="proteinAndPantherAssociation" next="importStep"/>
-        <batch:step id="importStep" parent="orthologyImportStep"/>
+        <batch:step id="associationStep" parent="proteinAndPantherAssociation"/>
 
     </batch:job>
 </beans>

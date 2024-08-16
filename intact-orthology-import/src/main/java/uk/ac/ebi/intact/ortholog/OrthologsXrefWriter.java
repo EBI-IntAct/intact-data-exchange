@@ -17,7 +17,12 @@ public class OrthologsXrefWriter {
     private final static String PANTHER_DATABASE_MI = "MI:0702";
     private final Map<String, IntactCvTerm> cvTermMap = new HashMap<>();
     private final IntactDao intactDao;
-    private final InteractorService interactorService;
+
+    public void addOrthologyXrefs(IntactProtein protein, Collection<String> pantherIds) throws Exception{
+        for (String pantherId: pantherIds) {
+            addOrthologyXref(protein, pantherId);
+        }
+    }
 
 
     public void addOrthologyXref(IntactProtein protein, String pantherId) throws Exception{
