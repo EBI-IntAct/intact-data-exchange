@@ -32,7 +32,6 @@ public class IntactProteinAndPantherWriter implements ItemWriter<Map<IntactProte
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
-        // Implement if needed for checkpointing
     }
 
     @Override
@@ -54,10 +53,10 @@ public class IntactProteinAndPantherWriter implements ItemWriter<Map<IntactProte
                     String protein = entry.getKey().getUniprotkb();
                     String pantherIndex = entry.getValue();
                     bufferedWriter.write(protein + "," + pantherIndex);
-                    bufferedWriter.newLine(); // Optionally add a newline after the text
+                    bufferedWriter.newLine();
                 }
             }
-            bufferedWriter.flush(); // Ensure all data is written to the file
+            bufferedWriter.flush();
         } catch (IOException e) {
             throw new ItemStreamException("Error writing to file", e);
         }

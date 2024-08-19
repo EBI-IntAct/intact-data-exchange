@@ -88,7 +88,7 @@ public class OrthologsFileParser {
         try (FileWriter fileWriter = new FileWriter(filePath.toFile(), true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
             bufferedWriter.write(uniprotId + "," + pantherId);
-            bufferedWriter.newLine(); // Optionally add a newline after the text
+            bufferedWriter.newLine();
         }
     }
 }

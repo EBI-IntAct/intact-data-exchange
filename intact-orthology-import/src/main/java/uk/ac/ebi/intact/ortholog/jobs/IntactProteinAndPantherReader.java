@@ -41,11 +41,11 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        try {
-            OrthologsFileParser.parseFileAndSave(uncompressedPantherFilePath, proteinPantherPairDirPath);
-        } catch (IOException e) {
-            throw new ItemStreamException("Error parsing the file: " + uncompressedPantherFilePath, e);
-        }
+//        try {
+//            OrthologsFileParser.parseFileAndSave(uncompressedPantherFilePath, proteinPantherPairDirPath);
+//        } catch (IOException e) {
+//            throw new ItemStreamException("Error parsing the file: " + uncompressedPantherFilePath, e);
+//        }
 
         Collection<IntactProtein> allProteins = orthologsProteinAssociation.getIntactProtein();
 //        Map<String, String> uniprotAndPanther = OrthologsFileParser.parseFile(filePath);

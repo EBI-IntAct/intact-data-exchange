@@ -147,27 +147,33 @@ public class OrthologsProteinAssociation {
         try (FileWriter fileWriter = new FileWriter("proteinAndPantherBatches.txt", true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
             bufferedWriter.write(toWrite);
-            bufferedWriter.newLine(); // Optionally add a newline after the text
+            bufferedWriter.newLine();
 
         } catch (IOException e) {
-            e.printStackTrace(); // Print the stack trace to help with debugging
+            e.printStackTrace();
         }
     }
 
     public static Collection<String> associateOneProteinToPantherIds(String dirPath, IntactProtein protein) throws IOException {
-        Path filePath = Path.of(dirPath).resolve(protein.getUniprotkb());
+        String proteinAc = protein.getUniprotkb();
         List<String> pantherIds = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 2) {
-                    String proteinId = parts[0];
-                    if (proteinId.equals(protein.getUniprotkb())) {
-                        pantherIds.add(parts[1]);
-                    }
+        if (proteinAc != null) {
+            Path filePath = Path.of(dirPath).resolve(protein.getUniprotkb());
+            if (filePath.toFile().exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        String[] parts = line.split(",");
+                        if (parts.length == 2) {
+                            String proteinId = parts[0];
+                            if (proteinId.equals(protein.getUniprotkb())) {
+                                pantherIds.add(parts[1]);
+                            }
 
+                        }
+                    }
                 }
+                return pantherIds;
             }
         }
         return pantherIds;

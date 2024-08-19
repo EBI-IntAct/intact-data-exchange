@@ -186,9 +186,9 @@
     <!--        <constructor-arg index="0" ref="orthologsXrefWriter"/>-->
     <!--    </bean>-->
 
-    <!--    <bean id="proteinCollectionWriter" class="uk.ac.ebi.intact.ortholog.jobs.ProteinCollectionWriter">-->
-    <!--        <constructor-arg index="0" ref="interactorService"/>-->
-    <!--    </bean>-->
+        <bean id="proteinCollectionWriter" class="uk.ac.ebi.intact.ortholog.jobs.ProteinCollectionWriter">
+            <constructor-arg index="0" ref="interactorService"/>
+        </bean>
 
     <bean id="intactProteinAndPantherReader" class="uk.ac.ebi.intact.ortholog.jobs.IntactProteinAndPantherReader">
         <constructor-arg index="0" ref="orthologsProteinAssociation"/>
@@ -213,7 +213,7 @@
 
             <batch:chunk reader="intactProteinAndPantherReader"
                          processor="intactProteinAndPantherProcessor"
-                         writer="intactProteinAndPantherWriter"
+                         writer="proteinCollectionWriter"
                          retry-limit="10">
 
                 <batch:retryable-exception-classes>
@@ -224,7 +224,7 @@
                 <batch:streams>
                     <batch:stream ref="intactProteinAndPantherReader"/>
                     <batch:stream ref="intactProteinAndPantherProcessor"/>
-                    <batch:stream ref="intactProteinAndPantherWriter"/>
+                    <batch:stream ref="proteinCollectionWriter"/>
                 </batch:streams>
             </batch:chunk>
         </batch:tasklet>
