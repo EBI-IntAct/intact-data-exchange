@@ -166,6 +166,10 @@ public class ComplexSolrConverter {
         // add info to complex_id field: ac, owner, (db, id and db:id) from xrefs
         indexComplexAC(complex, solrDocument) ;
 
+        // Predicted complex
+        solrDocument.addField(ComplexFieldNames.PREDICTED_COMPLEX, complex.isPredictedComplex());
+        solrDocument.addField(ComplexFieldNames.PREDICTED_COMPLEX_F, complex.isPredictedComplex());
+
         // add info to complex_alias field: short label, full name, (name and type) from  alias
         // and add info to complex_name
         indexComplexNames(complex, solrDocument) ;
@@ -181,6 +185,10 @@ public class ComplexSolrConverter {
         // add info to interaction_type field:
         if (complex.getCvInteractionType() != null){
             this.complexSolrEnricher.enrichInteractionType(complex.getCvInteractionType(), solrDocument);
+        }
+
+        if (complex.getCvEvidenceType() != null){
+            this.complexSolrEnricher.enrichEvidenceType(complex.getCvEvidenceType(), solrDocument);
         }
 
         if (complex.getCvInteractorType() != null){

@@ -148,6 +148,11 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         enrichCvTermParents(ComplexFieldNames.INTERACTION_TYPE, null, cvDagObject, solrDocument);
     }
 
+    public void enrichEvidenceType(CvDatabase cvDagObject, SolrInputDocument solrDocument) {
+        solrDocument.addField(ComplexFieldNames.EVIDENCE_TYPE, cvDagObject.getIdentifier());
+        solrDocument.addField(ComplexFieldNames.EVIDENCE_TYPE_F, cvDagObject.getIdentifier());
+    }
+
     // is for enrich complex_organism* fields and return a SolrDocument
     public void enrichOrganism(Interaction interaction, SolrInputDocument solrDocument) throws SolrServerException {
         // retrieve the ontology term for this interaction (using BioSource)
@@ -236,39 +241,14 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
                             processXref(xrefFieldName, xrefFieldExact, solrDocument, shortLabel, ID);
 
                             if (checkExpEvidence){
-                                if (this.mapOfPsicquicClients.containsKey ( shortLabel ) ){
-                                    PsicquicSimpleClient client = this.mapOfPsicquicClients.get(shortLabel);
-                                    InputStream stream = null;
-                                    try{
-                                        stream = client.getByInteraction(ID, PsicquicSimpleClient.MITAB25, 0, 1);
-                                        Iterator<psidev.psi.mi.tab.model.BinaryInteraction> binaryIterator = reader.iterate(stream);
-                                        if (binaryIterator.hasNext()){
-                                            psidev.psi.mi.tab.model.BinaryInteraction<psidev.psi.mi.tab.model.Interactor> binary = binaryIterator.next();
-                                            for (CrossReference ref : binary.getPublications()){
-                                                String db = ref.getDatabase() ;
-                                                String pubid = ref.getIdentifier() ;
-                                                if (db != null && pubid != null){
-                                                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db ) ;
-                                                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, pubid ) ;
-                                                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db + ":" + pubid ) ;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    catch(IOException e){
-                                        log.error(
-                                                "ERROR with psicquic client serving '" + shortLabel + "' data. Cannot fetch data for id '" + ID + "'.",
-                                                e);
-                                    }
-                                    finally {
-
-                                        if (stream != null){
-                                            try {
-                                                stream.close();
-                                            } catch (IOException e) {
-                                                log.error(e);
-                                            }
-                                        }
+                                List<CrossReference> publications = getPublicationCrossRefs(shortLabel, ID);
+                                for (CrossReference ref : publications) {
+                                    String db = ref.getDatabase() ;
+                                    String pubid = ref.getIdentifier() ;
+                                    if (db != null && pubid != null){
+                                        solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db ) ;
+                                        solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, pubid ) ;
+                                        solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db + ":" + pubid ) ;
                                     }
                                 }
                             }
@@ -335,7 +315,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     /****************************/
     // enrich fields in the SolrDocument passed as parameter
     public void enrich (
-            Interaction interaction,
+            InteractionImpl interaction,
             SolrInputDocument solrDocument )
             throws Exception {
         // check parameters and information
@@ -343,6 +323,9 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
 
         // Enrich interaction type
         enrichInteractionType(interaction.getCvInteractionType(), solrDocument) ;
+
+        // Enrich evidence type
+        enrichEvidenceType(interaction.getCvEvidenceType(), solrDocument); ;
 
         // Enrich Complex Organism fields
         enrichOrganism(interaction, solrDocument) ;
@@ -400,6 +383,57 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         this.complexProperties = complexProperties;
         initialiseMapOfPsicquicClients();
         this.reader = new PsimiTabReader();
+    }
+
+    private List<CrossReference> getPublicationCrossRefsFromPsicquic(String psicquicService, String id) throws IOException {
+        InputStream stream = null;
+        try {
+            PsicquicSimpleClient client = this.mapOfPsicquicClients.get(psicquicService);
+            stream = client.getByInteraction(id, PsicquicSimpleClient.MITAB25, 0, 1);
+            Iterator<psidev.psi.mi.tab.model.BinaryInteraction> binaryIterator = reader.iterate(stream);
+            if (binaryIterator.hasNext()) {
+                psidev.psi.mi.tab.model.BinaryInteraction<psidev.psi.mi.tab.model.Interactor> binary = binaryIterator.next();
+                return binary.getPublications();
+            }
+            return new ArrayList<>();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    log.error(e);
+                }
+            }
+        }
+    }
+
+    private List<CrossReference> getPublicationCrossRefs(String expEvidenceDatabase, String id) {
+        if (this.mapOfPsicquicClients.containsKey(expEvidenceDatabase)) {
+            try {
+                return getPublicationCrossRefsFromPsicquic(expEvidenceDatabase, id);
+            } catch (IOException e1) {
+                log.error(
+                        "ERROR with psicquic client serving '" + expEvidenceDatabase + "' data. Cannot fetch data for id '" + id + "'. Trying on all psicquic services.",
+                        e1);
+            }
+        }
+
+        for (String psicquicService: this.mapOfPsicquicClients.keySet()) {
+            if (!psicquicService.equals(expEvidenceDatabase)) {
+                try {
+                    List<CrossReference> xrefs = getPublicationCrossRefsFromPsicquic(psicquicService, id);
+                    log.info("Data for id '" + id + "' fetched from psicquic client serving '" + psicquicService + "' data.");
+                    return xrefs;
+                } catch (IOException e2) {
+                    log.error(
+                            "ERROR with psicquic client serving '" + psicquicService + "' data. Cannot fetch data for id '" + id + "'.",
+                            e2);
+                }
+            }
+        }
+
+        log.error("ERROR with psicquic client data. Cannot fetch data for id '" + id + "'.");
+        return new ArrayList<>();
     }
 }
 

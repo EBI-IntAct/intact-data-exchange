@@ -26,6 +26,7 @@ public class FileNameGenerator {
      * Negative tag
      */
     private String negativeTag = "negative";
+    private String predictedTag = "predicted";
 
     private DecimalFormat decimalFormat;
 
@@ -120,6 +121,39 @@ public class FileNameGenerator {
         return buffer.toString();
     }
 
+    public String createComplexSpeciesName(String name, Integer chunk, boolean predicted){
+        StringBuffer buffer = new StringBuffer();
+
+        String truncatedName = name;
+        if (name.contains(characterToTruncate)){
+            truncatedName = name.substring(0, name.indexOf(characterToTruncate));
+        }
+
+        buffer.append(replaceBadCharactersFor(truncatedName));
+        if (chunk != null){
+            buffer.append(separator);
+            buffer.append(decimalFormat.format(chunk));
+        }
+        if (predicted && predictedTag != null){
+            buffer.append(separator);
+            buffer.append(predictedTag);
+        }
+
+        return buffer.toString();
+    }
+
+    public String createComplexName(String name, Integer chunk){
+        StringBuffer buffer = new StringBuffer();
+
+        buffer.append(replaceBadCharactersFor(name));
+        if (chunk != null){
+            buffer.append(separator);
+            buffer.append(decimalFormat.format(chunk));
+        }
+
+        return buffer.toString();
+    }
+
     public String getSeparator() {
         return separator;
     }
@@ -134,6 +168,14 @@ public class FileNameGenerator {
 
     public void setNegativeTag(String negativeTag) {
         this.negativeTag = negativeTag;
+    }
+
+    public String getPredictedTag() {
+        return predictedTag;
+    }
+
+    public void setPredictedTag(String predictedTag) {
+        this.predictedTag = predictedTag;
     }
 
     public String getCharacterToTruncate() {

@@ -20,7 +20,8 @@ public class FileExportHandler {
     private static final Log log = LogFactory.getLog(FileExportHandler.class);
 
     private File dirFile;
-    private Map<Integer, ExportWriter> fileMap = new HashMap<>();
+    private Map<Integer, ExportWriter> curatedFileMap = new HashMap<>();
+    private Map<Integer, ExportWriter> predictedFileMap = new HashMap<>();
 
     public FileExportHandler(File dirFile) throws IOException {
         log.info("Create report files in: " + dirFile.getPath());
@@ -32,17 +33,30 @@ public class FileExportHandler {
         }
 
         //Copy README to target directory
-        Files.copy(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("readme.htm")),
-                new File(dirFile, "README.htm").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("readme.html")),
+                new File(dirFile, "README.html").toPath(), StandardCopyOption.REPLACE_EXISTING);
         this.dirFile = dirFile;
     }
 
-    public ExportWriter createExportFile(int taxId) throws IOException {
-        fileMap.put(taxId, new ComplexFlatWriter(new FileWriter(new File(dirFile, taxId + ".tsv"))));
-        return fileMap.get(taxId);
+    public ExportWriter createExportFile(int taxId, boolean predicted) throws IOException {
+        String filename = String.valueOf(taxId);
+        if (predicted) {
+            filename += "_predicted";
+        }
+
+        getFileMap(predicted).put(taxId, new ComplexFlatWriter(new FileWriter(new File(dirFile, filename + ".tsv"))));
+        return getFileMap(predicted).get(taxId);
     }
 
-    public ExportWriter getExportFile(Integer taxId) {
-        return fileMap.get(taxId);
+    public ExportWriter getExportFile(Integer taxId, boolean predicted) {
+        return getFileMap(predicted).get(taxId);
+    }
+
+    private Map<Integer, ExportWriter> getFileMap(boolean predicted) {
+        if (predicted) {
+            return predictedFileMap;
+        } else {
+            return curatedFileMap;
+        }
     }
 }

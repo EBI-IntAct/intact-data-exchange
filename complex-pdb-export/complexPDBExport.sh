@@ -19,8 +19,9 @@ fi
 DATABASE=$1
 FILE_NAME_PREFIX=$2
 RELEASED=$3
+PREDICTED=$4
 
 rm -rf target
 mkdir target
 
-mvn clean install -Pcomplex-pdb-export,${DATABASE},postgres -Dprefix=${FILE_NAME_PREFIX} -Dreleased=${RELEASED} -Dmaven.test.skip=true
+mvn clean install -Pcomplex-pdb-export,${DATABASE},postgres -Dprefix=${FILE_NAME_PREFIX} -Dreleased=${RELEASED} -Dpredicted=${PREDICTED} -Dmaven.test.skip=true
