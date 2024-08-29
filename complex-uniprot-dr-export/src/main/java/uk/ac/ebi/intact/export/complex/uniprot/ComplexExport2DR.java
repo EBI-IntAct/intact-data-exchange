@@ -62,7 +62,7 @@ public class ComplexExport2DR {
                 "where predictedComplex is false";
         Iterator<Complex> complexes = complexService.iterateAll(countQuery, query, new HashMap<>());
 
-        System.err.println("Complexes to export: " + complexService.countAll());
+        System.err.println("Complexes to export: " + complexService.countAll(countQuery, new HashMap<>()));
 
         BufferedWriter drWriter = null;
 
