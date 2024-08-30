@@ -214,6 +214,7 @@
             <batch:chunk reader="intactProteinAndPantherReader"
                          processor="intactProteinAndPantherProcessor"
                          writer="proteinCollectionWriter"
+                         commit-interval="1000"
                          retry-limit="10">
 
                 <batch:retryable-exception-classes>
