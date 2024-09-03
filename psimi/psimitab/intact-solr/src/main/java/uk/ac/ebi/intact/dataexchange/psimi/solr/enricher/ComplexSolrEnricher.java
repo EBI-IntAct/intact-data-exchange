@@ -204,6 +204,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         Interactor interactor = participant.getInteractor();
         String identifier = ComplexUtils.getParticipantIdentifier(participant);
 
+        // TODO: filter, maybe by database, to not store all xrefs, only those we want (like panther)
         List<ComplexInteractorXref> xrefs = interactor.getXrefs().stream()
                 .map(xref -> new ComplexInteractorXref(
                         xref.getPrimaryId(),
