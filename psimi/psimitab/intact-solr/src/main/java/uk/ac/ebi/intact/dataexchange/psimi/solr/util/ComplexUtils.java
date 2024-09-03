@@ -59,6 +59,10 @@ public final class ComplexUtils {
 
     public static String getParticipantIdentifierLink(Component participant, String identifier) {
         InteractorXref xref = getParticipantIdentifierXref(participant);
+        return getIdentifierLink(xref, identifier);
+    }
+
+    public static String getIdentifierLink(InteractorXref xref, String identifier) {
         if (xref != null && xref.getParent() != null) {
             Annotation annot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(xref.getCvDatabase(), SEARCH_MI);
             if (annot == null) {

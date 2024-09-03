@@ -1,5 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.complex;
 
+import java.util.List;
+
 public class ComplexInteractor {
 
     /*************************/
@@ -15,7 +17,8 @@ public class ComplexInteractor {
                              String description,
                              String stochiometry,
                              String interactorType,
-                             String organismName) {
+                             String organismName,
+                             List<ComplexInteractorXref> xrefs) {
         this.identifier = identifier;
         this.identifierLink = identifierLink;
         this.name = name;
@@ -23,6 +26,7 @@ public class ComplexInteractor {
         this.stochiometry = stochiometry;
         this.interactorType = interactorType;
         this.organismName = organismName;
+        this.xrefs = xrefs;
     }
 
     /*********************************/
@@ -85,6 +89,14 @@ public class ComplexInteractor {
         this.organismName = organismName;
     }
 
+    public List<ComplexInteractorXref> getXrefs() {
+        return xrefs;
+    }
+
+    public void setXrefs(List<ComplexInteractorXref> xrefs) {
+        this.xrefs = xrefs;
+    }
+
     /********************************/
     /*      Private attributes      */
     /********************************/
@@ -96,4 +108,5 @@ public class ComplexInteractor {
     private String stochiometry = null;
     private String interactorType;
     private String organismName;
+    private List<ComplexInteractorXref> xrefs;
 }
