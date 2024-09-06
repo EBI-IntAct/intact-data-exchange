@@ -12,6 +12,7 @@ import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import uk.ac.ebi.intact.ortholog.OrthologsFileParser;
 import uk.ac.ebi.intact.ortholog.OrthologsProteinAssociation;
 import uk.ac.ebi.intact.ortholog.model.ProteinAndPantherGroup;
+import uk.ac.ebi.intact.ortholog.UpdatedProteinFileParser;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -23,16 +24,18 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
     private final OrthologsProteinAssociation orthologsProteinAssociation;
     private final String uncompressedPantherFilePath;
     private final String proteinPantherPairDirPath;
+    private final UpdatedProteinFileParser updatedProteinFileParser;
 
     private Iterator<IntactProtein> proteinIterator;
 
     @Override
     public ProteinAndPantherGroup read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+        Collection<String> alreadyUpdatedProteins = UpdatedProteinFileParser.parseFile();
         while (proteinIterator.hasNext()) {
             IntactProtein protein = proteinIterator.next();
             Collection<String> pantherIds = OrthologsProteinAssociation
                     .associateOneProteinToPantherIds(proteinPantherPairDirPath, protein);
-            if (!pantherIds.isEmpty()) {
+            if (!pantherIds.isEmpty() && !alreadyUpdatedProteins.contains(protein.getUniprotkb())) {
                 return new ProteinAndPantherGroup(protein, pantherIds);
             }
         }
@@ -47,9 +50,12 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
 //            throw new ItemStreamException("Error parsing the file: " + uncompressedPantherFilePath, e);
 //        }
 
+
         Collection<IntactProtein> allProteins = orthologsProteinAssociation.getIntactProtein();
+
 //        Map<String, String> uniprotAndPanther = OrthologsFileParser.parseFile(filePath);
 //        uniprotAndPantherIterator = uniprotAndPanther.entrySet().iterator();
+
         proteinIterator = allProteins.iterator();
     }
 
