@@ -22,4 +22,18 @@ public class UpdatedProteinFileParser {
         log.info("Number of proteins already updated: " + alreadyUpdatedProteins.size());
         return alreadyUpdatedProteins;
     }
+
+    public static boolean findProteinInFile(String proteinId){
+        try (BufferedReader reader = new BufferedReader(new FileReader("UpdatedProteins.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains(proteinId)) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
 }

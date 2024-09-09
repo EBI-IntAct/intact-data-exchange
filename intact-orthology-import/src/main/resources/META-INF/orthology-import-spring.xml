@@ -37,10 +37,17 @@
     <bean id="basicBatchJobLauncher"
           class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
         <property name="jobRepository" ref="basicBatchJobRepository" />
-        <property name="taskExecutor" ref="syncTaskExecutor" />
+        <property name="taskExecutor" ref="threadPoolTaskExecutor" />
     </bean>
 
     <bean id="syncTaskExecutor" class="org.springframework.core.task.SyncTaskExecutor"/>
+
+    <bean id="threadPoolTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="10"/>
+        <property name="maxPoolSize" value="25"/>
+        <property name="queueCapacity" value="100"/>
+        <property name="threadNamePrefix" value="OrthologyTaskExecutor-"/>
+    </bean>
 
     <!-- Basic job explorer -->
     <bean id="basicBatchJobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"

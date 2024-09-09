@@ -16,7 +16,9 @@ import uk.ac.ebi.intact.ortholog.UpdatedProteinFileParser;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPantherGroup>, ItemStream {
@@ -27,15 +29,17 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
     private final UpdatedProteinFileParser updatedProteinFileParser;
 
     private Iterator<IntactProtein> proteinIterator;
+    private Collection<String> alreadyUpdatedProteins;
 
     @Override
-    public ProteinAndPantherGroup read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-        Collection<String> alreadyUpdatedProteins = UpdatedProteinFileParser.parseFile();
+    public ProteinAndPantherGroup read() throws Exception{
         while (proteinIterator.hasNext()) {
             IntactProtein protein = proteinIterator.next();
             Collection<String> pantherIds = OrthologsProteinAssociation
                     .associateOneProteinToPantherIds(proteinPantherPairDirPath, protein);
+            System.out.println(protein.getUniprotkb());
             if (!pantherIds.isEmpty() && !alreadyUpdatedProteins.contains(protein.getUniprotkb())) {
+//            if (!pantherIds.isEmpty() && UpdatedProteinFileParser.findProteinInFile(protein.getUniprotkb())){
                 return new ProteinAndPantherGroup(protein, pantherIds);
             }
         }
@@ -44,12 +48,12 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
+        alreadyUpdatedProteins = UpdatedProteinFileParser.parseFile();
 //        try {
 //            OrthologsFileParser.parseFileAndSave(uncompressedPantherFilePath, proteinPantherPairDirPath);
 //        } catch (IOException e) {
 //            throw new ItemStreamException("Error parsing the file: " + uncompressedPantherFilePath, e);
 //        }
-
 
         Collection<IntactProtein> allProteins = orthologsProteinAssociation.getIntactProtein();
 

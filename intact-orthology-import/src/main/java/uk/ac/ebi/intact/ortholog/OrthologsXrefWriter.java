@@ -14,8 +14,15 @@ import java.util.Map;
 public class OrthologsXrefWriter {
 
     private final static String PANTHER_DATABASE_MI = "MI:0702";
+    private final static String ORTHOLOGY_MI = "MI:2426";
     private final Map<String, IntactCvTerm> cvTermMap = new HashMap<>();
     private final IntactDao intactDao;
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cvTermMap, intactDao);
+    }
 
     public void addOrthologyXrefs(IntactProtein protein, Collection<String> pantherIds) throws Exception{
         for (String pantherId: pantherIds) {
@@ -32,7 +39,7 @@ public class OrthologsXrefWriter {
 
     private InteractorXref newOrthologsXref(String id) throws Exception{
         IntactCvTerm database = findCvTerm(IntactUtils.DATABASE_OBJCLASS, PANTHER_DATABASE_MI);
-        IntactCvTerm qualifier = findCvTerm(IntactUtils.QUALIFIER_OBJCLASS, Xref.SEE_ALSO_MI);
+        IntactCvTerm qualifier = findCvTerm(IntactUtils.QUALIFIER_OBJCLASS, ORTHOLOGY_MI);
         return new InteractorXref(database, id, qualifier);
     }
 

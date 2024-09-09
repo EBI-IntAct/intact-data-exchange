@@ -40,10 +40,17 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Xmx2024m</argument>
-                                <argument>-Xms256m</argument>
+                                <!--<argument>-Xmx12288m</argument>-->
+                                <!--<argument>-Xms2048m</argument>-->
+
+                                <argument>-Xmx2048m</argument>
+                                <argument>-Xms512m</argument>
+                                <argument>-XX:+HeapDumpOnOutOfMemoryError</argument>
+                                <argument>
+                                    -XX:HeapDumpPath=/Users/susiehuget/IdeaProjects/intact-data-exchange/intact-orthology-import/heapdump.hprof
+                                </argument>
                                 <argument>-classpath</argument>
-                                <classpath />
+                                <classpath/>
                                 <argument>psidev.psi.mi.jami.batch.MIBatchJobManager</argument>
                                 <argument>classpath*:/META-INF/orthology-import-spring.xml</argument>
                                 <argument>${job.name}</argument>
@@ -58,7 +65,7 @@
 
     <dependencies>
 
-<!--        base dependencies -->
+        <!--        base dependencies -->
 
         <dependency>
             <groupId>psidev.psi.mi.jami</groupId>
@@ -123,5 +130,9 @@
             <version>2.4</version>
         </dependency>
 
+        <!--        <dependency>-->
+        <!--            <groupId></groupId>-->
+        <!--            <artifactId></artifactId>-->
+        <!--        </dependency>-->
     </dependencies>
 </project>
