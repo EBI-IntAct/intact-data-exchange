@@ -12,6 +12,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
@@ -29,8 +30,13 @@ import java.util.Map;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml", "/META-INF/job-tests.spring.xml"
-        , "classpath*:/META-INF/intact.spring.xml", "classpath*:/META-INF/standalone/*-standalone.spring.xml"})
+@TestPropertySource(locations="classpath:/retry.properties")
+@ContextConfiguration(locations = {
+        "/META-INF/mitab-creation.spring.xml",
+        "/META-INF/job-tests.spring.xml",
+        "classpath*:/META-INF/intact.spring.xml",
+        "classpath*:/META-INF/standalone/*-standalone.spring.xml"
+})
 public class ClusterScoreTaskletTest{
 
     @Resource(name = "intactBatchJobLauncher")
