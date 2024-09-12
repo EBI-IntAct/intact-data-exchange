@@ -15,10 +15,7 @@ import uk.ac.ebi.intact.ortholog.model.ProteinAndPantherGroup;
 import uk.ac.ebi.intact.ortholog.UpdatedProteinFileParser;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPantherGroup>, ItemStream {
@@ -55,7 +52,11 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
 //            throw new ItemStreamException("Error parsing the file: " + uncompressedPantherFilePath, e);
 //        }
 
-        Collection<IntactProtein> allProteins = orthologsProteinAssociation.getIntactProtein();
+//        Collection<IntactProtein> allProteins = orthologsProteinAssociation.getIntactProtein();
+
+        int startAc = executionContext.getInt("startAc");
+        int endAc = executionContext.getInt("endAc");
+        List<IntactProtein> allProteins = orthologsProteinAssociation.fetchProteins(startAc, endAc);
 
 //        Map<String, String> uniprotAndPanther = OrthologsFileParser.parseFile(filePath);
 //        uniprotAndPantherIterator = uniprotAndPanther.entrySet().iterator();

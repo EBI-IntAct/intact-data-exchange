@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import javax.annotation.Resource;
+import javax.persistence.Query;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -26,18 +27,18 @@ public class OrthologsProteinAssociation {
         return intactDao.getProteinDao().getAll();
     }
 
-    // Method below is just for testing
+    public List<Integer> getProteinAcs() {
+        String sqlQuery = "select CAST(REPLACE(ac,'EBI-','') as integer) as numberAC from intact.ia_interactor p where category = 'protein' order by numberAC asc";
+        Query query = intactDao.getEntityManager().createNativeQuery(sqlQuery);
+        return query.getResultList();
+    }
 
-    public Collection<IntactProtein> getFewIntactProtein() {
-        log.info("Fetching few Intact Proteins...");
-        List<IntactProtein> fewIntactProteins = new ArrayList<>();
-        List<String> proteinsToFetch = Arrays.asList("P38153", "Q01217", "P38116", "P32449", "Q12406", "P43561", "P15646", "P43561", "P17710", "P19659");
-
-        var proteinDao = intactDao.getProteinDao();
-        for (String proteinToFetch : proteinsToFetch) {
-            fewIntactProteins.addAll(proteinDao.getByXref(proteinToFetch));
-        }
-        return fewIntactProteins;
+    public List<IntactProtein> fetchProteins(Integer startAc, Integer endAc) {
+        String sqlQuery = "select p.ac FROM IntactProtein p where p.category = 'protein' and CAST(REPLACE(ac,'EBI-','') as integer) BETWEEN :startAc and :endAc";
+        Query query = intactDao.getEntityManager().createNativeQuery(sqlQuery);
+        query.setParameter("startAc", startAc);
+        query.setParameter("endAc", endAc);
+        return query.getResultList();
     }
 
     public Map<IntactProtein, String> associateAllProteinsToPantherId(Map<String, String> uniprotIdAndPanther, Collection<IntactProtein> intactProteins) {
