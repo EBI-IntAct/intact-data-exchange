@@ -40,8 +40,12 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     private PsimiTabReader reader;
     private final ObjectMapper mapper;
 
-    private final static String EXP_EVIDENCE="exp-evidence";
-    private final static String INTACT_SECONDARY="intact-secondary";
+    private static final String EXP_EVIDENCE="exp-evidence";
+    private static final String INTACT_SECONDARY="intact-secondary";
+
+    // Currently, we are only storing interactors xrefs from the following databases:
+    // - panther (MI:0702)
+    private static final Set<String> INTERACTOR_XREF_DATABASE_MIS_TO_STORE = Set.of("MI:0702");
 
     /*************************/
     /*      Constructor      */
@@ -204,8 +208,9 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         Interactor interactor = participant.getInteractor();
         String identifier = ComplexUtils.getParticipantIdentifier(participant);
 
-        // TODO: filter, maybe by database, to not store all xrefs, only those we want (like panther)
         List<ComplexInteractorXref> xrefs = interactor.getXrefs().stream()
+                .filter(xref -> xref.getCvDatabase() != null)
+                .filter(xref -> INTERACTOR_XREF_DATABASE_MIS_TO_STORE.contains(xref.getCvDatabase().getIdentifier()))
                 .map(xref -> new ComplexInteractorXref(
                         xref.getPrimaryId(),
                         ComplexUtils.getIdentifierLink(xref, xref.getPrimaryId()),
