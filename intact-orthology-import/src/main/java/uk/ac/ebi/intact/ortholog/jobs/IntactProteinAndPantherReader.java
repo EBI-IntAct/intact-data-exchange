@@ -34,9 +34,8 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
             IntactProtein protein = proteinIterator.next();
             Collection<String> pantherIds = OrthologsProteinAssociation
                     .associateOneProteinToPantherIds(proteinPantherPairDirPath, protein);
-//            System.out.println(protein.getUniprotkb());
-            if (!pantherIds.isEmpty() && !alreadyUpdatedProteins.contains(protein.getUniprotkb())) {
-//            if (!pantherIds.isEmpty() && UpdatedProteinFileParser.findProteinInFile(protein.getUniprotkb())){
+//            if (!pantherIds.isEmpty() && !alreadyUpdatedProteins.contains(protein.getUniprotkb())) {
+            if (!pantherIds.isEmpty()) {
                 return new ProteinAndPantherGroup(protein, pantherIds);
             }
         }
@@ -45,21 +44,16 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        alreadyUpdatedProteins = UpdatedProteinFileParser.parseFile();
+//        alreadyUpdatedProteins = UpdatedProteinFileParser.parseFile();
 //        try {
 //            OrthologsFileParser.parseFileAndSave(uncompressedPantherFilePath, proteinPantherPairDirPath);
 //        } catch (IOException e) {
 //            throw new ItemStreamException("Error parsing the file: " + uncompressedPantherFilePath, e);
 //        }
 
-//        Collection<IntactProtein> allProteins = orthologsProteinAssociation.getIntactProtein();
-
         int startAc = executionContext.getInt("startAc");
         int endAc = executionContext.getInt("endAc");
         List<IntactProtein> allProteins = orthologsProteinAssociation.fetchProteins(startAc, endAc);
-
-//        Map<String, String> uniprotAndPanther = OrthologsFileParser.parseFile(filePath);
-//        uniprotAndPantherIterator = uniprotAndPanther.entrySet().iterator();
 
         proteinIterator = allProteins.iterator();
     }

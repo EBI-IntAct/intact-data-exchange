@@ -182,6 +182,7 @@
     <bean id="orthologsReaderTasklet" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsReaderTasklet">
         <constructor-arg index="0" value="${urlPanther}"/>
         <constructor-arg index="1" value="${uncompressedPantherFilePath}"/>
+        <constructor-arg index="2" value="${proteinPantherPairDirPath}"/>
     </bean>
 
     <!--    <bean id="orthologsItemReader" class="uk.ac.ebi.intact.ortholog.jobs.OrthologsItemReader">-->
