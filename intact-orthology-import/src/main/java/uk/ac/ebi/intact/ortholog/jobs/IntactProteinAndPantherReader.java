@@ -37,7 +37,7 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
             IntactProtein protein = proteinIterator.next();
             Collection<String> pantherIds = OrthologsProteinAssociation
                     .associateOneProteinToPantherIds(proteinPantherPairDirPath, protein);
-            System.out.println(protein.getUniprotkb());
+//            System.out.println(protein.getUniprotkb());
             if (!pantherIds.isEmpty() && !alreadyUpdatedProteins.contains(protein.getUniprotkb())) {
 //            if (!pantherIds.isEmpty() && UpdatedProteinFileParser.findProteinInFile(protein.getUniprotkb())){
                 return new ProteinAndPantherGroup(protein, pantherIds);

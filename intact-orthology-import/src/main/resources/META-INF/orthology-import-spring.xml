@@ -37,7 +37,7 @@
     <bean id="basicBatchJobLauncher"
           class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
         <property name="jobRepository" ref="basicBatchJobRepository" />
-        <property name="taskExecutor" ref="threadPoolTaskExecutor" />
+        <property name="taskExecutor" ref="syncTaskExecutor" />
     </bean>
 
     <bean id="syncTaskExecutor" class="org.springframework.core.task.SyncTaskExecutor"/>
@@ -219,6 +219,10 @@
         <constructor-arg index="0" ref="interactorService"/>
     </bean>
 
+    <bean id="proteinPartitioner" class="uk.ac.ebi.intact.ortholog.ProteinPartitioner">
+<!--        <constructor-arg index="0" ref="orthologsProteinAssociation"/>-->
+    </bean>
+
     <!--    Intact protein and panther association -->
     <batch:step id="proteinAndPantherAssociation" parent="basicBatchStep">
         <batch:tasklet transaction-manager="jamiTransactionManager">
@@ -285,7 +289,11 @@
             <batch:next on="*" to="associationStep"/>
         </batch:step>
 
-        <batch:step id="associationStep" parent="proteinAndPantherAssociation"/>
+        <batch:step id="associationStep" parent="proteinAndPantherAssociation">
+            <batch:partition step="proteinAndPantherAssociation" partitioner="proteinPartitioner">
+                <batch:handler grid-size="100" task-executor="syncTaskExecutor"/>
+            </batch:partition>
+        </batch:step>
 
     </batch:job>
 </beans>

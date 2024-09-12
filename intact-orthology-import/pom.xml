@@ -40,11 +40,11 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <!--<argument>-Xmx12288m</argument>-->
-                                <!--<argument>-Xms2048m</argument>-->
+                                <argument>-Xmx12288m</argument>
+                                <argument>-Xms2048m</argument>
 
-                                <argument>-Xmx2048m</argument>
-                                <argument>-Xms512m</argument>
+<!--                                <argument>-Xmx2048m</argument>-->
+<!--                                <argument>-Xms512m</argument>-->
                                 <argument>-XX:+HeapDumpOnOutOfMemoryError</argument>
                                 <argument>
                                     -XX:HeapDumpPath=/Users/susiehuget/IdeaProjects/intact-data-exchange/intact-orthology-import/heapdump.hprof

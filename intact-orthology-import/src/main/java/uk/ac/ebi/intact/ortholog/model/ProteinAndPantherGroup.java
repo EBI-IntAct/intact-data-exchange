@@ -7,7 +7,6 @@ import java.util.Collection;
 
 @Value
 public class ProteinAndPantherGroup {
-
     IntactProtein protein;
     Collection<String> pantherIds;
 }
