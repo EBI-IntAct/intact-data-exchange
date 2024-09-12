@@ -8,7 +8,7 @@
 #SBATCH -J "ORTHOLOG_IMPORT"   # job name
 #SBATCH -o "/nfs/production/hhe/intact/data/panther/logs/ortholog-import-%j.out"   # job output file
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user= susiehuget@ebi.ac.uk   # email address
+#SBATCH --mail-user=susiehuget@ebi.ac.uk   # email address
 export JAVA_HOME=/hps/software/users/hhe/intact/third-party-softwares/latest_intact_jdk11
 
 #if [ $# -ne 2 ]; then
