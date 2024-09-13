@@ -26,7 +26,8 @@ public class ProteinPartitioner implements Partitioner {
 
         List<Integer> proteinAcs = orthologsProteinAssociation.getProteinAcs();
 
-        log.info("Starting new partition");
+        log.info("Starting new partitions");
+        log.info("Number of partitions: " + partSize);
         Map<String,ExecutionContext> partitionMap = new HashMap<String,ExecutionContext>();
 
         int totalCount = proteinAcs.size();
@@ -35,6 +36,7 @@ public class ProteinPartitioner implements Partitioner {
         int endingIndex= (int) targetSize;
         int number=0;
 
+        log.info("Proteins per partitions: " + targetSize);
 
         while(startingIndex<=(totalCount-1)){
             ExecutionContext ctxMap = new ExecutionContext();
