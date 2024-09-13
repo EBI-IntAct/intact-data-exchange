@@ -7,7 +7,9 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,7 +50,6 @@ public class OrthologsFileParser {
     public static void parseFileAndSave(String inputFilePath, String outputDirPath) throws IOException {
         Pattern uniprotKBRegex = Pattern.compile("UniProtKB=([A-Z0-9]+)");
         Pattern pantherRegex = Pattern.compile("PTHR\\d+");
-        long uniprotAndPantherCount = 0;
         log.info("Parsing file...");
 
         File outputDir = new File(outputDirPath);
@@ -57,11 +58,15 @@ public class OrthologsFileParser {
             FileUtils.deleteDirectory(outputDir);
         }
         outputDir.mkdirs();
+        long linesRead = 0;
 
+        // First we store all matches in a map to ensure there's no duplication
+        Map<String, Set<String>> uniprotAndPTHR = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFilePath))) {
 
             String line;
             while ((line = reader.readLine()) != null) {
+                linesRead++;
                 ArrayList<String> uniprotMatches = new ArrayList<>();
 
                 Matcher uniprotMatcher = uniprotKBRegex.matcher(line);
@@ -72,14 +77,36 @@ public class OrthologsFileParser {
                 }
                 while (pantherMatcher.find()) {
                     for (String uniprotMatch : uniprotMatches) {
-                        writePair(outputDir.toPath(), uniprotMatch, pantherMatcher.group());
-                        uniprotAndPantherCount += uniprotMatches.size();
+                        uniprotAndPTHR.putIfAbsent(uniprotMatch, new HashSet<>());
+                        uniprotAndPTHR.get(uniprotMatch).add(pantherMatcher.group());
+//                        writePair(outputDir.toPath(), uniprotMatch, pantherMatcher.group());
                     }
+                }
+
+                if (linesRead % 10_000 == 0) {
+                    log.info(linesRead + " lines read, " + uniprotAndPTHR.size() + " proteins read");
                 }
             }
         }
 
+        log.info(linesRead + " lines read, " + uniprotAndPTHR.size() + " proteins read");
         log.info("File parsed.");
+
+        log.info("Saving map to files...");
+
+        // Then, we write all the files
+        long uniprotAndPantherCount = 0;
+        for (String uniprotMatch : uniprotAndPTHR.keySet()) {
+            for (String pantherMatch : uniprotAndPTHR.get(uniprotMatch)) {
+                writePair(outputDir.toPath(), uniprotMatch, pantherMatch);
+            }
+            uniprotAndPantherCount += uniprotAndPTHR.get(uniprotMatch).size();
+            if (uniprotAndPantherCount % 10_000 == 0) {
+                log.info(uniprotAndPantherCount + " proteins saved");
+            }
+        }
+
+        log.info("All protein files saved.");
         log.info("Number of Panther identifiers: " + uniprotAndPantherCount);
     }
 
