@@ -34,7 +34,7 @@ public class OrthologsProteinAssociation {
     }
 
     public List<IntactProtein> fetchProteins(Integer startAc, Integer endAc) {
-        String sqlQuery = "select p.ac FROM IntactProtein p where p.category = 'protein' and CAST(REPLACE(ac,'EBI-','') as integer) BETWEEN :startAc and :endAc";
+        String sqlQuery = "select p.ac FROM IntactProtein p where CAST(REPLACE(ac,'EBI-','') as integer) BETWEEN :startAc and :endAc";
         Query query = intactDao.getEntityManager().createQuery(sqlQuery);
         query.setParameter("startAc", startAc);
         query.setParameter("endAc", endAc);
