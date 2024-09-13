@@ -79,11 +79,10 @@ public class OrthologsFileParser {
                     for (String uniprotMatch : uniprotMatches) {
                         uniprotAndPTHR.putIfAbsent(uniprotMatch, new HashSet<>());
                         uniprotAndPTHR.get(uniprotMatch).add(pantherMatcher.group());
-//                        writePair(outputDir.toPath(), uniprotMatch, pantherMatcher.group());
                     }
                 }
 
-                if (linesRead % 10_000 == 0) {
+                if (linesRead % 250_000 == 0) {
                     log.info(linesRead + " lines read, " + uniprotAndPTHR.size() + " proteins read");
                 }
             }
@@ -101,7 +100,7 @@ public class OrthologsFileParser {
                 writePair(outputDir.toPath(), uniprotMatch, pantherMatch);
             }
             uniprotAndPantherCount += uniprotAndPTHR.get(uniprotMatch).size();
-            if (uniprotAndPantherCount % 10_000 == 0) {
+            if (uniprotAndPantherCount % 25_000 == 0) {
                 log.info(uniprotAndPantherCount + " proteins saved");
             }
         }
