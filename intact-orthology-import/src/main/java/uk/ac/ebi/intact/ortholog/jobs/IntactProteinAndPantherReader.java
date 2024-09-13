@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.ortholog.jobs;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -17,6 +18,7 @@ import uk.ac.ebi.intact.ortholog.UpdatedProteinFileParser;
 import java.io.IOException;
 import java.util.*;
 
+@Log4j
 @RequiredArgsConstructor
 public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPantherGroup>, ItemStream {
 
@@ -54,6 +56,7 @@ public class IntactProteinAndPantherReader implements ItemReader<ProteinAndPanth
         int startAc = executionContext.getInt("startAc");
         int endAc = executionContext.getInt("endAc");
         List<IntactProtein> allProteins = orthologsProteinAssociation.fetchProteins(startAc, endAc);
+        log.info("Reading " + allProteins.size() + " proteins");
 
         proteinIterator = allProteins.iterator();
     }

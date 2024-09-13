@@ -32,7 +32,7 @@ public class ProteinPartitioner implements Partitioner {
         int totalCount = proteinAcs.size();
         long targetSize=(long)Math.ceil((double)totalCount/partSize);
         int startingIndex=0;
-        int endingIndex=99;
+        int endingIndex= (int) targetSize;
         int number=0;
 
 
@@ -45,7 +45,7 @@ public class ProteinPartitioner implements Partitioner {
             }
 
             ctxMap.putInt("startAc",proteinAcs.get((int)startingIndex));
-            ctxMap.putInt("endAc",proteinAcs.get((int)endingIndex));
+            ctxMap.putInt("endAc",proteinAcs.get((int)endingIndex - 1));
             startingIndex+= (int) targetSize;
             endingIndex+= (int) targetSize;
 
