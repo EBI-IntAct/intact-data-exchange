@@ -290,7 +290,7 @@
             <batch:next on="*" to="associationStep"/>
         </batch:step>
 
-        <batch:step id="associationStep" parent="proteinAndPantherAssociation">
+        <batch:step id="associationStep">
             <batch:partition step="proteinAndPantherAssociation" partitioner="proteinPartitioner">
                 <batch:handler grid-size="100" task-executor="syncTaskExecutor"/>
             </batch:partition>
