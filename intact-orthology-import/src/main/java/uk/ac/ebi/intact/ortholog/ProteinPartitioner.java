@@ -3,9 +3,7 @@ package uk.ac.ebi.intact.ortholog;
 import lombok.extern.log4j.Log4j;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
-import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +12,6 @@ import java.util.Map;
 public class ProteinPartitioner implements Partitioner {
 
     private final OrthologsProteinAssociation orthologsProteinAssociation;
-//    private final Collection<IntactProtein> intactProteins;
 
     public ProteinPartitioner(OrthologsProteinAssociation orthologsProteinAssociation) {
         this.orthologsProteinAssociation = orthologsProteinAssociation;
@@ -22,38 +19,39 @@ public class ProteinPartitioner implements Partitioner {
 
     @Override
     public Map<String, ExecutionContext> partition(int partSize) {
-//        Collection<IntactProtein> intactProteins = orthologsProteinAssociation.getIntactProtein();
-
         List<Integer> proteinAcs = orthologsProteinAssociation.getProteinAcs();
 
         log.info("Starting new partitions");
         log.info("Number of partitions: " + partSize);
-        Map<String,ExecutionContext> partitionMap = new HashMap<String,ExecutionContext>();
+        Map<String, ExecutionContext> partitionMap = new HashMap<>();
 
         int totalCount = proteinAcs.size();
-        long targetSize=(long)Math.ceil((double)totalCount/partSize);
-        int startingIndex=0;
-        int endingIndex= (int) targetSize;
-        int number=0;
+        int targetSize = (int) Math.ceil((double) totalCount / partSize);
+        int startingIndex = 0;
+        int endingIndex = targetSize;
+        int number = 0;
 
         log.info("Proteins per partitions: " + targetSize);
 
-        while(startingIndex<=(totalCount-1)){
+        while (startingIndex < totalCount) {
             ExecutionContext ctxMap = new ExecutionContext();
-            partitionMap.put("Thread:-"+number, ctxMap);
+            partitionMap.put("Thread:-" + number, ctxMap);
 
-            if(endingIndex>=(totalCount-1)){
-                endingIndex=(totalCount-1);
+            if (endingIndex > totalCount) {
+                endingIndex = totalCount;
             }
 
-            ctxMap.putInt("startAc",proteinAcs.get((int)startingIndex));
-            ctxMap.putInt("endAc",proteinAcs.get((int)endingIndex - 1));
-            startingIndex+= (int) targetSize;
-            endingIndex+= (int) targetSize;
+            ctxMap.putInt("startAc", proteinAcs.get(startingIndex));
+            ctxMap.putInt("endAc", proteinAcs.get(endingIndex - 1));
+
+            // Next start index is the previous end index
+            // Next end index is increased by target size (number of proteins per partition)
+            startingIndex = endingIndex;
+            endingIndex += targetSize;
 
             number++;
         }
-        log.debug("END: Created Partitions of size: "+ partitionMap.size());
+        log.info("END: Created " + partitionMap.size() + " partitions");
         return partitionMap;
     }
 }
