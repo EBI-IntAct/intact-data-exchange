@@ -638,7 +638,7 @@ public class QueryBuilder {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
         TransactionStatus transactionStatus = dataContext.beginTransaction();
-// TODO
+
         StringBuffer queryString = new StringBuffer();
         queryString.append("select distinct(i.ac) from InteractionImpl i ");
         queryString.append("where not exists (");
