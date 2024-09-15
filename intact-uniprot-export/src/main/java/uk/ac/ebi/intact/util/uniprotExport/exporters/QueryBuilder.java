@@ -34,17 +34,20 @@ public class QueryBuilder {
 
     private final String interactionsInvolvingInteractorsNoUniprotUpdate = "select i2 from Component c2 join " +
             "c2.interaction as i2 join c2.interactor as p join p.annotations as a where a.cvTopic.shortLabel = :noUniprotUpdate";
-    private final String interactionAcsInvolvingInteractorsNoUniprotUpdate = "select distinct(interactions.ac) from (" + interactionsInvolvingInteractorsNoUniprotUpdate + ") interactions";
+    private final String interactionAcsInvolvingInteractorsNoUniprotUpdate = "select distinct(i2.ac) from Component c2 join " +
+            "c2.interaction as i2 join c2.interactor as p join p.annotations as a where a.cvTopic.shortLabel = :noUniprotUpdate";
 
     // negative interactions
     private final String negativeInteractions = "select i3 from Component c3 join c3.interaction as i3 join " +
             "i3.annotations as a2 where a2.cvTopic.shortLabel = :negative";
-    private final String negativeInteractionAcs = "select distinct(interactions.ac) from (" + negativeInteractions + ") interactions";
+    private final String negativeInteractionAcs = "select distinct(i3.ac) from Component c3 join c3.interaction as i3 join " +
+            "i3.annotations as a2 where a2.cvTopic.shortLabel = :negative";
 
     // interactors with an uniprot identity cross reference
     private final String interactorUniprotIdentity = "select p2 from InteractorImpl p2 join p2.xrefs as refs where " +
             "refs.cvDatabase.identifier = :uniprot and refs.cvXrefQualifier.identifier = :identity";
-    private final String interactorUniprotIdentities = "select distinct(proteins.ac) from (" + interactorUniprotIdentity + ") proteins";
+    private final String interactorUniprotIdentities = "select distinct(p2.ac) from InteractorImpl p2 join p2.xrefs as refs where " +
+            "refs.cvDatabase.identifier = :uniprot and refs.cvXrefQualifier.identifier = :identity";
 
     // interactors which are not a protein
     private final String nonProteinInteractor = "select distinct(p3.ac) from InteractorImpl p3 where p3.objClass <> :protein";
@@ -53,22 +56,30 @@ public class QueryBuilder {
     private final String interactionInvolvingNonUniprotOrNonProtein = "select i4 from Component c4 join " +
             "c4.interaction as i4 join c4.interactor as p4 where ( p4.ac in ("+nonProteinInteractor+") or " +
             "not exists ("+interactorUniprotIdentity+" and p2.ac = p4.ac))";
-    private final String interactionAcsInvolvingNonUniprotOrNonProtein = "select distinct(interactions.ac) from (" + interactionInvolvingNonUniprotOrNonProtein + ") interactions";
+    private final String interactionAcsInvolvingNonUniprotOrNonProtein = "select distinct(i4.ac) from Component c4 join " +
+            "c4.interaction as i4 join c4.interactor as p4 where ( p4.ac in ("+nonProteinInteractor+") or " +
+            "not exists ("+interactorUniprotIdentity+" and p2.ac = p4.ac))";
 
     private final String interactionsFromExperimentNoExport = "select i7 from InteractionImpl i7 " +
             "join i7.experiments as e3 join e3.annotations as an3 where an3.cvTopic.shortLabel = :drExport " +
             "and trim(upper(an3.annotationText)) = :no";
-    private final String interactionAcsFromExperimentNoExport = "select distinct(interactions.ac) from (" + interactionsFromExperimentNoExport + ") interactions";
+    private final String interactionAcsFromExperimentNoExport = "select distinct(i7.ac) from InteractionImpl i7 " +
+            "join i7.experiments as e3 join e3.annotations as an3 where an3.cvTopic.shortLabel = :drExport " +
+            "and trim(upper(an3.annotationText)) = :no";
 
     private final String interactionsFromExperimentExportYes = "select i8 from InteractionImpl i8 " +
             "join i8.experiments as e4 join e4.annotations as an4 where an4.cvTopic.shortLabel = :drExport " +
             "and trim(upper(an4.annotationText)) = :yes";
-    private final String interactionAcsFromExperimentExportYes = "select distinct(interactions.ac) from (" + interactionsFromExperimentExportYes + ") interactions";
+    private final String interactionAcsFromExperimentExportYes = "select distinct(i8.ac) from InteractionImpl i8 " +
+            "join i8.experiments as e4 join e4.annotations as an4 where an4.cvTopic.shortLabel = :drExport " +
+            "and trim(upper(an4.annotationText)) = :yes";
 
     private final String interactionsFromExperimentExportConditional = "select i9 from InteractionImpl i9 " +
             "join i9.confidences as confidence join i9.experiments as e5 join e5.annotations as an6 where " +
             "an6.cvTopic.shortLabel = :drExport and confidence.cvConfidenceType.identifier = :confidence and trim(upper(confidence.value)) = trim(upper(an6.annotationText))";
-    private final String interactionAcsFromExperimentExportConditional = "select distinct(interactions.ac) from (" + interactionsFromExperimentExportConditional + ") interactions";
+    private final String interactionAcsFromExperimentExportConditional = "select distinct(i9.ac) from InteractionImpl i9 " +
+            "join i9.confidences as confidence join i9.experiments as e5 join e5.annotations as an6 where " +
+            "an6.cvTopic.shortLabel = :drExport and confidence.cvConfidenceType.identifier = :confidence and trim(upper(confidence.value)) = trim(upper(an6.annotationText))";
 
     private final String interactionsFromExperimentExportSpecified = "select distinct(i10.ac) from InteractionImpl i10 " +
             "join i10.experiments as e6 join e6.annotations as an7 where an7.cvTopic.shortLabel = :drExport";
@@ -77,12 +88,16 @@ public class QueryBuilder {
             "where i11.ac in (" + interactionsFromExperimentExportSpecified + ") " +
             "and not exists (" + interactionsFromExperimentExportYes + " and i8.ac = i11.ac) " +
             "and not exists ("+interactionsFromExperimentExportConditional+" and i9.ac = i11.ac)";
-    private final String interactionAcsDrExportNotPassed = "select distinct(interactions.ac) from (" + interactionsDrExportNotPassed + ") interactions";
+    private final String interactionAcsDrExportNotPassed = "select distinct(i11.ac) from InteractionImpl i11 " +
+            "where i11.ac in (" + interactionsFromExperimentExportSpecified + ") " +
+            "and not exists (" + interactionsFromExperimentExportYes + " and i8.ac = i11.ac) " +
+            "and not exists ("+interactionsFromExperimentExportConditional+" and i9.ac = i11.ac)";
 
     // interactions attached to a publication released or ready-to-be-released
     private final String releasedInteractions = "select rel from Component relComp join relComp.interaction as rel join rel.experiments" +
             " as relexp join relexp.publication as relpub where (relpub.status.shortLabel = :released or relpub.status.shortLabel = :ready_for_release)";
-    private final String releasedInteractionAcs = "select distinct(interactions.ac) from (" + releasedInteractions + ") interactions";
+    private final String releasedInteractionAcs = "select distinct(rel.ac) from Component relComp join relComp.interaction as rel join rel.experiments" +
+            " as relexp join relexp.publication as relpub where (relpub.status.shortLabel = :released or relpub.status.shortLabel = :ready_for_release)";
 
     // select status of the different methods in IntAct
     private final String methodStatus = "select ci.identifier, a.annotationText from CvInteraction ci join ci.annotations as a join a.cvTopic as ct" +
@@ -94,7 +109,8 @@ public class QueryBuilder {
     // negative interactions
     private final String inferredInteractions = "select infer from InteractionImpl as infer join " +
             "infer.experiments as exp join exp.cvInteraction as det where (det.identifier = :inferred_author or det.identifier = :inferred_curator)";
-    private final String inferredInteractionAcs = "select distinct(interactions.ac) from (" + inferredInteractions + ") interactions";
+    private final String inferredInteractionAcs = "select distinct(infer.ac) from InteractionImpl as infer join " +
+            "infer.experiments as exp join exp.cvInteraction as det where (det.identifier = :inferred_author or det.identifier = :inferred_curator)";
 
     private final String isoformsWithDifferentParents = "select iso.ac as ac, x2.primaryid as primaryid2, x1.primaryid as primaryid1 " +
             "from intact.ia_interactor iso, intact.ia_interactor parent, intact.ia_interactor_xref x1, intact.ia_interactor_xref x1_1, intact.ia_interactor_xref x2 " +
@@ -622,7 +638,7 @@ public class QueryBuilder {
         DataContext dataContext = IntactContext.getCurrentInstance().getDataContext();
 
         TransactionStatus transactionStatus = dataContext.beginTransaction();
-
+// TODO
         StringBuffer queryString = new StringBuffer();
         queryString.append("select distinct(i.ac) from InteractionImpl i ");
         queryString.append("where not exists (");
