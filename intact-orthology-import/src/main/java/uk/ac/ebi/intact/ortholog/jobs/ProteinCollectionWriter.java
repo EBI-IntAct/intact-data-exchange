@@ -7,14 +7,12 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import uk.ac.ebi.intact.jami.service.InteractorService;
-import uk.ac.ebi.intact.ortholog.UpdatedProteinFileWriter;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class ProteinCollectionWriter implements ItemWriter<IntactProtein>, ItemStream {
 
     private final InteractorService interactorService;
-    private final UpdatedProteinFileWriter updatedProteinFileWriter;
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
@@ -34,9 +32,5 @@ public class ProteinCollectionWriter implements ItemWriter<IntactProtein>, ItemS
     @Override
     public void write(List<? extends IntactProtein> items) throws Exception {
         interactorService.saveOrUpdate(items);
-        for (IntactProtein protein : items) {
-//            UpdatedProteinFileWriter.updatedProteinWriter(protein.getUniprotkb());
-            UpdatedProteinFileWriter.updatedProteinWriter(protein.getUniprotkb());
-        }
     }
 }

@@ -37,6 +37,10 @@ public class ProteinPartitioner implements Partitioner {
             ExecutionContext ctxMap = new ExecutionContext();
             partitionMap.put("Thread:-" + number, ctxMap);
 
+            if (endingIndex > totalCount) {
+                endingIndex = totalCount;
+            }
+
             ctxMap.putInt("startAc", proteinAcs.get(startingIndex));
             ctxMap.putInt("endAc", proteinAcs.get(endingIndex - 1));
 

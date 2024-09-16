@@ -1,14 +1,12 @@
 package uk.ac.ebi.intact.ortholog;
 
 import lombok.RequiredArgsConstructor;
-import psidev.psi.mi.jami.model.Xref;
 import uk.ac.ebi.intact.jami.dao.IntactDao;
 import uk.ac.ebi.intact.jami.model.extension.IntactCvTerm;
 import uk.ac.ebi.intact.jami.model.extension.IntactProtein;
 import uk.ac.ebi.intact.jami.model.extension.InteractorXref;
 import uk.ac.ebi.intact.jami.utils.IntactUtils;
 import java.util.*;
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class OrthologsXrefWriter {

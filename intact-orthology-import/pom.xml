@@ -135,10 +135,5 @@
             <version>2.2.3</version>
             <scope>compile</scope>
         </dependency>
-
-        <!--        <dependency>-->
-        <!--            <groupId></groupId>-->
-        <!--            <artifactId></artifactId>-->
-        <!--        </dependency>-->
     </dependencies>
 </project>
