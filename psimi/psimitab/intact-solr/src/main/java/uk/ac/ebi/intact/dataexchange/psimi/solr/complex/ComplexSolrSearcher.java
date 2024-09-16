@@ -296,6 +296,9 @@ public class ComplexSolrSearcher {
         // Check if query has negative filters and if it has add a new filter query
         //solrQuery = checkNegativeFilter ( solrQuery ) ;
 
+        // Sort by the predicted_complex field to have curated complexes first
+        solrQuery.addSortField(ComplexFieldNames.PREDICTED_COMPLEX, SolrQuery.ORDER.asc);
+
         // Send the query to the Solr Server and return the answer
         return solrServer.query ( solrQuery ) ;
     }
