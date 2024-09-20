@@ -29,6 +29,8 @@ import uk.ac.ebi.intact.task.mitab.IntactBinaryInteractionProcessor;
 import uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor;
 import uk.ac.ebi.intact.task.util.FileNameGenerator;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -40,6 +42,8 @@ import java.util.*;
  */
 
 public class PublicationMitabItemProcessor implements ItemProcessor<Publication, SortedSet<PublicationFileEntry>>, ItemStream {
+
+    private final static String PUBLICATION_DATE_FORMAT = "yyyy";
 
     /**
      * The fileName generator
@@ -134,7 +138,9 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
             if (annot.getCvTopic() != null){
                 // date
                 if (CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())) {
-                    publicationDate = annot.getAnnotationText();
+                    if (annot.getAnnotationText().matches(PUBLICATION_DATE_FORMAT)) {
+                        publicationDate = annot.getAnnotationText();
+                    }
                 }
             }
         }

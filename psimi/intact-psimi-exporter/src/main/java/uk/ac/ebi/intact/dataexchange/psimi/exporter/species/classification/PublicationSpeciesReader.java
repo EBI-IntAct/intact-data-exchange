@@ -30,20 +30,37 @@ public class PublicationSpeciesReader extends JdbcCursorItemReader<PublicationSp
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        String query = "select distinct p.shortlabel as pubid, EXTRACT (YEAR FROM p.created ) as year, b.shortlabel as species, b.taxid as taxid, v.count_interaction as number_interactions"+
-        " from ia_publication p"+
-                " join ia_experiment e on p.ac = e.publication_ac"+
-                " join ia_int2exp ie on ie.experiment_ac = e.ac"+
-                " join ia_component c on ie.interaction_ac = c.interaction_ac"+
-                " join ia_interactor i on i.ac = c.interactor_ac"+
-                " join ia_biosource b on b.ac = i.biosource_ac"+
-                " join (select count(ie2.interaction_ac) as count_interaction, p2.ac as publication_ac"+
-                " from ia_int2exp ie2, ia_experiment e2, ia_publication p2"+
-                " where e2.ac = ie2.experiment_ac and e2.publication_ac = p2.ac"+
-                " group by p2.ac) v on v.publication_ac = p.ac"+
-                " where p.shortLabel != '14681455'"+
-                " group by b.shortlabel, p.shortlabel, b.taxid, p.created, v.count_interaction"+
-                " order by b.shortlabel, p.shortlabel, v.count_interaction DESC";
+        String query = "select distinct pub.pubid, pub.year, pub.species, pub.taxid, pub.number_interactions" +
+                "  from (select" +
+                "    p.shortlabel as pubid," +
+                "    case when pub_year.description is null then EXTRACT (YEAR FROM p.created ) else cast(pub_year.description as numeric) end as year," +
+                "    b.shortlabel as species," +
+                "    b.taxid as taxid," +
+                "    v.count_interaction as number_interactions" +
+                "    from ia_publication p"+
+                "    join ia_experiment e on p.ac = e.publication_ac"+
+                "    join ia_int2exp ie on ie.experiment_ac = e.ac"+
+                "    join ia_component c on ie.interaction_ac = c.interaction_ac"+
+                "    join ia_interactor i on i.ac = c.interactor_ac"+
+                "    join ia_biosource b on b.ac = i.biosource_ac"+
+                "    join (" +
+                "      select count(ie2.interaction_ac) as count_interaction, p2.ac as publication_ac"+
+                "      from ia_int2exp ie2, ia_experiment e2, ia_publication p2"+
+                "      where e2.ac = ie2.experiment_ac and e2.publication_ac = p2.ac"+
+                "      group by p2.ac" +
+                "    ) v on v.publication_ac = p.ac" +
+                "    left join (" +
+                "      select p2a.publication_ac, a.description" +
+                "      from ia_pub2annot p2a" +
+                "      join ia_annotation a on p2a.annotation_ac = a.ac" +
+                "      join ia_controlledvocab t on a.topic_ac = t.ac" +
+                "      where t.identifier = 'MI:0886'" +
+                "      and a.description ~ '[0-9]{4}'" +
+                "    ) pub_year on p.ac = pub_year.publication_ac"+
+                "    where p.shortLabel != '14681455'" +
+                "  ) pub"+
+                "  group by b.shortlabel, p.shortlabel, b.taxid, p.created, v.count_interaction"+
+                "  order by b.shortlabel, p.shortlabel, v.count_interaction DESC";
 
         setSql(query);
         setRowMapper(new PublicationSpeciesRowMapper());
