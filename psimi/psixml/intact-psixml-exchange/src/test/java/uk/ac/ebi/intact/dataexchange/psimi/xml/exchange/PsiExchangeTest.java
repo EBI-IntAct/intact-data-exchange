@@ -250,6 +250,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Interaction mockInteraction = getMockBuilder().createInteractionRandomBinary();
         Experiment exp = mockInteraction.getExperiments().iterator().next();
         exp.addXref(getMockBuilder().createPrimaryReferenceXref(exp, "1234567"));
+        mockInteraction.getOwner().setAnnotations(new ArrayList<>());
 
         IntactEntry entry = new IntactEntry(Arrays.asList(mockInteraction));
 
@@ -372,6 +373,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Interaction mockInteraction = getMockBuilder().createInteractionRandomBinary();
         Experiment exp = mockInteraction.getExperiments().iterator().next();
         exp.addXref(getMockBuilder().createPrimaryReferenceXref(exp, "1234567"));
+        mockInteraction.getOwner().setAnnotations(new ArrayList<>());
 
         IntactEntry entry = new IntactEntry(Arrays.asList(mockInteraction));
 
@@ -404,6 +406,7 @@ public class PsiExchangeTest extends AbstractPsiExchangeTest  {
         Interaction mockInteraction = getMockBuilder().createInteractionRandomBinary();
         Experiment exp = mockInteraction.getExperiments().iterator().next();
         exp.addXref(getMockBuilder().createPrimaryReferenceXref(exp, "1234567"));
+        mockInteraction.getOwner().setAnnotations(new ArrayList<>());
 
         IntactEntry entry = new IntactEntry(Arrays.asList(mockInteraction));
 

@@ -121,7 +121,7 @@ public class ExperimentEnricher extends FullExperimentEnricher {
                 Collection<Annotation> pubYears = AnnotationUtils.collectAllAnnotationsHavingTopic(objectToEnrich.getAnnotations(),
                         Annotation.PUBLICATION_YEAR_MI, Annotation.PUBLICATION_YEAR);
                 Annotation pubYear = pubYears.stream()
-                        .filter(ann -> IntactUtils.YEAR_FORMAT_STR.matches(ann.getValue()))
+                        .filter(ann -> IntactUtils.YEAR_FORMAT_REGEX.matcher(ann.getValue()).matches())
                         .findFirst()
                         .orElse(null);
                 if (pubYear != null){
