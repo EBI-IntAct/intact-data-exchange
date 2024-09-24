@@ -17,6 +17,10 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.util;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import psidev.psi.mi.xml.model.DbReference;
 import psidev.psi.mi.xml.model.Interactor;
 import psidev.psi.mi.xml.model.NamesContainer;
@@ -39,6 +43,12 @@ import static org.junit.Assert.assertNotNull;
  * @author Bruno Aranda (baranda@ebi.ac.uk)
  * @version $Id$
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@TestPropertySource(locations="classpath:/retry.properties")
+@ContextConfiguration(locations = {
+        "classpath*:/META-INF/intact.spring.xml",
+        "classpath*:/META-INF/standalone/*-standalone.spring.xml"
+})
 public class PsiConverterUtilsTest {
 
     @Test

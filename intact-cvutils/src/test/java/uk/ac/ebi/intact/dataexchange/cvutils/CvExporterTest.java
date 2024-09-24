@@ -22,9 +22,13 @@ import org.bbop.dataadapter.DataAdapterException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.obo.dataadapter.OBOParseException;
 import org.obo.datamodel.*;
 import org.obo.datamodel.impl.*;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.intact.core.unit.IntactMockBuilder;
 import uk.ac.ebi.intact.dataexchange.cvutils.model.CvObjectOntologyBuilder;
 import uk.ac.ebi.intact.model.CvDagObject;
@@ -46,6 +50,12 @@ import java.util.Map;
  * @version $Id$
  * @since 2.0.1
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@TestPropertySource(locations="classpath:/retry.properties")
+@ContextConfiguration(locations = {
+        "classpath*:/META-INF/intact.spring.xml",
+        "classpath*:/META-INF/standalone/*-standalone.spring.xml"
+})
 public class CvExporterTest {
 
     //initialize logger
