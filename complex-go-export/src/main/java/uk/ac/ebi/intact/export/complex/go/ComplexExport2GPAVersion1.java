@@ -189,7 +189,8 @@ public class ComplexExport2GPAVersion1 {
                     return false;
                 }
             }
-        } else {
+        } else if (!intactComplex.isPredictedComplex()) {
+            // Go xrefs are only expected for curated complexes
             System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") [ " + intactComplex.getOrganism().getScientificName() + "] has empty complex GO Xref");
             return false;
         }

@@ -2,6 +2,10 @@ package uk.ac.ebi.intact.dataexchange.psimi.xml.converter.shared;
 
 import org.junit.Test;
 import org.junit.Assert;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import psidev.psi.mi.xml.model.*;
 import uk.ac.ebi.intact.model.Institution;
 import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
@@ -13,6 +17,12 @@ import uk.ac.ebi.intact.dataexchange.psimi.xml.converter.PsiConversionException;
  * @version $Id$
  * @since 2.1.0
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@TestPropertySource(locations="classpath:/retry.properties")
+@ContextConfiguration(locations = {
+        "classpath*:/META-INF/intact.spring.xml",
+        "classpath*:/META-INF/standalone/*-standalone.spring.xml"
+})
 public class RangeConverterTest {
 
     @Test

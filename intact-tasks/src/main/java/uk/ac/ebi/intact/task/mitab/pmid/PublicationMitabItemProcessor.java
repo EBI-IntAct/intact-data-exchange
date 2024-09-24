@@ -29,7 +29,10 @@ import uk.ac.ebi.intact.task.mitab.IntactBinaryInteractionProcessor;
 import uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor;
 import uk.ac.ebi.intact.task.util.FileNameGenerator;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Processor which converts a publication from intact to mitab file
@@ -40,6 +43,8 @@ import java.util.*;
  */
 
 public class PublicationMitabItemProcessor implements ItemProcessor<Publication, SortedSet<PublicationFileEntry>>, ItemStream {
+
+    private final static Pattern PUBLICATION_DATE_REGEX = Pattern.compile("[0-9]{4}");
 
     /**
      * The fileName generator
@@ -134,7 +139,9 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
             if (annot.getCvTopic() != null){
                 // date
                 if (CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())) {
-                    publicationDate = annot.getAnnotationText();
+                    if (PUBLICATION_DATE_REGEX.matcher(annot.getAnnotationText()).matches()) {
+                        publicationDate = annot.getAnnotationText();
+                    }
                 }
             }
         }

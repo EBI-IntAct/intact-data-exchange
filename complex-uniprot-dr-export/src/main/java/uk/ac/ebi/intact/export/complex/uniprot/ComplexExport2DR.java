@@ -57,12 +57,12 @@ public class ComplexExport2DR {
 
         ComplexService complexService = ApplicationContextProvider.getBean("complexService");
         final String query = "select distinct i from IntactComplex i " +
-                "where predictedComplex is false";
+                "where predictedComplex is false or predictedComplex is null";
         final String countQuery = "select count(distinct i.ac) from IntactComplex i " +
-                "where predictedComplex is false";
+                "where predictedComplex is false or predictedComplex is null";
         Iterator<Complex> complexes = complexService.iterateAll(countQuery, query, new HashMap<>());
 
-        System.err.println("Complexes to export: " + complexService.countAll());
+        System.err.println("Complexes to export: " + complexService.countAll(countQuery, new HashMap<>()));
 
         BufferedWriter drWriter = null;
 
