@@ -16,9 +16,10 @@ import java.util.regex.Pattern;
 @Log4j
 public class OrthologsFileParser {
 
+    private static final Pattern UNIPROT_KB_REGEX = Pattern.compile("UniProtKB=([A-Z0-9]+)");
+    private static final Pattern PANTHER_REGEX = Pattern.compile("PTHR\\d+");
+
     public static void parseFileAndSave(String inputFilePath, String outputDirPath) throws IOException {
-        Pattern uniprotKBRegex = Pattern.compile("UniProtKB=([A-Z0-9]+)");
-        Pattern pantherRegex = Pattern.compile("PTHR\\d+");
         log.info("Parsing file...");
 
         File outputDir = new File(outputDirPath);
@@ -37,8 +38,8 @@ public class OrthologsFileParser {
                 linesRead++;
                 ArrayList<String> uniprotMatches = new ArrayList<>();
 
-                Matcher uniprotMatcher = uniprotKBRegex.matcher(line);
-                Matcher pantherMatcher = pantherRegex.matcher(line);
+                Matcher uniprotMatcher = UNIPROT_KB_REGEX.matcher(line);
+                Matcher pantherMatcher = PANTHER_REGEX.matcher(line);
 
                 while (uniprotMatcher.find()) {
                     uniprotMatches.add(uniprotMatcher.group(1));
