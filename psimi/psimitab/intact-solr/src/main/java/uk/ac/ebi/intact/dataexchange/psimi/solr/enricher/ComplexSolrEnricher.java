@@ -12,6 +12,7 @@ import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexFieldNames;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexInteractor;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexInteractorXref;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.util.ComplexUtils;
 import uk.ac.ebi.intact.model.*;
@@ -20,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Complex Field Enricher is such as Ontoly Field Enricher
@@ -38,8 +40,12 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     private PsimiTabReader reader;
     private final ObjectMapper mapper;
 
-    private final static String EXP_EVIDENCE="exp-evidence";
-    private final static String INTACT_SECONDARY="intact-secondary";
+    private static final String EXP_EVIDENCE="exp-evidence";
+    private static final String INTACT_SECONDARY="intact-secondary";
+
+    // Currently, we are only storing interactors xrefs from the following databases:
+    // - panther (MI:0702)
+    private static final Set<String> INTERACTOR_XREF_DATABASE_MIS_TO_STORE = Set.of("MI:0702");
 
     /*************************/
     /*      Constructor      */
@@ -202,6 +208,16 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         Interactor interactor = participant.getInteractor();
         String identifier = ComplexUtils.getParticipantIdentifier(participant);
 
+        List<ComplexInteractorXref> xrefs = interactor.getXrefs().stream()
+                .filter(xref -> xref.getCvDatabase() != null)
+                .filter(xref -> INTERACTOR_XREF_DATABASE_MIS_TO_STORE.contains(xref.getCvDatabase().getIdentifier()))
+                .map(xref -> new ComplexInteractorXref(
+                        xref.getPrimaryId(),
+                        ComplexUtils.getIdentifierLink(xref, xref.getPrimaryId()),
+                        xref.getCvDatabase() != null ? xref.getCvDatabase().getShortLabel() : null,
+                        xref.getCvXrefQualifier() != null ? xref.getCvXrefQualifier().getShortLabel() : null))
+                .collect(Collectors.toList());
+
         ComplexInteractor complexInteractor = new ComplexInteractor(
                 identifier,
                 ComplexUtils.getParticipantIdentifierLink(participant, identifier),
@@ -209,7 +225,8 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
                 interactor.getFullName(),
                 ComplexUtils.getParticipantStoichiometry(participant),
                 interactor.getCvInteractorType().getFullName(),
-                findInteractorOrganismName(interactor));
+                findInteractorOrganismName(interactor),
+                xrefs);
         String serialisedInteractor = mapper.writeValueAsString(complexInteractor);
         solrDocument.addField(ComplexFieldNames.SERIALISED_INTERACTION, serialisedInteractor);
     }
