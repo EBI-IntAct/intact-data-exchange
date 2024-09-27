@@ -29,8 +29,6 @@ import uk.ac.ebi.intact.task.mitab.IntactBinaryInteractionProcessor;
 import uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor;
 import uk.ac.ebi.intact.task.util.FileNameGenerator;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -134,8 +132,9 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
         }
 
         String publicationDate = null;
+        List<String> datasets = new ArrayList<>();
         Collection<Annotation> pubAnnotations = AnnotatedObjectUtils.getPublicAnnotations(publication);
-        for (Annotation annot : pubAnnotations){
+        for (Annotation annot : pubAnnotations) {
             if (annot.getCvTopic() != null){
                 // date
                 if (CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())) {
@@ -143,16 +142,20 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
                         publicationDate = annot.getAnnotationText();
                     }
                 }
+                // dataset
+                if (CvTopic.DATASET_MI_REF.equals(annot.getCvTopic().getIdentifier())) {
+                    datasets.add(annot.getAnnotationText());
+                }
             }
         }
 
         if (this.currentNegativeStringBuilder.length() > 0){
             createPublicationEntry(
-                    publicationEntries, publication.getCreated(), publication.getShortLabel(), this.currentNegativeStringBuilder, true, publicationDate);
+                    publicationEntries, publication.getCreated(), publication.getShortLabel(), this.currentNegativeStringBuilder, true, publicationDate, datasets);
         }
         if (this.currentStringBuilder.length() > 0){
             createPublicationEntry(
-                    publicationEntries, publication.getCreated(), publication.getShortLabel(), this.currentStringBuilder, false, publicationDate);
+                    publicationEntries, publication.getCreated(), publication.getShortLabel(), this.currentStringBuilder, false, publicationDate, datasets);
         }
 
         IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().clear();
@@ -228,7 +231,8 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
                                         String publicationName,
                                         StringBuffer mitab,
                                         boolean isNegative,
-                                        String publicationDate) {
+                                        String publicationDate,
+                                        List<String> datasets) {
         log.info("create publication entry : " + publicationName);
 
         // create a publication name
@@ -236,7 +240,7 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
         String entryName = publicationNameGenerator.createPublicationName(publicationName, null, isNegative);
 
         // create a publication entry
-        PublicationFileEntry publicationEntry = new PublicationFileEntry(date, entryName, mitab, isNegative, publicationDate);
+        PublicationFileEntry publicationEntry = new PublicationFileEntry(date, entryName, mitab, isNegative, publicationDate, datasets);
         // add the publication entry to the list of publication entries
         publicationEntries.add(publicationEntry);
 

@@ -137,11 +137,11 @@ public class PublicationMitabItemWriterTest extends IntactBasicTestCase{
 
         PublicationFileEntry oldEntryWithNoPublicationDate = pubWithNoPublicationDateEntries.iterator().next();
         PublicationFileEntry newEntryWithNoPublicationDate = new PublicationFileEntry(
-                dateFormatForEntry.parse(secondCreatedDate), "12345_10", oldEntryWithNoPublicationDate.getBinaryInteractions(), false, null);
+                dateFormatForEntry.parse(secondCreatedDate), "12345_10", oldEntryWithNoPublicationDate.getBinaryInteractions(), false, null, new ArrayList<>());
         pubWithNoPublicationDateEntries2.add(newEntryWithNoPublicationDate);
         PublicationFileEntry oldEntryWithPublicationDate = pubWithPublicationDateEntries.iterator().next();
         PublicationFileEntry newEntryWithPublicationDate = new PublicationFileEntry(
-                dateFormatForEntry.parse(secondCreatedDate), "98765_10", oldEntryWithPublicationDate.getBinaryInteractions(), false, secondPublicationDate);
+                dateFormatForEntry.parse(secondCreatedDate), "98765_10", oldEntryWithPublicationDate.getBinaryInteractions(), false, secondPublicationDate, new ArrayList<>());
         pubWithPublicationDateEntries2.add(newEntryWithPublicationDate);
 
         DateFormat format = new SimpleDateFormat("yyyy");
