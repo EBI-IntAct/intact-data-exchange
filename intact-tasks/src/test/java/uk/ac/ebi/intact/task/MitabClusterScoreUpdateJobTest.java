@@ -13,6 +13,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.intact.core.persister.CorePersister;
 
@@ -30,8 +31,13 @@ import java.util.Map;
  * @since <pre>07/02/12</pre>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/META-INF/mitab-creation.spring.xml", "/META-INF/job-tests.spring.xml"
-        , "classpath*:/META-INF/intact.spring.xml", "classpath*:/META-INF/standalone/*-standalone.spring.xml"})
+@TestPropertySource(locations="classpath:/retry.properties")
+@ContextConfiguration(locations = {
+        "/META-INF/mitab-creation.spring.xml",
+        "/META-INF/job-tests.spring.xml",
+        "classpath*:/META-INF/intact.spring.xml",
+        "classpath*:/META-INF/standalone/*-standalone.spring.xml"
+})
 public class MitabClusterScoreUpdateJobTest {
 
     @Resource(name = "intactBatchJobLauncher")

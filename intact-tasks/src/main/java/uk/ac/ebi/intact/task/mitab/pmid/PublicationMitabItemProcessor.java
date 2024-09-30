@@ -16,9 +16,12 @@ import psidev.psi.mi.tab.model.OrganismImpl;
 import psidev.psi.mi.tab.model.builder.MitabWriterUtils;
 import psidev.psi.mi.tab.model.builder.PsimiTabVersion;
 import uk.ac.ebi.intact.core.context.IntactContext;
+import uk.ac.ebi.intact.model.Annotation;
+import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Interaction;
 import uk.ac.ebi.intact.model.Publication;
+import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.InteractionUtils;
 import uk.ac.ebi.intact.psimitab.converters.converters.ExperimentConverter;
 import uk.ac.ebi.intact.psimitab.converters.converters.PublicationConverter;
@@ -27,6 +30,7 @@ import uk.ac.ebi.intact.task.mitab.InteractionExpansionCompositeProcessor;
 import uk.ac.ebi.intact.task.util.FileNameGenerator;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Processor which converts a publication from intact to mitab file
@@ -37,6 +41,8 @@ import java.util.*;
  */
 
 public class PublicationMitabItemProcessor implements ItemProcessor<Publication, SortedSet<PublicationFileEntry>>, ItemStream {
+
+    private final static Pattern PUBLICATION_DATE_REGEX = Pattern.compile("[0-9]{4}");
 
     /**
      * The fileName generator
@@ -125,11 +131,31 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
             }
         }
 
+        String publicationDate = null;
+        List<String> datasets = new ArrayList<>();
+        Collection<Annotation> pubAnnotations = AnnotatedObjectUtils.getPublicAnnotations(publication);
+        for (Annotation annot : pubAnnotations) {
+            if (annot.getCvTopic() != null){
+                // date
+                if (CvTopic.PUBLICATION_YEAR_MI_REF.equals(annot.getCvTopic().getIdentifier())) {
+                    if (PUBLICATION_DATE_REGEX.matcher(annot.getAnnotationText()).matches()) {
+                        publicationDate = annot.getAnnotationText();
+                    }
+                }
+                // dataset
+                if (CvTopic.DATASET_MI_REF.equals(annot.getCvTopic().getIdentifier())) {
+                    datasets.add(annot.getAnnotationText());
+                }
+            }
+        }
+
         if (this.currentNegativeStringBuilder.length() > 0){
-            createPublicationEntry(publicationEntries, publication.getCreated(), publication.getShortLabel(), this.currentNegativeStringBuilder, true);
+            createPublicationEntry(
+                    publicationEntries, publication.getCreated(), publication.getShortLabel(), this.currentNegativeStringBuilder, true, publicationDate, datasets);
         }
         if (this.currentStringBuilder.length() > 0){
-            createPublicationEntry(publicationEntries, publication.getCreated(), publication.getShortLabel(), this.currentStringBuilder, false);
+            createPublicationEntry(
+                    publicationEntries, publication.getCreated(), publication.getShortLabel(), this.currentStringBuilder, false, publicationDate, datasets);
         }
 
         IntactContext.getCurrentInstance().getDaoFactory().getEntityManager().clear();
@@ -200,7 +226,13 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
         }
     }
 
-    private void createPublicationEntry(Set<PublicationFileEntry> publicationEntries, Date date, String publicationName, StringBuffer mitab, boolean isNegative) {
+    private void createPublicationEntry(Set<PublicationFileEntry> publicationEntries,
+                                        Date date,
+                                        String publicationName,
+                                        StringBuffer mitab,
+                                        boolean isNegative,
+                                        String publicationDate,
+                                        List<String> datasets) {
         log.info("create publication entry : " + publicationName);
 
         // create a publication name
@@ -208,7 +240,7 @@ public class PublicationMitabItemProcessor implements ItemProcessor<Publication,
         String entryName = publicationNameGenerator.createPublicationName(publicationName, null, isNegative);
 
         // create a publication entry
-        PublicationFileEntry publicationEntry = new PublicationFileEntry(date, entryName, mitab, isNegative);
+        PublicationFileEntry publicationEntry = new PublicationFileEntry(date, entryName, mitab, isNegative, publicationDate, datasets);
         // add the publication entry to the list of publication entries
         publicationEntries.add(publicationEntry);
 

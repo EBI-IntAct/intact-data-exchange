@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.tab.PsimiTabReader;
 import uk.ac.ebi.intact.core.unit.IntactBasicTestCase;
+import uk.ac.ebi.intact.model.Annotation;
+import uk.ac.ebi.intact.model.CvTopic;
 import uk.ac.ebi.intact.model.Experiment;
 import uk.ac.ebi.intact.model.Publication;
 import uk.ac.ebi.intact.task.mitab.BinaryInteractionItemProcessor;
@@ -29,7 +31,9 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -88,31 +92,57 @@ public class PublicationMitabItemWriterTest extends IntactBasicTestCase{
         TransactionStatus status = getDataContext().beginTransaction();
 
         // contains small scale experiment
-        Publication pub = getMockBuilder().createPublicationRandom();
-        pub.setShortLabel("12345");
+        Publication pubWithNoPublicationDate = getMockBuilder().createPublicationRandom();
+        pubWithNoPublicationDate.setShortLabel("12345");
         Experiment smallScale = getMockBuilder().createExperimentRandom(7);
-        smallScale.setPublication(pub);
-        pub.addExperiment(smallScale);
-        getCorePersister().saveOrUpdate(pub);
+        smallScale.setPublication(pubWithNoPublicationDate);
+        pubWithNoPublicationDate.addExperiment(smallScale);
+        getCorePersister().saveOrUpdate(pubWithNoPublicationDate);
 
         getDataContext().commitTransaction(status);
 
         TransactionStatus status2 = getDataContext().beginTransaction();
 
+        // contains small scale experiment
+        String publicationYearStr = "2020";
+        Publication pubWithPublicationDate = getMockBuilder().createPublicationRandom();
+        pubWithPublicationDate.setShortLabel("98765");
+        List<Annotation> annotations = new ArrayList();
+        annotations.add(getMockBuilder().createAnnotation(
+                publicationYearStr,
+                getMockBuilder().createCvObject(CvTopic.class, "MI:0886", "publication year")));
+        pubWithPublicationDate.setAnnotations(annotations);
+        Experiment smallestScale = getMockBuilder().createExperimentRandom(1);
+        smallestScale.setPublication(pubWithPublicationDate);
+        pubWithPublicationDate.addExperiment(smallestScale);
+        getCorePersister().saveOrUpdate(pubWithPublicationDate);
+
+        getDataContext().commitTransaction(status2);
+
+        TransactionStatus status3 = getDataContext().beginTransaction();
+
         StepExecution stepExecution = getStepExecution();
         mitabProcessor.open(stepExecution.getExecutionContext());
 
-        SortedSet<PublicationFileEntry> pubEntries = mitabProcessor.process(pub);
-        SortedSet<PublicationFileEntry> pubEntries2 = new TreeSet();
+        SortedSet<PublicationFileEntry> pubWithNoPublicationDateEntries = mitabProcessor.process(pubWithNoPublicationDate);
+        SortedSet<PublicationFileEntry> pubWithPublicationDateEntries = mitabProcessor.process(pubWithPublicationDate);
+        SortedSet<PublicationFileEntry> pubWithNoPublicationDateEntries2 = new TreeSet();
+        SortedSet<PublicationFileEntry> pubWithPublicationDateEntries2 = new TreeSet();
 
         mitabProcessor.close();
 
         DateFormat dateFormatForEntry = new SimpleDateFormat("yyyy-MM-dd");
-        String secondDate = "2009-07-09";
+        String secondCreatedDate = "2009-07-09";
+        String secondPublicationDate = "2021";
 
-        PublicationFileEntry oldEntry = pubEntries.iterator().next();
-        PublicationFileEntry newEntry = new PublicationFileEntry(dateFormatForEntry.parse(secondDate), "12345_10", oldEntry.getBinaryInteractions(), false);
-        pubEntries2.add(newEntry);
+        PublicationFileEntry oldEntryWithNoPublicationDate = pubWithNoPublicationDateEntries.iterator().next();
+        PublicationFileEntry newEntryWithNoPublicationDate = new PublicationFileEntry(
+                dateFormatForEntry.parse(secondCreatedDate), "12345_10", oldEntryWithNoPublicationDate.getBinaryInteractions(), false, null, new ArrayList<>());
+        pubWithNoPublicationDateEntries2.add(newEntryWithNoPublicationDate);
+        PublicationFileEntry oldEntryWithPublicationDate = pubWithPublicationDateEntries.iterator().next();
+        PublicationFileEntry newEntryWithPublicationDate = new PublicationFileEntry(
+                dateFormatForEntry.parse(secondCreatedDate), "98765_10", oldEntryWithPublicationDate.getBinaryInteractions(), false, secondPublicationDate, new ArrayList<>());
+        pubWithPublicationDateEntries2.add(newEntryWithPublicationDate);
 
         DateFormat format = new SimpleDateFormat("yyyy");
 
@@ -121,7 +151,7 @@ public class PublicationMitabItemWriterTest extends IntactBasicTestCase{
         writer.getGlobalPositiveMitabItemWriter().open(stepExecution.getExecutionContext());
         writer.getGlobalNegativeMitabItemWriter().open(stepExecution.getExecutionContext());
 
-        writer.write(Arrays.asList(pubEntries, pubEntries2));
+        writer.write(Arrays.asList(pubWithNoPublicationDateEntries, pubWithPublicationDateEntries, pubWithNoPublicationDateEntries2, pubWithPublicationDateEntries2));
         writer.getGlobalPositiveMitabItemWriter().update(stepExecution.getExecutionContext());
         writer.getGlobalNegativeMitabItemWriter().update(stepExecution.getExecutionContext());
         writer.close();
@@ -129,30 +159,44 @@ public class PublicationMitabItemWriterTest extends IntactBasicTestCase{
         writer.getGlobalNegativeMitabItemWriter().close();
 
         pmid = new File(writer.getParentFolderPaths());
-
         Assert.assertTrue(pmid.exists());
-        File year = new File(pmid, format.format(pub.getCreated()));
-        Assert.assertTrue(year.exists());
 
-        File[] pubmeds = year.listFiles();
+        File createdYear = new File(pmid, format.format(pubWithNoPublicationDate.getCreated()));
+        Assert.assertTrue(createdYear.exists());
 
-        Assert.assertEquals(1, pubmeds.length);
-        Assert.assertEquals(pubEntries.iterator().next().getEntryName() + ".txt", pubmeds[0].getName());
-        Assert.assertEquals(7, mitabReader.read(pubmeds[0]).size());
+        File[] pubmedsWithNoPublicationDate = createdYear.listFiles();
+        Assert.assertEquals(1, pubmedsWithNoPublicationDate.length);
+        Assert.assertEquals(pubWithNoPublicationDateEntries.iterator().next().getEntryName() + ".txt", pubmedsWithNoPublicationDate[0].getName());
+        Assert.assertEquals(7, mitabReader.read(pubmedsWithNoPublicationDate[0]).size());
 
-        File secondYear = new File(pmid, "2009");
-        Assert.assertTrue(secondYear.exists());
+        File publicationYear = new File(pmid, publicationYearStr);
+        Assert.assertTrue(publicationYear.exists());
 
-        File[] secondPubmeds = secondYear.listFiles();
+        File[] pubmedsWithPublicationDate = publicationYear.listFiles();
+        Assert.assertEquals(1, pubmedsWithPublicationDate.length);
+        Assert.assertEquals(pubWithPublicationDateEntries.iterator().next().getEntryName() + ".txt", pubmedsWithPublicationDate[0].getName());
+        Assert.assertEquals(1, mitabReader.read(pubmedsWithPublicationDate[0]).size());
 
-        Assert.assertEquals(1, secondPubmeds.length);
-        Assert.assertEquals("12345_10.txt", secondPubmeds[0].getName());
-        Assert.assertEquals(7, mitabReader.read(secondPubmeds[0]).size());
+        File secondCreatedYear = new File(pmid, secondCreatedDate.substring(0, 4));
+        Assert.assertTrue(secondCreatedYear.exists());
+
+        File[] secondPubmedsWithNoPublicationDate = secondCreatedYear.listFiles();
+        Assert.assertEquals(1, secondPubmedsWithNoPublicationDate.length);
+        Assert.assertEquals("12345_10.txt", secondPubmedsWithNoPublicationDate[0].getName());
+        Assert.assertEquals(7, mitabReader.read(secondPubmedsWithNoPublicationDate[0]).size());
+
+        File secondPublicationYear = new File(pmid, secondPublicationDate);
+        Assert.assertTrue(secondPublicationYear.exists());
+
+        File[] secondPubmedsWithPublicationDate = secondPublicationYear.listFiles();
+        Assert.assertEquals(1, secondPubmedsWithPublicationDate.length);
+        Assert.assertEquals("98765_10.txt", secondPubmedsWithPublicationDate[0].getName());
+        Assert.assertEquals(1, mitabReader.read(secondPubmedsWithPublicationDate[0]).size());
 
         File globalFile = new File("target/lala.txt");
         Assert.assertTrue(globalFile.exists());
-        Assert.assertEquals(14, mitabReader.read(globalFile).size());
+        Assert.assertEquals(16, mitabReader.read(globalFile).size());
 
-        getDataContext().commitTransaction(status2);
+        getDataContext().commitTransaction(status3);
     }
 }

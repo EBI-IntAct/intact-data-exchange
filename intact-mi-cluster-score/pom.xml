@@ -4,7 +4,7 @@
     <parent>
         <artifactId>intact-dataexchange-master</artifactId>
         <groupId>uk.ac.ebi.intact.dataexchange</groupId>
-        <version>3.3.2-SNAPSHOT</version>
+        <version>4.3.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>intact-mi-cluster-score</artifactId>
@@ -353,7 +353,7 @@
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>8.2-504.jdbc3</version>
+            <version>8.2-504.jdbc4</version>
         </dependency>
 
         <!-- H2 -->

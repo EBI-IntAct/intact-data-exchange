@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.task.mitab.pmid;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * The publication entry is an mitab inputstream with a few information about the publication. A publicationEntry only contains interactions of a same publication.
@@ -28,7 +29,15 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry>{
 
     private boolean isNegative;
 
-    public PublicationFileEntry(Date createdDate, String pubId, StringBuffer mitab, boolean isNegative){
+    private String publicationDate;
+    private List<String> datasets;
+
+    public PublicationFileEntry(Date createdDate,
+                                String pubId,
+                                StringBuffer mitab,
+                                boolean isNegative,
+                                String publicationDate,
+                                List<String> datasets) {
         super();
         this.createdDate = createdDate;
         this.entryName = pubId;
@@ -39,6 +48,8 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry>{
             this.binaryInteractions.append(mitab);
         }
         this.isNegative = isNegative;
+        this.publicationDate = publicationDate;
+        this.datasets = datasets;
     }
 
     public Date getCreatedDate() {
@@ -59,6 +70,22 @@ public class PublicationFileEntry implements Comparable<PublicationFileEntry>{
 
     public StringBuffer getBinaryInteractions() {
         return binaryInteractions;
+    }
+
+    public String getPublicationDate() {
+        return publicationDate;
+    }
+
+    public void setPublicationDate(String publicationDate) {
+        this.publicationDate = publicationDate;
+    }
+
+    public List<String> getDatasets() {
+        return datasets;
+    }
+
+    public void setDatasets(List<String> datasets) {
+        this.datasets = datasets;
     }
 
     @Override

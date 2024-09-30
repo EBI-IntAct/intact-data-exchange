@@ -21,6 +21,7 @@
         <fieldType name="uuid"          class="solr.UUIDField"/>
         <fieldType name="int"           class="solr.TrieIntField"   positionIncrementGap="0"     precisionStep="0"/>
         <fieldType name="boolean"       class="solr.BoolField"      sortMissingLast="true"       omitNorms="true"/>
+        <fieldType name="facetBoolean"  class="solr.BoolField"      sortMissingLast="true"       omitNorms="true"/>
         <fieldType name="facetString"   class="solr.StrField"       positionIncrementGap="100"   omitNorms="true"/>
         <fieldType name="string"        class="solr.TextField"      positionIncrementGap="100"   omitNorms="true">
             <analyzer>
@@ -92,8 +93,14 @@
         <field name="complex_ac"                type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
         <field name="ac"                        type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
         <field name="complex_version"           type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
-        <field name="description"               type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
+        <!-- TODO: description is required, can this cause issues now that predicted complexes don't have description? -->
+        <field name="description"               type="string"       indexed="false" stored="true"   multiValued="false" required="false"/>
         <field name="organism_name"             type="string"       indexed="false" stored="true"   multiValued="false" required="true"/>
+        <field name="predicted_complex"         type="boolean"      indexed="true"  stored="true"  multiValued="false" default="false"/>
+        <field name="predicted_complex_f"       type="facetBoolean"      indexed="true"  stored="false"  multiValued="false" default="false"/>
+        <field name="evidence_type"             type="text_ws"         indexed="true"  stored="false"  multivalued="true"/> <!-- Faceting -->
+        <field name="evidence_type_f"           type="facetString"  indexed="true"  stored="false"  multivalued="true"/>
+        <!-- TODO: do we want to also add humap confidence to display it in the search results? Or even to filter search results? -->
         <field name="udate"                     type="int"          indexed="true"  stored="false"  multiValued="false" default="0"/>
         <field name="param"                     type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
         <!-- interactor information -->
@@ -105,6 +112,7 @@
         <field name="pxref"                     type="text_ws"         indexed="true"  stored="false"  multiValued="true"/>
         <field name="pxref_e"                   type="text_ws"         indexed="true"  stored="false"  multiValued="true"/>
         <field name="stc"                       type="boolean"      indexed="true"  stored="false"  multiValued="false" default="false"/> <!-- Faceting -->
+        <field name="serialised_interactor"     type="text_general"	 indexed="false"  stored="true"  multiValued="true"/>
         <!-- fields same as PSICQUIC -->
         <field name="pbiorole"                  type="text_ws"         indexed="true"  stored="false"  multiValued="true"/> <!-- Faceting -->
         <field name="pbiorole_f"                type="facetString"  indexed="true"  stored="false"  multiValued="true"/>

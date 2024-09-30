@@ -1,6 +1,7 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.enricher;
 
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -10,13 +11,17 @@ import psidev.psi.mi.tab.PsimiTabReader;
 import psidev.psi.mi.tab.model.CrossReference;
 import uk.ac.ebi.intact.bridges.ontologies.term.OntologyTerm;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexFieldNames;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexInteractor;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.complex.ComplexInteractorXref;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.ontology.OntologySearcher;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.util.ComplexUtils;
 import uk.ac.ebi.intact.model.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Complex Field Enricher is such as Ontoly Field Enricher
@@ -31,17 +36,23 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     /********************************/
     private static final Log log = LogFactory.getLog ( ComplexSolrEnricher.class );
     private Map<String, PsicquicSimpleClient> mapOfPsicquicClients;
-    private String complexProperties=null;
+    private String complexProperties = null;
     private PsimiTabReader reader;
+    private final ObjectMapper mapper;
 
-    private final static String EXP_EVIDENCE="exp-evidence";
-    private final static String INTACT_SECONDARY="intact-secondary";
+    private static final String EXP_EVIDENCE="exp-evidence";
+    private static final String INTACT_SECONDARY="intact-secondary";
+
+    // Currently, we are only storing interactors xrefs from the following databases:
+    // - panther (MI:0702)
+    private static final Set<String> INTERACTOR_XREF_DATABASE_MIS_TO_STORE = Set.of("MI:0702");
 
     /*************************/
     /*      Constructor      */
     /*************************/
     public ComplexSolrEnricher ( OntologySearcher ontologySearcher_ ) {
         super ( ontologySearcher_) ;
+        this.mapper = new ObjectMapper();
     }
 
     /*******************************/
@@ -143,6 +154,11 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         enrichCvTermParents(ComplexFieldNames.INTERACTION_TYPE, null, cvDagObject, solrDocument);
     }
 
+    public void enrichEvidenceType(CvDatabase cvDagObject, SolrInputDocument solrDocument) {
+        solrDocument.addField(ComplexFieldNames.EVIDENCE_TYPE, cvDagObject.getIdentifier());
+        solrDocument.addField(ComplexFieldNames.EVIDENCE_TYPE_F, cvDagObject.getIdentifier());
+    }
+
     // is for enrich complex_organism* fields and return a SolrDocument
     public void enrichOrganism(Interaction interaction, SolrInputDocument solrDocument) throws SolrServerException {
         // retrieve the ontology term for this interaction (using BioSource)
@@ -182,12 +198,37 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     // is for enrich complex_xref* fields and return a SolrDocument
     public void enrichInteractionXref(Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument) throws SolrServerException {
         enrichXrefs(ComplexFieldNames.COMPLEX_XREF, ComplexFieldNames.COMPLEX_XREF_EXACT, ComplexFieldNames.COMPLEX_ID, interactorXrefs, solrDocument, true);
-
     }
 
     public void enrichInteractorXref(Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument) throws SolrServerException {
         enrichXrefs(ComplexFieldNames.INTERACTOR_XREF, ComplexFieldNames.INTERACTOR_XREF_EXACT, ComplexFieldNames.INTERACTOR_ID, interactorXrefs, solrDocument, false);
+    }
 
+    public void enrichSerialisedParticipant(Component participant, SolrInputDocument solrDocument) throws JsonProcessingException, SolrServerException {
+        Interactor interactor = participant.getInteractor();
+        String identifier = ComplexUtils.getParticipantIdentifier(participant);
+
+        List<ComplexInteractorXref> xrefs = interactor.getXrefs().stream()
+                .filter(xref -> xref.getCvDatabase() != null)
+                .filter(xref -> INTERACTOR_XREF_DATABASE_MIS_TO_STORE.contains(xref.getCvDatabase().getIdentifier()))
+                .map(xref -> new ComplexInteractorXref(
+                        xref.getPrimaryId(),
+                        ComplexUtils.getIdentifierLink(xref, xref.getPrimaryId()),
+                        xref.getCvDatabase() != null ? xref.getCvDatabase().getShortLabel() : null,
+                        xref.getCvXrefQualifier() != null ? xref.getCvXrefQualifier().getShortLabel() : null))
+                .collect(Collectors.toList());
+
+        ComplexInteractor complexInteractor = new ComplexInteractor(
+                identifier,
+                ComplexUtils.getParticipantIdentifierLink(participant, identifier),
+                ComplexUtils.getParticipantName(participant),
+                interactor.getFullName(),
+                ComplexUtils.getParticipantStoichiometry(participant),
+                interactor.getCvInteractorType().getFullName(),
+                findInteractorOrganismName(interactor),
+                xrefs);
+        String serialisedInteractor = mapper.writeValueAsString(complexInteractor);
+        solrDocument.addField(ComplexFieldNames.SERIALISED_INTERACTION, serialisedInteractor);
     }
 
     protected void enrichXrefs(String xrefFieldName, String xrefFieldExact, String idFieldName, Collection<? extends Xref> interactorXrefs, SolrInputDocument solrDocument, boolean checkExpEvidence) throws SolrServerException {
@@ -217,37 +258,14 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
                             processXref(xrefFieldName, xrefFieldExact, solrDocument, shortLabel, ID);
 
                             if (checkExpEvidence){
-                                if (this.mapOfPsicquicClients.containsKey ( shortLabel ) ){
-                                    PsicquicSimpleClient client = this.mapOfPsicquicClients.get(shortLabel);
-                                    InputStream stream = null;
-                                    try{
-                                        stream = client.getByInteraction(ID, PsicquicSimpleClient.MITAB25, 0, 1);
-                                        Iterator<psidev.psi.mi.tab.model.BinaryInteraction> binaryIterator = reader.iterate(stream);
-                                        if (binaryIterator.hasNext()){
-                                            psidev.psi.mi.tab.model.BinaryInteraction<psidev.psi.mi.tab.model.Interactor> binary = binaryIterator.next();
-                                            for (CrossReference ref : binary.getPublications()){
-                                                String db = ref.getDatabase() ;
-                                                String pubid = ref.getIdentifier() ;
-                                                if (db != null && pubid != null){
-                                                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db ) ;
-                                                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, pubid ) ;
-                                                    solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db + ":" + pubid ) ;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    catch(IOException e){
-                                        log.error("ERROR with psicquic client serving "+shortLabel+" data. Cannot fetch data.", e);
-                                    }
-                                    finally {
-
-                                        if (stream != null){
-                                            try {
-                                                stream.close();
-                                            } catch (IOException e) {
-                                                log.error(e);
-                                            }
-                                        }
+                                List<CrossReference> publications = getPublicationCrossRefs(shortLabel, ID);
+                                for (CrossReference ref : publications) {
+                                    String db = ref.getDatabase() ;
+                                    String pubid = ref.getIdentifier() ;
+                                    if (db != null && pubid != null){
+                                        solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db ) ;
+                                        solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, pubid ) ;
+                                        solrDocument.addField ( ComplexFieldNames.PUBLICATION_ID, db + ":" + pubid ) ;
                                     }
                                 }
                             }
@@ -314,7 +332,7 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     /****************************/
     // enrich fields in the SolrDocument passed as parameter
     public void enrich (
-            Interaction interaction,
+            InteractionImpl interaction,
             SolrInputDocument solrDocument )
             throws Exception {
         // check parameters and information
@@ -322,6 +340,9 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
 
         // Enrich interaction type
         enrichInteractionType(interaction.getCvInteractionType(), solrDocument) ;
+
+        // Enrich evidence type
+        enrichEvidenceType(interaction.getCvEvidenceType(), solrDocument); ;
 
         // Enrich Complex Organism fields
         enrichOrganism(interaction, solrDocument) ;
@@ -355,6 +376,22 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         return biosource != null ? findOntologyTerm(biosource.getTaxId(), biosource.getShortLabel()) : null ;
     }
 
+    // is for find the ontology term for a specific interaction. Needs to take the host organism coming from experiment
+    public String findInteractorOrganismName(Interactor interactor) throws SolrServerException {
+        // get BioSource information from interactor
+        BioSource biosource = interactor.getBioSource();
+
+        if (biosource != null) {
+            // get OntologyTerm using tax id and short label
+            OntologyTerm ontologyTerm = findOntologyTerm(biosource.getTaxId(), biosource.getShortLabel());
+            if (ontologyTerm != null) {
+                return ontologyTerm.getName() + "; " + ontologyTerm.getId();
+            }
+        }
+
+        return null;
+    }
+
     public String getComplexProperties() {
         return complexProperties;
     }
@@ -363,6 +400,57 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
         this.complexProperties = complexProperties;
         initialiseMapOfPsicquicClients();
         this.reader = new PsimiTabReader();
+    }
+
+    private List<CrossReference> getPublicationCrossRefsFromPsicquic(String psicquicService, String id) throws IOException {
+        InputStream stream = null;
+        try {
+            PsicquicSimpleClient client = this.mapOfPsicquicClients.get(psicquicService);
+            stream = client.getByInteraction(id, PsicquicSimpleClient.MITAB25, 0, 1);
+            Iterator<psidev.psi.mi.tab.model.BinaryInteraction> binaryIterator = reader.iterate(stream);
+            if (binaryIterator.hasNext()) {
+                psidev.psi.mi.tab.model.BinaryInteraction<psidev.psi.mi.tab.model.Interactor> binary = binaryIterator.next();
+                return binary.getPublications();
+            }
+            return new ArrayList<>();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    log.error(e);
+                }
+            }
+        }
+    }
+
+    private List<CrossReference> getPublicationCrossRefs(String expEvidenceDatabase, String id) {
+        if (this.mapOfPsicquicClients.containsKey(expEvidenceDatabase)) {
+            try {
+                return getPublicationCrossRefsFromPsicquic(expEvidenceDatabase, id);
+            } catch (IOException e1) {
+                log.error(
+                        "ERROR with psicquic client serving '" + expEvidenceDatabase + "' data. Cannot fetch data for id '" + id + "'. Trying on all psicquic services.",
+                        e1);
+            }
+        }
+
+        for (String psicquicService: this.mapOfPsicquicClients.keySet()) {
+            if (!psicquicService.equals(expEvidenceDatabase)) {
+                try {
+                    List<CrossReference> xrefs = getPublicationCrossRefsFromPsicquic(psicquicService, id);
+                    log.info("Data for id '" + id + "' fetched from psicquic client serving '" + psicquicService + "' data.");
+                    return xrefs;
+                } catch (IOException e2) {
+                    log.error(
+                            "ERROR with psicquic client serving '" + psicquicService + "' data. Cannot fetch data for id '" + id + "'.",
+                            e2);
+                }
+            }
+        }
+
+        log.error("ERROR with psicquic client data. Cannot fetch data for id '" + id + "'.");
+        return new ArrayList<>();
     }
 }
 

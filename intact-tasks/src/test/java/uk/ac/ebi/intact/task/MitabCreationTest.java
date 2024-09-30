@@ -156,7 +156,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
         Assert.assertEquals(1, interaction.getComponents().size());
 
         // set stoichiometry
-        interaction.getComponents().iterator().next().setStoichiometry(2);
+        interaction.getComponents().iterator().next().setStoichiometry(2f);
 
         CvDatabase goDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO);
         proteinA.addXref(getMockBuilder().createXref(proteinA, "GO:0030246", null, goDb));
@@ -200,7 +200,7 @@ public class MitabCreationTest extends IntactBasicTestCase {
         Assert.assertEquals(1, interaction.getComponents().size());
 
         // set stoichiometry
-        interaction.getComponents().iterator().next().setStoichiometry(4);
+        interaction.getComponents().iterator().next().setStoichiometry(4f);
 
         CvDatabase goDb = getMockBuilder().createCvObject(CvDatabase.class, CvDatabase.GO_MI_REF, CvDatabase.GO);
         proteinA.addXref(getMockBuilder().createXref(proteinA, "GO:0030246", null, goDb));

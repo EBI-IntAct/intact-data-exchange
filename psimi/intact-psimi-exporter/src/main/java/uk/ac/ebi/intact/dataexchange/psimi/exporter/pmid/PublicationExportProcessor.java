@@ -132,13 +132,13 @@ public class PublicationExportProcessor implements ItemProcessor<IntactPublicati
                     log.info("Create final chunk file for " + publication.getShortLabel());
 
                     // we flush the previous currentIntactEntry
-                    flushIntactEntry(publicationEntries, publication.getShortLabel(), publication.getCreated(), currentIntactEntry, false);
+                    flushIntactEntry(publicationEntries, publication.getShortLabel(), publication.getCreated(), currentIntactEntry, false, publication.getPublicationDate());
                 }
                 if (!iterator.hasNext() && !currentNegativeIntactEntry.isEmpty()){
                     log.info("Create final chunk file for " + publication.getShortLabel());
 
                     // we flush the previous currentIntactEntry
-                    flushIntactEntry(publicationEntries, publication.getShortLabel(), publication.getCreated(), currentNegativeIntactEntry, true);
+                    flushIntactEntry(publicationEntries, publication.getShortLabel(), publication.getCreated(), currentNegativeIntactEntry, true, publication.getPublicationDate());
                 }
             }
             else {
@@ -155,14 +155,14 @@ public class PublicationExportProcessor implements ItemProcessor<IntactPublicati
      * @param publicationId
      */
     private void flushIntactEntry(Collection<PublicationFileEntry> publicationEntries, String publicationId, Date created,
-                                  Collection<InteractionEvidence> intactEntry, boolean isNegative){
+                                  Collection<InteractionEvidence> intactEntry, boolean isNegative, Date publicationDate){
 
         // name of the entry = publicationId_smallChunkNumber
         String publicationName = publicationNameGenerator.createPublicationName(publicationId, null, isNegative);
 
 
         // flush the current intact entry and start a new one
-        createPublicationEntry(publicationEntries, created, publicationName, intactEntry);
+        createPublicationEntry(publicationEntries, created, publicationName, intactEntry, publicationDate);
     }
 
     private void startNewIntactEntry(Experiment exp, Collection<InteractionEvidence> intactEntry){
@@ -173,11 +173,12 @@ public class PublicationExportProcessor implements ItemProcessor<IntactPublicati
 
     //@Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
     private void createPublicationEntry(Collection<PublicationFileEntry> publicationEntries, Date date, String publicationName,
-                                        Collection<InteractionEvidence> intactEntry) {
+                                        Collection<InteractionEvidence> intactEntry, Date publicationDate) {
         log.info("create publication entry : " + publicationName);
 
         // create a publication entry
-        PublicationFileEntry publicationEntry = new PublicationFileEntry(date, publicationName, new ArrayList<InteractionEvidence>(intactEntry));
+        PublicationFileEntry publicationEntry = new PublicationFileEntry(
+                date, publicationName, new ArrayList<InteractionEvidence>(intactEntry), publicationDate);
         // add the publication entry to the list of publication entries
         publicationEntries.add(publicationEntry);
 

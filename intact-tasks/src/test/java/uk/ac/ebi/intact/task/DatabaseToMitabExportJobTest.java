@@ -106,7 +106,7 @@ public class DatabaseToMitabExportJobTest extends IntactBasicTestCase{
         Assert.assertEquals(1, interaction.getComponents().size());
 
         // set stoichiometry
-        interaction.getComponents().iterator().next().setStoichiometry(2);
+        interaction.getComponents().iterator().next().setStoichiometry(2f);
         proteinA.getBioSource().setTaxId("9606");
 
         corePersister.saveOrUpdate(interaction);
@@ -145,7 +145,7 @@ public class DatabaseToMitabExportJobTest extends IntactBasicTestCase{
         Assert.assertEquals(1, interaction.getComponents().size());
 
         // set stoichiometry
-        interaction.getComponents().iterator().next().setStoichiometry(4);
+        interaction.getComponents().iterator().next().setStoichiometry(4f);
 
         proteinA.getBioSource().setTaxId("9606");
 

@@ -22,4 +22,4 @@ FILE=$2
 rm -rf target
 mkdir target
 
-mvn clean install -Pdr-export,${DATABASE} -DoutputFile=${FILE}.tsv -Ddb=oracle -Dmaven.test.skip=true
+mvn clean install -Pdr-export,${DATABASE} -DoutputFile=${FILE}.tsv -Ddb=postgres -Dmaven.test.skip=true

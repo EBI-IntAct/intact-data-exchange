@@ -121,7 +121,8 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
                 // the experiments does contain negative interactions. Normally in intact, one experiment containing one negative should only contain negative
                 if (exp.getInteractionEvidences().iterator().next().isNegative()){
                     if (interactionSize > largeScale){
-                        processLargeScaleExperiments(publicationEntries, publication.getShortLabel(), publication.getCreated(), exp, true);
+                        processLargeScaleExperiments(
+                                publicationEntries, publication.getShortLabel(), publication.getCreated(), exp, true, publication.getPublicationDate());
                     }
                     // we cannot append a new experiment otherwise the number of interactions will be too big
                     else if (sumOfNegativeInteractions + interactionSize > largeScale){
@@ -131,7 +132,8 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
                         boolean appendChunkIndex = true;
 
                         // we flush the previous currentIntactEntry
-                        flushIntactEntry(publicationEntries, publication.getShortLabel(), publication.getCreated(), numberNegativeEntries, appendChunkIndex, this.currentNegativeIntactEntry, true);
+                        flushIntactEntry(
+                                publicationEntries, publication.getShortLabel(), publication.getCreated(), numberNegativeEntries, appendChunkIndex, this.currentNegativeIntactEntry, true, publication.getPublicationDate());
                         // we processed one 'small scale entry'
                         numberNegativeEntries ++;
                         sumOfNegativeInteractions = 0;
@@ -156,7 +158,8 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
                 }
                 // one large scale experiment will be splitted and need to be processed separately in the independent intact entry
                 else if (interactionSize > largeScale){
-                    processLargeScaleExperiments(publicationEntries, publication.getShortLabel(), publication.getCreated(), exp, false);
+                    processLargeScaleExperiments(
+                            publicationEntries, publication.getShortLabel(), publication.getCreated(), exp, false, publication.getPublicationDate());
                 }
                 // we cannot append a new experiment otherwise the number of interactions will be too big
                 else if (sumOfInteractions + interactionSize > largeScale){
@@ -166,7 +169,8 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
                     boolean appendChunkIndex = true;
 
                     // we flush the previous currentIntactEntry
-                    flushIntactEntry(publicationEntries, publication.getShortLabel(), publication.getCreated(), numberEntries, appendChunkIndex, currentIntactEntry, false);
+                    flushIntactEntry(
+                            publicationEntries, publication.getShortLabel(), publication.getCreated(), numberEntries, appendChunkIndex, currentIntactEntry, false, publication.getPublicationDate());
                     // we processed one 'small scale entry'
                     numberEntries ++;
                     sumOfInteractions = 0;
@@ -195,14 +199,16 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
                     boolean appendChunkIndex = numberEntries > 1;
 
                     // we flush the previous currentIntactEntry
-                    flushIntactEntry(publicationEntries, publication.getShortLabel(), publication.getCreated(), numberEntries, appendChunkIndex, currentIntactEntry, false);
+                    flushIntactEntry(
+                            publicationEntries, publication.getShortLabel(), publication.getCreated(), numberEntries, appendChunkIndex, currentIntactEntry, false, publication.getPublicationDate());
                 }
                 if (!iterator.hasNext() && !currentNegativeIntactEntry.isEmpty()){
                     log.info("Create final chunk file for " + publication.getShortLabel());
                     boolean appendChunkIndex = numberNegativeEntries > 1;
 
                     // we flush the previous currentIntactEntry
-                    flushIntactEntry(publicationEntries, publication.getShortLabel(), publication.getCreated(), numberNegativeEntries, appendChunkIndex, currentNegativeIntactEntry, true);
+                    flushIntactEntry(
+                            publicationEntries, publication.getShortLabel(), publication.getCreated(), numberNegativeEntries, appendChunkIndex, currentNegativeIntactEntry, true, publication.getPublicationDate());
                 }
             }
             else {
@@ -219,7 +225,7 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
      * @param publicationId
      */
     private void processLargeScaleExperiments(Collection<PublicationFileEntry> publicationEntries, String publicationId,
-                                              Date created, Experiment exp, boolean isNegative){
+                                              Date created, Experiment exp, boolean isNegative, Date publicationDate){
         log.info("Create large scale experiment " + ((IntactExperiment)exp).getShortLabel());
         // number of interactions already processed
         int interactionProcessed = 0;
@@ -252,7 +258,7 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
             // name of the entry = publicationId_experimentLabel_chunkNumber
             String publicationName = publicationNameGenerator.createPublicationName(publicationId, ((IntactExperiment)exp).getShortLabel(), numberOfChunk, isNegative);
             // flush the current intact entry and start a new one
-            createChunkPublicationEntry(publicationEntries, created, publicationName, independentIntactEntry);
+            createChunkPublicationEntry(publicationEntries, created, publicationName, independentIntactEntry, publicationDate);
 
             interactionProcessed += interactionChunk;
 
@@ -269,7 +275,7 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
      * @param appendChunkIndex
      */
     private void flushIntactEntry(Collection<PublicationFileEntry> publicationEntries, String publicationId, Date created, int index, boolean appendChunkIndex,
-                                  Collection<InteractionEvidence> intactEntry, boolean isNegative){
+                                  Collection<InteractionEvidence> intactEntry, boolean isNegative, Date publicationDate){
 
         // name of the entry = publicationId_smallChunkNumber
         String publicationName;
@@ -282,7 +288,7 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
         }
 
         // flush the current intact entry and start a new one
-        createChunkPublicationEntry(publicationEntries, created, publicationName, intactEntry);
+        createChunkPublicationEntry(publicationEntries, created, publicationName, intactEntry, publicationDate);
 
     }
 
@@ -294,11 +300,12 @@ public class PublicationExportChunkProcessor implements ItemProcessor<IntactPubl
 
     //@Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
     private void createChunkPublicationEntry(Collection<PublicationFileEntry> publicationEntries, Date date, String publicationName,
-                                             Collection<InteractionEvidence> intactEntry) {
+                                             Collection<InteractionEvidence> intactEntry, Date publicationDate) {
         log.info("create chunk publication entry : " + publicationName);
 
         // create a publication entry
-        PublicationFileEntry publicationEntry = new PublicationFileEntry(date, publicationName, new ArrayList<InteractionEvidence>(intactEntry));
+        PublicationFileEntry publicationEntry = new PublicationFileEntry(
+                date, publicationName, new ArrayList<InteractionEvidence>(intactEntry), publicationDate);
         // add the publication entry to the list of publication entries
         publicationEntries.add(publicationEntry);
 

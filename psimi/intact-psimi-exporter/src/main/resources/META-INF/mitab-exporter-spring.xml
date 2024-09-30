@@ -32,10 +32,10 @@
     <!-- simple positive interaction evidence reader -->
     <bean id="intactPositiveInteractionEvidenceReader" class="org.springframework.batch.item.database.JpaPagingItemReader" lazy-init="true">
         <property name="queryString" value="select i from IntactInteractionEvidence i
-        where i.ac not in
-        (select distinct i2.ac from IntactInteractionEvidence i2
+        where not exists
+        (select i2 from IntactInteractionEvidence i2
         join i2.dbAnnotations as a
-        where a.topic.shortName = :negative)
+        where i2.ac = i.ac and a.topic.shortName = :negative)
         order by i.created, i.ac"/>
         <property name="entityManagerFactory" ref="intactEntityManagerFactory"/>
         <property name="parameterValues">
