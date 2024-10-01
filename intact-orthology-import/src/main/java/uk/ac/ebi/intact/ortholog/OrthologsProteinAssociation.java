@@ -37,7 +37,9 @@ public class OrthologsProteinAssociation {
         String proteinAc = protein.getUniprotkb();
         List<String> pantherIds = new ArrayList<>();
         if (proteinAc != null) {
-            Path filePath = Path.of(dirPath).resolve(protein.getUniprotkb());
+            // We just use the first 2 characters for the file name, with each file containing data for multiple proteins
+            String uniprotIdPrefix = protein.getUniprotkb().substring(0, 2);
+            Path filePath = Path.of(dirPath).resolve(uniprotIdPrefix);
             if (filePath.toFile().exists()) {
                 try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
                     String line;

@@ -20,15 +20,17 @@ public class OrthologsFileParser {
     private static final Pattern PANTHER_REGEX = Pattern.compile("PTHR\\d+");
 
     public static void parseFileAndSave(String inputFilePath, String outputDirPath) throws IOException {
-        log.info("Parsing file...");
-
         File outputDir = new File(outputDirPath);
         // First, we empty de directory to start clean
         if (outputDir.exists()) {
+            log.info("Deleting previous data...");
             FileUtils.deleteDirectory(outputDir);
+            log.info("Previous data deleted.");
         }
         outputDir.mkdirs();
         long linesRead = 0;
+
+        log.info("Parsing file...");
 
         // First we store all matches in a map to ensure there's no duplication
         Map<String, Set<String>> uniprotAndPTHR = new HashMap<>();
@@ -64,22 +66,28 @@ public class OrthologsFileParser {
 
         // Then, we write all the files
         long uniprotAndPantherCount = 0;
+        Set<String> filenames = new HashSet<>();
         for (String uniprotMatch : uniprotAndPTHR.keySet()) {
             for (String pantherMatch : uniprotAndPTHR.get(uniprotMatch)) {
-                writePair(outputDir.toPath(), uniprotMatch, pantherMatch);
+                // We just use the first 2 characters for the file name to have multiple proteins per file and fewer files overall
+                String uniprotIdPrefix = uniprotMatch.substring(0, 2);
+                writePair(outputDir.toPath(), uniprotIdPrefix, uniprotMatch, pantherMatch);
+                filenames.add(uniprotIdPrefix + uniprotMatch);
             }
             uniprotAndPantherCount += uniprotAndPTHR.get(uniprotMatch).size();
             if (uniprotAndPantherCount % 25_000 == 0) {
-                log.info(uniprotAndPantherCount + " proteins saved");
+                log.info(uniprotAndPantherCount + " proteins saved in " + filenames.size() + " files");
             }
         }
 
         log.info("All protein files saved.");
         log.info("Number of Panther identifiers: " + uniprotAndPantherCount);
+        log.info("Number of files: " + filenames.size());
     }
 
-    private static void writePair(Path dirPath, String uniprotId, String pantherId) throws IOException {
-        Path filePath = dirPath.resolve(uniprotId);
+    private static void writePair(Path dirPath, String filename, String uniprotId, String pantherId) throws IOException {
+
+        Path filePath = dirPath.resolve(filename);
         try (FileWriter fileWriter = new FileWriter(filePath.toFile(), true);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
             bufferedWriter.write(uniprotId + "," + pantherId);
