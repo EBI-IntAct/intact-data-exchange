@@ -72,7 +72,7 @@ public class OrthologsFileParser {
                 // We just use the first 2 characters for the file name to have multiple proteins per file and fewer files overall
                 String uniprotIdPrefix = uniprotMatch.substring(0, 2);
                 writePair(outputDir.toPath(), uniprotIdPrefix, uniprotMatch, pantherMatch);
-                filenames.add(uniprotIdPrefix + uniprotMatch);
+                filenames.add(uniprotIdPrefix);
             }
             uniprotAndPantherCount += uniprotAndPTHR.get(uniprotMatch).size();
             if (uniprotAndPantherCount % 25_000 == 0) {
