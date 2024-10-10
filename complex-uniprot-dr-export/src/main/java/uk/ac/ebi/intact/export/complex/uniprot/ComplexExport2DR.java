@@ -4,6 +4,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import psidev.psi.mi.jami.model.Complex;
+import psidev.psi.mi.jami.model.Entity;
+import psidev.psi.mi.jami.model.Interactor;
+import psidev.psi.mi.jami.model.InteractorPool;
 import psidev.psi.mi.jami.model.ModelledParticipant;
 import psidev.psi.mi.jami.model.Protein;
 import psidev.psi.mi.jami.model.Xref;
@@ -96,17 +99,36 @@ public class ComplexExport2DR {
         }
     }
 
+    private static Set<Protein> getAllProteins(Collection<Interactor> interactors) {
+        Set<Protein> proteins = new HashSet<>();
+        for (Interactor interactor : interactors) {
+            if (interactor.getInteractorType().getMIIdentifier().equals(Protein.PROTEIN_MI)) {
+                // Protein
+                proteins.add((Protein) interactor);
+            } else if (interactor.getInteractorType().getMIIdentifier().equals(Complex.COMPLEX_MI)) {
+                // Subcomplex
+                proteins.addAll(getAllProteins(
+                        ((Complex) interactor).getParticipants().stream()
+                                .map(Entity::getInteractor)
+                                .collect(Collectors.toList())));
+            } else if (interactor.getInteractorType().getMIIdentifier().equals(InteractorPool.MOLECULE_SET_MI)) {
+                // Molecule set
+                proteins.addAll(getAllProteins((InteractorPool) interactor));
+            }
+        }
+        return proteins;
+    }
+
     private static boolean drComplexLines(StringBuilder informationSb, IntactComplex intactComplex, boolean writeParentComplex) {
 
         if (intactComplex.getParticipants() != null) {
 
             Set<String> uniqueLines = new HashSet<>();
 
-            Set<Protein> proteins = intactComplex.getParticipants().stream()
-                .filter(participant -> participant.getInteractor().getInteractorType().getMIIdentifier().equals("MI:0326")) //proteins
-                .map(ModelledParticipant::getInteractor)
-                .map(Protein.class::cast)
-                .collect(Collectors.toSet());
+            Set<Protein> proteins = getAllProteins(
+                    intactComplex.getParticipants().stream()
+                            .map(ModelledParticipant::getInteractor)
+                            .collect(Collectors.toSet()));
 
             for (Protein protein : proteins) {
                 String line = componentLine(protein, intactComplex);
