@@ -5,6 +5,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.hibernate.Hibernate;
 import uk.ac.ebi.intact.dataexchange.psimi.solr.enricher.ComplexSolrEnricher;
+import uk.ac.ebi.intact.dataexchange.psimi.solr.util.ComplexUtils;
 import uk.ac.ebi.intact.model.*;
 
 import java.util.ArrayList;
@@ -218,21 +219,7 @@ public class TreeComplexComponents {
             }
 
             private void indexFields(SolrInputDocument solrDocument) throws SolrServerException, JsonProcessingException {
-
-                Interactor interactor = component.getInteractor();
-                if (interactor != null){
-                    // index interactor ac
-                    indexInteractorAC(interactor, solrDocument);
-
-                    // index interactor names
-                    indexInteractorNames(interactor, solrDocument);
-
-                    // index interactor type
-                    enricher.enrichInteractorType(interactor.getCvInteractorType(), solrDocument);
-
-                    // index and enrich xrefs
-                    enricher.enrichInteractorXref(interactor.getXrefs(), solrDocument);
-                }
+                this.indexInteractorFields(component.getInteractor(), solrDocument);
 
                 // index biological role
                 if (component.getCvBiologicalRole() != null){
@@ -246,6 +233,30 @@ public class TreeComplexComponents {
                 if (hasSons()){
                     for (TreeComponents t : sons){
                          t.indexFields(solrDocument);
+                    }
+                }
+            }
+
+            private void indexInteractorFields(Interactor interactor, SolrInputDocument solrDocument) throws SolrServerException {
+                if (interactor != null){
+                    // index interactor ac
+                    indexInteractorAC(interactor, solrDocument);
+
+                    // index interactor names
+                    indexInteractorNames(interactor, solrDocument);
+
+                    // index interactor type
+                    enricher.enrichInteractorType(interactor.getCvInteractorType(), solrDocument);
+
+                    // index and enrich xrefs
+                    enricher.enrichInteractorXref(interactor.getXrefs(), solrDocument);
+
+                    // If the interactor is a molecule set, then index the interactors part of the molecule set
+                    if (ComplexUtils.isMoleculeSet(interactor)) {
+                        Hibernate.initialize(((InteractorImpl) interactor).getInteractors());
+                        for (Interactor subInteractor: ((InteractorImpl) interactor).getInteractors()) {
+                            this.indexInteractorFields(subInteractor, solrDocument);
+                        }
                     }
                 }
             }

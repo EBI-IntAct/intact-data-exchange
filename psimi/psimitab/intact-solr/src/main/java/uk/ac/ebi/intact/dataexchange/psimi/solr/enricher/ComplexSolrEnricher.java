@@ -43,9 +43,9 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
     private static final String EXP_EVIDENCE="exp-evidence";
     private static final String INTACT_SECONDARY="intact-secondary";
 
-    // Currently, we are only storing interactors xrefs from the following databases:
-    // - panther (MI:0702)
-    private static final Set<String> INTERACTOR_XREF_DATABASE_MIS_TO_STORE = Set.of("MI:0702");
+    // Currently, we are only storing interactors xrefs with the following qualifiers:
+    // - orthology-group (MI:2426)
+    private static final Set<String> INTERACTOR_XREF_QUALIFIER_MIS_TO_STORE = Set.of("MI:2426");
 
     /*************************/
     /*      Constructor      */
@@ -206,21 +206,22 @@ public class ComplexSolrEnricher extends AbstractOntologyEnricher{
 
     public void enrichSerialisedParticipant(Component participant, SolrInputDocument solrDocument) throws JsonProcessingException, SolrServerException {
         Interactor interactor = participant.getInteractor();
-        String identifier = ComplexUtils.getParticipantIdentifier(participant);
+        InteractorXref identifierXref = ComplexUtils.getParticipantIdentifierXref(participant);
 
         List<ComplexInteractorXref> xrefs = interactor.getXrefs().stream()
-                .filter(xref -> xref.getCvDatabase() != null)
-                .filter(xref -> INTERACTOR_XREF_DATABASE_MIS_TO_STORE.contains(xref.getCvDatabase().getIdentifier()))
+                .filter(xref -> xref.getCvXrefQualifier() != null)
+                .filter(xref -> INTERACTOR_XREF_QUALIFIER_MIS_TO_STORE.contains(xref.getCvXrefQualifier().getIdentifier()))
                 .map(xref -> new ComplexInteractorXref(
                         xref.getPrimaryId(),
-                        ComplexUtils.getIdentifierLink(xref, xref.getPrimaryId()),
+                        ComplexUtils.getIdentifierLink(xref),
                         xref.getCvDatabase() != null ? xref.getCvDatabase().getShortLabel() : null,
                         xref.getCvXrefQualifier() != null ? xref.getCvXrefQualifier().getShortLabel() : null))
                 .collect(Collectors.toList());
 
         ComplexInteractor complexInteractor = new ComplexInteractor(
-                identifier,
-                ComplexUtils.getParticipantIdentifierLink(participant, identifier),
+                interactor.getAc(),
+                identifierXref != null ? identifierXref.getPrimaryId() : null,
+                ComplexUtils.getIdentifierLink(identifierXref),
                 ComplexUtils.getParticipantName(participant),
                 interactor.getFullName(),
                 ComplexUtils.getParticipantStoichiometry(participant),

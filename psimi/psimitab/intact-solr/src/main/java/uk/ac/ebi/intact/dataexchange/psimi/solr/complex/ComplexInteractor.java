@@ -11,7 +11,8 @@ public class ComplexInteractor {
     public ComplexInteractor() {
     }
 
-    public ComplexInteractor(String identifier,
+    public ComplexInteractor(String ac,
+                             String identifier,
                              String identifierLink,
                              String name,
                              String description,
@@ -19,6 +20,7 @@ public class ComplexInteractor {
                              String interactorType,
                              String organismName,
                              List<ComplexInteractorXref> xrefs) {
+        this.ac = ac;
         this.identifier = identifier;
         this.identifierLink = identifierLink;
         this.name = name;
@@ -32,6 +34,14 @@ public class ComplexInteractor {
     /*********************************/
     /*      Getters and Setters      */
     /*********************************/
+
+    public String getAc() {
+        return ac;
+    }
+
+    public void setAc(String ac) {
+        this.ac = ac;
+    }
 
     public String getIdentifier() {
         return identifier;
@@ -101,6 +111,7 @@ public class ComplexInteractor {
     /*      Private attributes      */
     /********************************/
 
+    private String ac = null;
     private String identifier = null;
     private String identifierLink = null;
     private String name = null;

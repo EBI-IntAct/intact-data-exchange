@@ -1,5 +1,6 @@
 package uk.ac.ebi.intact.dataexchange.psimi.solr.util;
 
+import org.hibernate.Hibernate;
 import uk.ac.ebi.intact.model.Alias;
 import uk.ac.ebi.intact.model.Annotation;
 import uk.ac.ebi.intact.model.Component;
@@ -7,6 +8,7 @@ import uk.ac.ebi.intact.model.CvAliasType;
 import uk.ac.ebi.intact.model.CvDatabase;
 import uk.ac.ebi.intact.model.CvInteractorType;
 import uk.ac.ebi.intact.model.Interactor;
+import uk.ac.ebi.intact.model.InteractorImpl;
 import uk.ac.ebi.intact.model.InteractorXref;
 import uk.ac.ebi.intact.model.util.AnnotatedObjectUtils;
 import uk.ac.ebi.intact.model.util.CvObjectUtils;
@@ -49,20 +51,11 @@ public final class ComplexUtils {
         return name;
     }
 
-    public static String getParticipantIdentifier(Component participant) {
-        InteractorXref xref = getParticipantIdentifierXref(participant);
-        if (xref != null) {
-            return xref.getPrimaryId();
-        }
-        return null;
+    public static InteractorXref getParticipantIdentifierXref(Component participant) {
+        return getInteractorIdentifierXref(participant.getInteractor());
     }
 
-    public static String getParticipantIdentifierLink(Component participant, String identifier) {
-        InteractorXref xref = getParticipantIdentifierXref(participant);
-        return getIdentifierLink(xref, identifier);
-    }
-
-    public static String getIdentifierLink(InteractorXref xref, String identifier) {
+    public static String getIdentifierLink(InteractorXref xref) {
         if (xref != null && xref.getParent() != null) {
             Annotation annot = AnnotatedObjectUtils.findAnnotationByTopicMiOrLabel(xref.getCvDatabase(), SEARCH_MI);
             if (annot == null) {
@@ -70,7 +63,7 @@ public final class ComplexUtils {
             }
 
             if (annot != null) {
-                return annot.getAnnotationText().replaceAll("\\$*\\{ac\\}", identifier);
+                return annot.getAnnotationText().replaceAll("\\$*\\{ac\\}", xref.getPrimaryId());
             }
         }
         return null;
@@ -134,6 +127,7 @@ public final class ComplexUtils {
     private static String getComplexName(Interactor complex) {
         return getAlias(complex, CvAliasType.COMPLEX_RECOMMENDED_NAME_MI_REF);
     }
+
     private static String getAlias(Interactor complex, String id) {
         for (Alias alias : complex.getAliases()) {
             if (alias.getName() != null && alias.getCvAliasType() != null && alias.getCvAliasType().getIdentifier().equals(id)) {
@@ -143,10 +137,10 @@ public final class ComplexUtils {
         return null;
     }
 
-    private static InteractorXref getParticipantIdentifierXref(Component participant) {
-        Interactor interactor = participant.getInteractor();
-        InteractorXref xref = null;
+    private static InteractorXref getInteractorIdentifierXref(Interactor interactor) {
         if (interactor != null) {
+            InteractorXref xref;
+
             CvInteractorType interactorType = interactor.getCvInteractorType();
             if (CvObjectUtils.isProteinType(interactorType)) {
                 xref = ProteinUtils.getUniprotXref(interactor);
@@ -160,13 +154,33 @@ public final class ComplexUtils {
             } else {
                 xref = XrefUtils.getIdentityXref(interactor, RNA_CENTRAL_MI);
             }
+
             if (xref == null) {
                 Collection<InteractorXref> identityXrefs = XrefUtils.getIdentityXrefs(interactor);
                 if (!identityXrefs.isEmpty()) {
                     xref = identityXrefs.iterator().next();
                 }
             }
+
+            if (xref != null) {
+                return xref;
+            }
+
+            // If the interactor is a molecule set, then we can get an identifier from the interactors part of the molecule set
+            if (isMoleculeSet(interactor)) {
+                Hibernate.initialize(((InteractorImpl) interactor).getInteractors());
+                for (Interactor subInteractor : ((InteractorImpl) interactor).getInteractors()) {
+                    InteractorXref subInteractorXref = getInteractorIdentifierXref(subInteractor);
+                    if (subInteractorXref != null) {
+                        return subInteractorXref;
+                    }
+                }
+            }
         }
-        return xref;
+        return null;
+    }
+
+    public static boolean isMoleculeSet(Interactor interactor) {
+        return interactor instanceof InteractorImpl && CvObjectUtils.isMoleculeSetType(interactor.getCvInteractorType());
     }
 }
