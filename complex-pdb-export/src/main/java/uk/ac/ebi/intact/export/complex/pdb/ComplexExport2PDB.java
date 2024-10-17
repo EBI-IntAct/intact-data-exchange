@@ -69,26 +69,42 @@ public class ComplexExport2PDB {
         // however PDB needs all released complexes including those to be released in the running release.
         // In order to cover all the cases we need all complexes released and ready for release to be exported.
         if(!released) {
-            query = "select distinct f from IntactComplex f "  +
-                    "join f.cvStatus as lcStatus " +
-                    "where f.predictedComplex is :predictedComplex " +
-                    "and (lcStatus.shortName = :readyForChecking " +
-                    "or lcStatus.shortName = :curationInProgress " +
-                    "or lcStatus.shortName = :acceptedOnHold)";
+            if (predicted) {
+                query = "select distinct f from IntactComplex f " +
+                        "join f.cvStatus as lcStatus " +
+                        "where f.predictedComplex is true " +
+                        "and (lcStatus.shortName = :readyForChecking " +
+                        "or lcStatus.shortName = :curationInProgress " +
+                        "or lcStatus.shortName = :acceptedOnHold)";
+            } else {
 
-            queryParameters.put("predictedComplex", predicted);
+                query = "select distinct f from IntactComplex f " +
+                        "join f.cvStatus as lcStatus " +
+                        "where (f.predictedComplex is false or f.predictedComplex is null) " +
+                        "and (lcStatus.shortName = :readyForChecking " +
+                        "or lcStatus.shortName = :curationInProgress " +
+                        "or lcStatus.shortName = :acceptedOnHold)";
+            }
+
             queryParameters.put("readyForChecking", LifeCycleStatus.READY_FOR_CHECKING.shortLabel());
             queryParameters.put("curationInProgress", LifeCycleStatus.CURATION_IN_PROGRESS.shortLabel());
             queryParameters.put("acceptedOnHold", LifeCycleStatus.ACCEPTED_ON_HOLD.shortLabel());
         }
         else {
-            query = "select distinct f from IntactComplex f "  +
-                    "join f.cvStatus as lcStatus " +
-                    "where f.predictedComplex is :predictedComplex " +
-                    "and (lcStatus.shortName = :readyForRelease " +
-                    "or lcStatus.shortName = :released)";
+            if (predicted) {
+                query = "select distinct f from IntactComplex f " +
+                        "join f.cvStatus as lcStatus " +
+                        "where f.predictedComplex is true " +
+                        "and (lcStatus.shortName = :readyForRelease " +
+                        "or lcStatus.shortName = :released)";
+            } else {
+                query = "select distinct f from IntactComplex f " +
+                        "join f.cvStatus as lcStatus " +
+                        "where (f.predictedComplex is false or f.predictedComplex is null) " +
+                        "and (lcStatus.shortName = :readyForRelease " +
+                        "or lcStatus.shortName = :released)";
+            }
 
-            queryParameters.put("predictedComplex", predicted);
             queryParameters.put("readyForRelease", LifeCycleStatus.READY_FOR_RELEASE.shortLabel());
             queryParameters.put("released", LifeCycleStatus.RELEASED.shortLabel());
         }
@@ -230,35 +246,26 @@ public class ComplexExport2PDB {
             System.err.println("\nComplex as interactor " + interactor.getPreferredIdentifier().getId() + " with stoi: " + stoichiometry);
             expandComponents(componentSb, (IntactComplex) interactor, stoichiometry, intactComplex);
 
-        } else if (interactor instanceof Protein) { //Proteins
+        } else if (interactor instanceof InteractorPool) {
+
+            InteractorPool pool = (InteractorPool) interactor;
+            Protein protein = findInteractorPoolMember(pool);
+            if (protein != null) {
+                proteinComponentLine(componentSb, protein, stoichiometry, intactComplex);
+            } else {
+                System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found a molecule set that doesn't have any uniprot id: " + interactor);
+                return false;
+            }
+
+        } else if (interactor instanceof Protein) {
 
             Protein protein = (Protein) interactor;
-            Xref identifier = protein.getPreferredIdentifier();
-
-            if (identifier == null) {
+            if (protein.getPreferredIdentifier() == null) {
                 System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found an interactor that doesn't have any identity: " + interactor);
                 return false;
-
             } else {
-
                 if (protein.getUniprotkb() != null) {
-                    /*  1 complex_id */
-                    componentSb.append(intactComplex.getComplexAc()).append(SEPARATOR);
-
-                    /*  2 complex_version */
-                    componentSb.append(intactComplex.getComplexVersion()).append(SEPARATOR);
-
-                    /*  3 database_name */
-                    componentSb.append(protein.getPreferredIdentifier().getDatabase().getShortName()).append(SEPARATOR);
-
-                    /*  4 database_accession */
-                    componentSb.append(extractUniprotCanonicalId(protein)).append(SEPARATOR);
-
-                    /*  5 stoichiometry */
-                    componentSb.append(stoichiometry);
-
-                    componentSb.append(NEW_LINE);
-
+                    proteinComponentLine(componentSb, protein, stoichiometry, intactComplex);
                 } else {
                     System.err.println("ERROR: Complex " + intactComplex.getComplexAc() + " (" + intactComplex.getAc() + ") found a protein that doesn't have any uniprot id: " + interactor);
                     return false;
@@ -270,6 +277,32 @@ public class ComplexExport2PDB {
         }
 
         return true;
+    }
+
+    private static Protein findInteractorPoolMember(InteractorPool interactorPool) {
+        for (Interactor interactor : interactorPool) {
+            if (interactor instanceof Protein) {
+                Protein protein = (Protein) interactor;
+                if (protein.getPreferredIdentifier() != null && protein.getUniprotkb() != null) {
+                    return protein;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static void proteinComponentLine(StringBuilder componentSb, Protein protein, Integer stoichiometry, IntactComplex intactComplex) {
+        /*  1 complex_id */
+        componentSb.append(intactComplex.getComplexAc()).append(SEPARATOR);
+        /*  2 complex_version */
+        componentSb.append(intactComplex.getComplexVersion()).append(SEPARATOR);
+        /*  3 database_name */
+        componentSb.append(protein.getPreferredIdentifier().getDatabase().getShortName()).append(SEPARATOR);
+        /*  4 database_accession */
+        componentSb.append(extractUniprotCanonicalId(protein)).append(SEPARATOR);
+        /*  5 stoichiometry */
+        componentSb.append(stoichiometry);
+        componentSb.append(NEW_LINE);
     }
 
     private static String extractUniprotCanonicalId(Protein protein) {
